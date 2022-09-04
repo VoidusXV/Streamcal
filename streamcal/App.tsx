@@ -1,9 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import useCachedResources from './hooks/useCachedResources';
-import useColorScheme from './hooks/useColorScheme';
-import Navigation from './navigation';
+import useCachedResources from "./hooks/useCachedResources";
+import useColorScheme from "./hooks/useColorScheme";
+
+//Screens
+import TabOneScreen from "./screens/TabOneScreen";
+import TabTwoScreen from "./screens/TabTwoScreen";
+import { NavigationContainer } from "@react-navigation/native";
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -14,8 +21,13 @@ export default function App() {
   } else {
     return (
       <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
+        <StatusBar></StatusBar>
+        <NavigationContainer>
+          <Tab.Navigator>
+            <Tab.Screen name="Home" component={TabOneScreen} />
+            <Tab.Screen name="Settings" component={TabTwoScreen} />
+          </Tab.Navigator>
+        </NavigationContainer>
       </SafeAreaProvider>
     );
   }
