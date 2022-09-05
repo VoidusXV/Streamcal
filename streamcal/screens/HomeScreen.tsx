@@ -63,7 +63,7 @@ const RenderItem = ({ onPress }: any) => {
         transform: [{ scale }],
       }}>
       <TouchableHighlight
-        style={{ flex: 1 }}
+        style={{ flex: 1, borderRadius: 5 }}
         underlayColor="#2c4063"
         onPressIn={onPressIn}
         onPressOut={onPressOut}

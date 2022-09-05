@@ -1,11 +1,12 @@
 import { StyleSheet, Text, View, Image, ScrollView, MaskedViewComponent } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Octicons } from "@expo/vector-icons";
 
 import { backgroundColor, selectionColor } from "../constants/Colors";
 import { WindowSize } from "../constants/Layout";
 import Seperator from "../Designs/Seperator";
+import { FlashList } from "@shopify/flash-list";
 
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 
@@ -67,7 +68,6 @@ const ContentInfo = () => (
 
 const SelectionBox = () => (
   <>
-    <Seperator style={{ backgroundColor: "#dbe8ff", marginTop: "5%" }}></Seperator>
     <View style={styles.SelectionBox}>
       <Text
         style={{
@@ -79,7 +79,6 @@ const SelectionBox = () => (
         FOLGEN
       </Text>
     </View>
-    <Seperator style={{ backgroundColor: "#dbe8ff" }}></Seperator>
   </>
 );
 const Season_SelectionBox = ({ TitleText }: any) => {
@@ -97,12 +96,80 @@ const Season_SelectionBox = ({ TitleText }: any) => {
             color: "white",
             fontSize: WindowSize.Width * 0.06,
           }}>
-          Staffel 1
+          {TitleText}
         </Text>
       </View>
     </View>
   );
 };
+
+const ContentItem = ({ ID, Title }: any) => {
+  return (
+    <View style={styles.ContentItem_Container}>
+      <View style={{ backgroundColor: "green", width: "45%", ...styles.ContainerMiddle }}>
+        <Image source={Cover2} resizeMode="cover" style={{ width: "100%", height: "100%" }}></Image>
+        <Octicons
+          name="play"
+          size={WindowSize.Width * 0.15}
+          color="white"
+          style={{ position: "absolute" }}></Octicons>
+      </View>
+
+      <View style={{ flex: 1 }}>
+        <Text
+          numberOfLines={2}
+          style={{
+            marginLeft: "5%",
+            marginTop: "3%",
+            maxWidth: "90%",
+            color: "white",
+            fontSize: WindowSize.Width * 0.04,
+          }}>
+          <Text style={{ fontWeight: "bold" }}>{ID}. </Text>
+          <Text>{Title}</Text>
+        </Text>
+
+        <View
+          style={{
+            height: "30%",
+            // justifyContent: "space-around",
+            alignItems: "center",
+            flexDirection: "row",
+            marginTop: "auto",
+          }}>
+          <Text
+            style={{
+              color: "white",
+              fontSize: WindowSize.Width * 0.04,
+              marginLeft: "5%",
+            }}>
+            24 Min
+          </Text>
+          <Octicons
+            name="download"
+            size={WindowSize.Width * 0.07}
+            style={{ marginLeft: "auto", marginRight: "7%" }}
+            color="white"></Octicons>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const data = [
+  { ID: 0, Title: "Testus_" },
+  { ID: 1, Title: "Testus_" },
+  { ID: 2, Title: "Testus_" },
+  { ID: 3, Title: "Testus_" },
+  { ID: 4, Title: "Testus_" },
+  { ID: 5, Title: "Testus_" },
+  { ID: 6, Title: "Testus_" },
+  { ID: 7, Title: "Testus_" },
+  { ID: 8, Title: "Testus_" },
+  { ID: 9, Title: "Testus_" },
+  { ID: 10, Title: "Testus_" },
+];
+
 const ViewContent = () => {
   return (
     <ScrollView style={styles.container}>
@@ -110,7 +177,16 @@ const ViewContent = () => {
       <View style={styles.ContentContainer}>
         <ContentInfo></ContentInfo>
         <SelectionBox></SelectionBox>
-        <Season_SelectionBox></Season_SelectionBox>
+        <Season_SelectionBox TitleText="Staffel 1"></Season_SelectionBox>
+
+        <FlashList
+          data={data}
+          keyExtractor={(item: any) => item.ID}
+          estimatedItemSize={20}
+          contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
+          renderItem={({ item }) => (
+            <ContentItem ID={item.ID + 1} Title={item.Title}></ContentItem>
+          )}></FlashList>
       </View>
     </ScrollView>
   );
@@ -141,17 +217,29 @@ const styles = StyleSheet.create({
   },
   SelectionBox: {
     width: "100%",
-    height: "13%",
+    height: WindowSize.Width * 0.13,
     backgroundColor: "#22314d",
     justifyContent: "center",
     alignItems: "center",
+    marginTop: "5%",
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
+    borderColor: "white",
   },
   Season_SelectionBox: {
     width: "100%",
-    height: "15%",
+    height: WindowSize.Width * 0.13,
     //borderRadius: 5,
     backgroundColor: "#22314d",
-    marginTop: "5%",
+    marginTop: "4%",
+    alignSelf: "center",
+    flexDirection: "row",
+  },
+  ContentItem_Container: {
+    width: "100%",
+    height: WindowSize.Height * 0.14,
+    marginTop: "4%",
+    backgroundColor: "#22314d",
     alignSelf: "center",
     flexDirection: "row",
   },
