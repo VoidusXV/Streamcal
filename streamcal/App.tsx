@@ -8,6 +8,7 @@ import { backgroundColor } from "./constants/Colors";
 //Screens
 import MainScreen from "./screens/MainScreen";
 import ViewContent from "./screens/ViewContent";
+import MediaScreen from "./screens/MediaScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,7 @@ export default function App() {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="MainScreen" component={MainScreen}></Stack.Screen>
           <Stack.Screen name="ViewContent" component={ViewContent}></Stack.Screen>
+          <Stack.Screen name="MediaScreen" component={MediaScreen}></Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

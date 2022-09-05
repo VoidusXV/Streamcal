@@ -1,4 +1,5 @@
 node_modules/
+MediaTest/
 .expo/
 dist/
 npm-debug.*
@@ -8,6 +9,7 @@ npm-debug.*
 *.key
 *.mobileprovision
 *.orig.*
+
 web-build/
 
 # macOS

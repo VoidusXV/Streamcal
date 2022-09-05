@@ -1,4 +1,15 @@
-import { StyleSheet, Text, View, Image, ScrollView, MaskedViewComponent } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  MaskedViewComponent,
+  TouchableHighlight,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  TouchableNativeFeedback,
+} from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
@@ -103,74 +114,71 @@ const Season_SelectionBox = ({ TitleText }: any) => {
   );
 };
 
-const ContentItem = ({ ID, Title }: any) => {
+const ContentItem = ({ ID, Title, onPress, navigation }: any) => {
   return (
-    <View style={styles.ContentItem_Container}>
-      <View style={{ backgroundColor: "green", width: "45%", ...styles.ContainerMiddle }}>
-        <Image source={Cover2} resizeMode="cover" style={{ width: "100%", height: "100%" }}></Image>
-        <Octicons
-          name="play"
-          size={WindowSize.Width * 0.15}
-          color="white"
-          style={{ position: "absolute" }}></Octicons>
-      </View>
+    <TouchableHighlight
+      activeOpacity={0.6}
+      underlayColor="#385180"
+      style={{ ...styles.ContentItem_Container }}
+      onPress={() => navigation.navigate("MediaScreen", { ID: ID })}>
+      <>
+        <View style={{ backgroundColor: "green", width: "45%", ...styles.ContainerMiddle }}>
+          <Image
+            source={Cover2}
+            resizeMode="cover"
+            style={{ width: "100%", height: "100%" }}></Image>
+          <Octicons
+            name="play"
+            size={WindowSize.Width * 0.15}
+            color="white"
+            style={{ position: "absolute" }}></Octicons>
+        </View>
 
-      <View style={{ flex: 1 }}>
-        <Text
-          numberOfLines={2}
-          style={{
-            marginLeft: "5%",
-            marginTop: "3%",
-            maxWidth: "90%",
-            color: "white",
-            fontSize: WindowSize.Width * 0.04,
-          }}>
-          <Text style={{ fontWeight: "bold" }}>{ID}. </Text>
-          <Text>{Title}</Text>
-        </Text>
-
-        <View
-          style={{
-            height: "30%",
-            // justifyContent: "space-around",
-            alignItems: "center",
-            flexDirection: "row",
-            marginTop: "auto",
-          }}>
+        <View style={{ flex: 1 }}>
           <Text
+            numberOfLines={2}
             style={{
+              marginLeft: "5%",
+              marginTop: "3%",
+              maxWidth: "90%",
               color: "white",
               fontSize: WindowSize.Width * 0.04,
-              marginLeft: "5%",
             }}>
-            24 Min
+            <Text style={{ fontWeight: "bold" }}>{ID}. </Text>
+            <Text>{Title}</Text>
           </Text>
-          <Octicons
-            name="download"
-            size={WindowSize.Width * 0.07}
-            style={{ marginLeft: "auto", marginRight: "7%" }}
-            color="white"></Octicons>
+
+          <View
+            style={{
+              height: "30%",
+              // justifyContent: "space-around",
+              alignItems: "center",
+              flexDirection: "row",
+              marginTop: "auto",
+            }}>
+            <Text
+              style={{
+                color: "white",
+                fontSize: WindowSize.Width * 0.04,
+                marginLeft: "5%",
+              }}>
+              24 Min
+            </Text>
+            <Octicons
+              name="download"
+              size={WindowSize.Width * 0.07}
+              style={{ marginLeft: "auto", marginRight: "7%" }}
+              color="white"></Octicons>
+          </View>
         </View>
-      </View>
-    </View>
+      </>
+    </TouchableHighlight>
   );
 };
 
-const data = [
-  { ID: 0, Title: "Testus_" },
-  { ID: 1, Title: "Testus_" },
-  { ID: 2, Title: "Testus_" },
-  { ID: 3, Title: "Testus_" },
-  { ID: 4, Title: "Testus_" },
-  { ID: 5, Title: "Testus_" },
-  { ID: 6, Title: "Testus_" },
-  { ID: 7, Title: "Testus_" },
-  { ID: 8, Title: "Testus_" },
-  { ID: 9, Title: "Testus_" },
-  { ID: 10, Title: "Testus_" },
-];
+const data = [{ ID: 0, Title: "Testus_" }];
 
-const ViewContent = () => {
+const ViewContent = ({ navigation }: any) => {
   return (
     <ScrollView style={styles.container}>
       <ImageContainer ContentTitle="One Piece"></ImageContainer>
@@ -185,7 +193,7 @@ const ViewContent = () => {
           estimatedItemSize={20}
           contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
           renderItem={({ item }) => (
-            <ContentItem ID={item.ID + 1} Title={item.Title}></ContentItem>
+            <ContentItem ID={item.ID + 1} Title={item.Title} navigation={navigation}></ContentItem>
           )}></FlashList>
       </View>
     </ScrollView>
