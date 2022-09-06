@@ -7,6 +7,7 @@ import { backgroundColor, selectionColor } from "../components/constants/Colors"
 import { WindowSize } from "../components/constants/Layout";
 import { FlashList } from "@shopify/flash-list";
 import MediaItemCard from "../components/Designs/MediaItemCard";
+import FadingEdgesView from "../components/Designs/FadingEdgesView";
 
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 
@@ -20,45 +21,35 @@ const ImageContainer = ({ ContentTitle }: any) => {
         position: "absolute",
       }}
     >
-      <LinearGradient
-        start={{ x: 0, y: 0.1 }}
-        end={{ x: 0, y: 1 }}
-        colors={["rgb(16, 23, 36)", "rgba(16, 23, 36, 0)"]}
-        style={{ height: "5%", width: "100%", position: "absolute", zIndex: 1 }}
-      ></LinearGradient>
-      <Image
-        source={Cover2}
-        resizeMethod="scale"
-        style={{ width: "100%", height: "100%", marginTop: "0%", zIndex: 0 }}
-        resizeMode="cover"
-      ></Image>
-      <Text
-        onLayout={(e) => setTextHeight(e.nativeEvent.layout.height)}
-        style={{
-          color: "white",
-          fontWeight: "500",
-          position: "absolute",
-          fontSize: WindowSize.Width * 0.07,
-          zIndex: 3,
-          marginTop: WindowSize.Width * 0.85 - (getTextHeight - WindowSize.Width * 0.1), //"85%",
-          marginLeft: "5%",
-          maxWidth: "90%",
-        }}
+      <FadingEdgesView
+        style={{ width: "100%", height: "100%" }}
+        ParentBackgroundColor={backgroundColor}
       >
-        {ContentTitle}
-      </Text>
-      <LinearGradient
-        colors={["rgb(16, 23, 36)", "rgba(16, 23, 36, 0)"]}
-        start={{ x: 1, y: 1 }}
-        end={{ x: 1, y: 0 }}
-        style={{
-          height: "25%",
-          width: "100%",
-          position: "absolute",
-          zIndex: 1,
-          marginTop: "70%",
-        }}
-      ></LinearGradient>
+        <Image
+          source={Cover2}
+          resizeMethod="scale"
+          style={{
+            width: "100%",
+            height: "100%",
+            zIndex: 0,
+          }}
+        ></Image>
+        <Text
+          onLayout={(e) => setTextHeight(e.nativeEvent.layout.height)}
+          style={{
+            color: "white",
+            fontWeight: "500",
+            position: "absolute",
+            fontSize: WindowSize.Width * 0.07,
+            zIndex: 3,
+            marginTop: WindowSize.Width * 0.85 - (getTextHeight - WindowSize.Width * 0.1), //"85%",
+            marginLeft: "5%",
+            maxWidth: "90%",
+          }}
+        >
+          {ContentTitle}
+        </Text>
+      </FadingEdgesView>
     </View>
   );
 };
