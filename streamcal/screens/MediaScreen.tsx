@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, ScrollView } from "react-native";
+import { StyleSheet, Text, View, Button, ScrollView, Animated } from "react-native";
 import React from "react";
 import { Video, AVPlaybackStatus, ResizeMode } from "expo-av";
 
@@ -31,6 +31,7 @@ const VideoPlayer = ({ navigation }: any) => {
   const [isLoaded, setLoaded] = React.useState<any>(false);
   const [getCurrentPosition, setCurrentPosition] = React.useState<any>(0); // Miliseconds
   const [wasPlaying, setwasPlaying] = React.useState(false);
+  const [isIcons, setIcons] = React.useState(true);
 
   const video = React.useRef<any>(null);
   const videoLayout = React.useRef<any>(null);
@@ -86,8 +87,30 @@ const VideoPlayer = ({ navigation }: any) => {
     );
   };
 
+  const ChangeIconVisibility = () => {
+    isIcons ? setIcons(false) : setIcons(true);
+  };
+
+  const IconsOpacity = React.useRef(new Animated.Value(1)).current;
+
+  const fadeIn = () => {
+    Animated.timing(IconsOpacity, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => setIcons(true));
+  };
+
+  const fadeOut = () => {
+    Animated.timing(IconsOpacity, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => setIcons(false));
+  };
+
   //console.log(video.current.getStatusAsync());
-  //  {/* <MaterialIcons name="close-fullscreen" size={24} color="black" /> */}
+  //  {/* <MaterialIcons name="close-fullscreen" size={24} color="black" />
 
   return (
     <View style={styles.video_container}>
@@ -95,6 +118,7 @@ const VideoPlayer = ({ navigation }: any) => {
         <Video
           //ref={(e)=> console.log(e.)}
           ref={video}
+          onTouchEnd={isIcons ? fadeOut : fadeIn}
           onLayout={(e) => (videoLayout.current = e)}
           onLoadStart={() => console.log("on load start")}
           onLoad={(e: any) => {
@@ -109,7 +133,8 @@ const VideoPlayer = ({ navigation }: any) => {
           }}
           source={{ uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" }}
         ></Video>
-        <View
+
+        <Animated.View
           style={{
             width: "100%",
             height: "20%",
@@ -119,6 +144,7 @@ const VideoPlayer = ({ navigation }: any) => {
             alignItems: "center",
             paddingRight: "5%",
             paddingLeft: "5%",
+            opacity: IconsOpacity,
           }}
         >
           <MaterialIcons
@@ -130,12 +156,16 @@ const VideoPlayer = ({ navigation }: any) => {
           <MaterialIcons
             name="open-in-full"
             size={Mini_IconSize}
-            style={{ left: WindowSize.Width * 0.25 }}
+            style={{ left: WindowSize.Width * 0.26 }}
             color="white"
           ></MaterialIcons>
           <MaterialIcons name="settings" size={Mini_IconSize} color="white"></MaterialIcons>
-        </View>
-        <Middle_Buttons></Middle_Buttons>
+        </Animated.View>
+
+        <Animated.View style={{ opacity: IconsOpacity }}>
+          <Middle_Buttons></Middle_Buttons>
+        </Animated.View>
+
         <Spinner
           size={IconSize}
           animation={"fade"}
@@ -148,63 +178,58 @@ const VideoPlayer = ({ navigation }: any) => {
           color={selectionColor}
           visible={!isLoaded}
         ></Spinner>
-        {/* <MaterialIcons
-          name="open-in-full"
-          size={Mini_IconSize}
-          style={{
-            position: "absolute",
-            marginLeft: "90%",
-            marginTop: WindowSize.Height * 0.3 - WindowSize.Width * 0.15,
-          }}
-          color="white"
-        ></MaterialIcons> */}
-        <Text
-          style={{
-            position: "absolute",
-            color: "white",
-            marginTop: WindowSize.Height * 0.3 - WindowSize.Width * 0.15,
-            marginLeft: "2%",
-          }}
-        >
-          {status.positionMillis ? MilisecondsToTimespamp(status.positionMillis) : "00:00"}
-        </Text>
-        <Text
-          style={{
-            position: "absolute",
-            color: "white",
-            marginTop: WindowSize.Height * 0.3 - WindowSize.Width * 0.15,
-            marginLeft: "85%",
-          }}
-        >
-          {status.durationMillis ? MilisecondsToTimespamp(status.durationMillis) : "00:00"}
-        </Text>
 
-        <Slider
-          style={{
-            width: "102%",
-            height: "20%",
-            //marginTop: WindowSize.Height * 0.05,
-            // backgroundColor: "red",
-            marginTop: WindowSize.Height * 0.25, // - WindowSize.Width * 0.48,
-            right: "2%",
-          }}
-          minimumValue={0}
-          maximumValue={Duration?.current}
-          minimumTrackTintColor={selectionColor}
-          maximumTrackTintColor="white"
-          thumbTintColor={selectionColor}
-          onValueChange={(e) => setCurrentPosition(e)}
-          value={status.positionMillis}
-          onSlidingStart={async () => {
-            setwasPlaying(status.isPlaying);
-            await video.current.pauseAsync();
-          }}
-          onSlidingComplete={async () => {
-            wasPlaying
-              ? await video?.current.playFromPositionAsync(getCurrentPosition)
-              : await video?.current.setPositionAsync(getCurrentPosition);
-          }}
-        ></Slider>
+        {isIcons && (
+          <>
+            <Text
+              style={{
+                position: "absolute",
+                color: "white",
+                marginTop: WindowSize.Height * 0.3 - WindowSize.Width * 0.15,
+                marginLeft: "2%",
+              }}
+            >
+              {status.positionMillis ? MilisecondsToTimespamp(status.positionMillis) : "00:00"}
+            </Text>
+            <Text
+              style={{
+                position: "absolute",
+                color: "white",
+                marginTop: WindowSize.Height * 0.3 - WindowSize.Width * 0.15,
+                marginLeft: "85%",
+              }}
+            >
+              {status.durationMillis ? MilisecondsToTimespamp(status.durationMillis) : "00:00"}
+            </Text>
+
+            <Slider
+              style={{
+                width: "102%",
+                height: "20%",
+                //marginTop: WindowSize.Height * 0.05,
+                // backgroundColor: "red",
+                marginTop: WindowSize.Height * 0.25, // - WindowSize.Width * 0.48,
+                right: "2%",
+              }}
+              minimumValue={0}
+              maximumValue={Duration?.current}
+              minimumTrackTintColor={selectionColor}
+              maximumTrackTintColor="white"
+              thumbTintColor={selectionColor}
+              onValueChange={(e) => setCurrentPosition(e)}
+              value={status.positionMillis}
+              onSlidingStart={async () => {
+                setwasPlaying(status.isPlaying);
+                await video.current.pauseAsync();
+              }}
+              onSlidingComplete={async () => {
+                wasPlaying
+                  ? await video?.current.playFromPositionAsync(getCurrentPosition)
+                  : await video?.current.setPositionAsync(getCurrentPosition);
+              }}
+            ></Slider>
+          </>
+        )}
       </>
     </View>
   );
