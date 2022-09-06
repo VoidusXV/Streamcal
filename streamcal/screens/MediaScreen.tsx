@@ -12,6 +12,20 @@ import Seperator from "../components/Designs/Seperator";
 import MediaItemCard from "../components/Designs/MediaItemCard";
 //const Vid = require("../assets/MediaTest/CCTEST.mp4");
 
+function MilisecondsToTimespamp(num: any) {
+  const sec = Math.trunc(num / 1000);
+  const min = Math.trunc(sec / 60);
+
+  if (sec < 60) {
+    if (sec > 10) return `00:${sec}`;
+    return `00:0${sec}`;
+  }
+
+  if (sec < 10) return `0${min}:0${sec % 60}`;
+
+  return `0${min}:${sec % 60}`;
+}
+
 const VideoPlayer = ({ navigation }: any) => {
   const [status, setStatus] = React.useState<any>({});
   const [isLoaded, setLoaded] = React.useState<any>(false);
@@ -95,7 +109,6 @@ const VideoPlayer = ({ navigation }: any) => {
           }}
           source={{ uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" }}
         ></Video>
-
         <View
           style={{
             width: "100%",
@@ -113,12 +126,16 @@ const VideoPlayer = ({ navigation }: any) => {
             size={Mini_IconSize}
             onPress={() => navigation.goBack()}
             color="white"
-          />
+          ></MaterialIcons>
+          <MaterialIcons
+            name="open-in-full"
+            size={Mini_IconSize}
+            style={{ left: WindowSize.Width * 0.25 }}
+            color="white"
+          ></MaterialIcons>
           <MaterialIcons name="settings" size={Mini_IconSize} color="white"></MaterialIcons>
         </View>
-
         <Middle_Buttons></Middle_Buttons>
-
         <Spinner
           size={IconSize}
           animation={"fade"}
@@ -131,8 +148,7 @@ const VideoPlayer = ({ navigation }: any) => {
           color={selectionColor}
           visible={!isLoaded}
         ></Spinner>
-
-        <MaterialIcons
+        {/* <MaterialIcons
           name="open-in-full"
           size={Mini_IconSize}
           style={{
@@ -141,7 +157,27 @@ const VideoPlayer = ({ navigation }: any) => {
             marginTop: WindowSize.Height * 0.3 - WindowSize.Width * 0.15,
           }}
           color="white"
-        ></MaterialIcons>
+        ></MaterialIcons> */}
+        <Text
+          style={{
+            position: "absolute",
+            color: "white",
+            marginTop: WindowSize.Height * 0.3 - WindowSize.Width * 0.15,
+            marginLeft: "2%",
+          }}
+        >
+          {status.positionMillis ? MilisecondsToTimespamp(status.positionMillis) : "00:00"}
+        </Text>
+        <Text
+          style={{
+            position: "absolute",
+            color: "white",
+            marginTop: WindowSize.Height * 0.3 - WindowSize.Width * 0.15,
+            marginLeft: "85%",
+          }}
+        >
+          {status.durationMillis ? MilisecondsToTimespamp(status.durationMillis) : "00:00"}
+        </Text>
 
         <Slider
           style={{
@@ -198,6 +234,7 @@ const FollowingEpisodes_Container = () => {
     </View>
   );
 };
+
 const MediaScreen = ({ navigation }: any) => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }}>
