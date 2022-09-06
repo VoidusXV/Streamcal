@@ -29,16 +29,21 @@ interface IFadingEdgesView {
   style?: ViewStyle | ViewStyle[];
   children?: any;
   ParentBackgroundColor: any;
+  BottomGradient_Position?: any;
 }
 
 const FadingEdgesView: React.FC<IFadingEdgesView> = ({
   style,
   children,
   ParentBackgroundColor,
+  BottomGradient_Position,
 }: any) => {
-  const [getLayout, setLayout] = React.useState<any>({});
+  const [getContainerLayout, setContainerLayout] = React.useState<any>({});
+  const [getBottomLayout, setBottomLayout] = React.useState<any>({});
+
+  //console.log(getContainerLayout.height);
   return (
-    <View style={style} onLayout={(e) => setLayout(e.nativeEvent.layout)}>
+    <View style={style} onLayout={(e) => setContainerLayout(e.nativeEvent.layout)}>
       <LinearGradient
         colors={[ParentBackgroundColor, `rgba(0,0,0,0)`]}
         locations={[0.0, 0.2]}
@@ -47,22 +52,23 @@ const FadingEdgesView: React.FC<IFadingEdgesView> = ({
           width: "100%",
           zIndex: 1,
           position: "absolute",
-        }}
-      ></LinearGradient>
+        }}></LinearGradient>
 
       {children}
 
       <LinearGradient
+        onLayout={(e) => setBottomLayout(e.nativeEvent.layout)}
         colors={[`rgba(0,0,0,0)`, ParentBackgroundColor]}
-        locations={[0.0, 0.8]}
+        locations={[0.0, 0.7]}
         style={{
           height: "25%",
           width: "100%",
           zIndex: 1,
           position: "absolute",
-          marginTop: getLayout.height ? getLayout.height - WindowSize.Height * 0.3 : 0,
-        }}
-      ></LinearGradient>
+          marginTop: getContainerLayout.width
+            ? getContainerLayout.height - getBottomLayout.height - (BottomGradient_Position || 0) // - WindowSize.Width * 0.25
+            : 0, //+ WindowSize.Width * 0.3 : 0,
+        }}></LinearGradient>
     </View>
   );
 };

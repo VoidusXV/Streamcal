@@ -1,12 +1,15 @@
 import { View, StyleSheet, Image } from "react-native";
 import { backgroundColor } from "../components/constants/Colors";
+import { WindowSize } from "../components/constants/Layout";
 import FadingEdgesView from "../components/Designs/FadingEdgesView";
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 
 export default function ListScreen() {
   return (
     <View style={styles.container}>
-      <FadingEdgesView style={{ width: "100%", height: "90%" }} ParentBackgroundColor={"red"}>
+      <FadingEdgesView
+        style={{ width: "100%", height: "100%", borderWidth: 1, borderColor: "green" }}
+        ParentBackgroundColor={"red"}>
         <Image
           source={Cover2}
           resizeMethod="scale"
@@ -14,8 +17,7 @@ export default function ListScreen() {
             width: "100%",
             height: "100%",
             zIndex: 0,
-          }}
-        ></Image>
+          }}></Image>
       </FadingEdgesView>
     </View>
   );
@@ -26,7 +28,10 @@ const styles = StyleSheet.create({
     flex: 1,
     //alignItems: "center",
     //justifyContent: "center",
+    width: "100%",
+    height: WindowSize.Height * 0.7,
     backgroundColor: backgroundColor,
+    position: "absolute",
   },
   title: {
     fontSize: 20,

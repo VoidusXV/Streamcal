@@ -19,12 +19,11 @@ const ImageContainer = ({ ContentTitle }: any) => {
         width: "100%",
         height: WindowSize.Height * 0.7,
         position: "absolute",
-      }}
-    >
+      }}>
       <FadingEdgesView
         style={{ width: "100%", height: "100%" }}
-        ParentBackgroundColor={backgroundColor}
-      >
+        BottomGradient_Position={WindowSize.Width * 0.3}
+        ParentBackgroundColor={backgroundColor}>
         <Image
           source={Cover2}
           resizeMethod="scale"
@@ -32,8 +31,7 @@ const ImageContainer = ({ ContentTitle }: any) => {
             width: "100%",
             height: "100%",
             zIndex: 0,
-          }}
-        ></Image>
+          }}></Image>
         <Text
           onLayout={(e) => setTextHeight(e.nativeEvent.layout.height)}
           style={{
@@ -45,8 +43,7 @@ const ImageContainer = ({ ContentTitle }: any) => {
             marginTop: WindowSize.Width * 0.85 - (getTextHeight - WindowSize.Width * 0.1), //"85%",
             marginLeft: "5%",
             maxWidth: "90%",
-          }}
-        >
+          }}>
           {ContentTitle}
         </Text>
       </FadingEdgesView>
@@ -70,8 +67,7 @@ const SelectionBox = () => (
         color: "white",
         textAlign: "center",
         letterSpacing: 2,
-      }}
-    >
+      }}>
       FOLGEN
     </Text>
   </View>
@@ -83,16 +79,14 @@ const Season_SelectionBox = ({ TitleText }: any) => {
         <MaterialIcons
           name="keyboard-arrow-down"
           size={WindowSize.Width * 0.09}
-          color="white"
-        ></MaterialIcons>
+          color="white"></MaterialIcons>
       </View>
       <View style={{ flex: 1, justifyContent: "center" }}>
         <Text
           style={{
             color: "white",
             fontSize: WindowSize.Width * 0.06,
-          }}
-        >
+          }}>
           {TitleText}
         </Text>
       </View>
@@ -121,10 +115,8 @@ const ViewContent = ({ navigation }: any) => {
               ID_Path={item.ID + 1}
               Title={item.Title}
               navigation={navigation}
-              CoverSrc={Cover2}
-            ></MediaItemCard>
-          )}
-        ></FlashList>
+              CoverSrc={Cover2}></MediaItemCard>
+          )}></FlashList>
       </View>
     </ScrollView>
   );
