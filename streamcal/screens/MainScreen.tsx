@@ -11,7 +11,7 @@ import AccountPage from "./AccountScreen";
 
 import { Ionicons, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { backgroundColor } from "../constants/Colors";
+import { backgroundColor } from "../components/constants/Colors";
 
 const Tab = createBottomTabNavigator();
 
@@ -31,7 +31,8 @@ export default function MainScreen() {
           screenOptions={{
             tabBarStyle: { backgroundColor: backgroundColor },
             tabBarLabelStyle: { color: "white" },
-          }}>
+          }}
+        >
           <Tab.Screen
             name="Home"
             component={HomeScreen}
@@ -40,7 +41,8 @@ export default function MainScreen() {
               tabBarIcon: ({ focused }) => (
                 <Ionicons name="ios-home-outline" size={24} color={isFocused(focused)}></Ionicons>
               ),
-            }}></Tab.Screen>
+            }}
+          ></Tab.Screen>
           <Tab.Screen
             name="Liste"
             component={ListScreen}
@@ -49,7 +51,8 @@ export default function MainScreen() {
               tabBarIcon: ({ focused }) => (
                 <FontAwesome name="bookmark-o" size={24} color={isFocused(focused)}></FontAwesome>
               ),
-            }}></Tab.Screen>
+            }}
+          ></Tab.Screen>
           <Tab.Screen
             name="Konto"
             component={AccountPage}
@@ -59,9 +62,11 @@ export default function MainScreen() {
                 <MaterialCommunityIcons
                   name="account-circle-outline"
                   size={24}
-                  color={isFocused(focused)}></MaterialCommunityIcons>
+                  color={isFocused(focused)}
+                ></MaterialCommunityIcons>
               ),
-            }}></Tab.Screen>
+            }}
+          ></Tab.Screen>
         </Tab.Navigator>
       </>
     );

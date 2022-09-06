@@ -1,14 +1,15 @@
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View, Button, ScrollView } from "react-native";
 import React from "react";
 import { Video, AVPlaybackStatus, ResizeMode } from "expo-av";
 
 import Slider from "@react-native-community/slider";
 import Spinner from "react-native-loading-spinner-overlay";
 
-import { MaterialIcons } from "@expo/vector-icons";
-import { backgroundColor, selectionColor } from "../constants/Colors";
-import { WindowSize } from "../constants/Layout";
-
+import { MaterialIcons, Octicons } from "@expo/vector-icons";
+import { backgroundColor, selectionColor } from "../components/constants/Colors";
+import { WindowSize } from "../components/constants/Layout";
+import Seperator from "../components/Designs/Seperator";
+import MediaItemCard from "../components/Designs/MediaItemCard";
 //const Vid = require("../assets/MediaTest/CCTEST.mp4");
 
 const VideoPlayer = ({ navigation }: any) => {
@@ -173,11 +174,73 @@ const VideoPlayer = ({ navigation }: any) => {
   );
 };
 
+const NextEpisode_Container = () => {
+  return (
+    <View style={{ marginTop: "5%" }}>
+      <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
+        Nächste Folge
+      </Text>
+      <MediaItemCard ID_Path={1} Title="TestusKopf"></MediaItemCard>
+    </View>
+  );
+};
+
+const FollowingEpisodes_Container = () => {
+  return (
+    <View style={{ marginTop: "5%" }}>
+      <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
+        Weitere Folgen
+      </Text>
+      <MediaItemCard ID_Path={1} Title="TestusKopf"></MediaItemCard>
+      <MediaItemCard ID_Path={2} Title="TestusKopf"></MediaItemCard>
+      <MediaItemCard ID_Path={3} Title="TestusKopf"></MediaItemCard>
+      <MediaItemCard ID_Path={4} Title="TestusKopf"></MediaItemCard>
+    </View>
+  );
+};
 const MediaScreen = ({ navigation }: any) => {
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }}>
       <VideoPlayer navigation={navigation}></VideoPlayer>
-    </View>
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            width: "100%",
+            //height: "15%",
+            //backgroundColor: "red",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <Text
+            style={{
+              ...styles.EpisodeText,
+              fontSize: WindowSize.Width * 0.04,
+              marginBottom: "1%",
+              marginTop: "4%",
+              color: "#95b9fc",
+              //textDecorationLine: "underline",
+            }}
+          >
+            One Piece
+          </Text>
+
+          <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
+            Folge 1: Der Kampf der Giganten Ugus ggefe fef efe er e rer er er e r e red wdwdwddwd
+            wdwdwdwd dwwdw
+          </Text>
+          <Octicons
+            name="download"
+            size={WindowSize.Width * 0.07}
+            style={{ marginLeft: "auto", marginRight: "7%" }}
+            color="white"
+          ></Octicons>
+        </View>
+        <Seperator style={{ marginTop: "5%" }}></Seperator>
+        <NextEpisode_Container></NextEpisode_Container>
+        <FollowingEpisodes_Container></FollowingEpisodes_Container>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -193,5 +256,9 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     //justifyContent: "center",
     //alignItems: "center",
+  },
+  EpisodeText: {
+    marginLeft: "5%",
+    color: "white",
   },
 });

@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
 import React from "react";
 
-const Seperator = ({ style }: any) => {
+interface ISeperator {
+  style?: ViewStyle | ViewStyle[];
+}
+const Seperator: React.FC<ISeperator> = ({ style }: any) => {
   return (
     <View
       style={{
@@ -9,7 +12,8 @@ const Seperator = ({ style }: any) => {
         height: "0.1%",
         backgroundColor: "white",
         ...style,
-      }}></View>
+      }}
+    ></View>
   );
 };
 

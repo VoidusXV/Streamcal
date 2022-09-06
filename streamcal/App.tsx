@@ -4,7 +4,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 
-import { backgroundColor } from "./constants/Colors";
+import { backgroundColor } from "./components/constants/Colors";
 //Screens
 import MainScreen from "./screens/MainScreen";
 import ViewContent from "./screens/ViewContent";

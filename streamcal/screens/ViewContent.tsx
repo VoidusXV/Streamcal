@@ -1,23 +1,12 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ScrollView,
-  MaskedViewComponent,
-  TouchableHighlight,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  TouchableNativeFeedback,
-} from "react-native";
+import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
 
-import { backgroundColor, selectionColor } from "../constants/Colors";
-import { WindowSize } from "../constants/Layout";
-import Seperator from "../Designs/Seperator";
+import { backgroundColor, selectionColor } from "../components/constants/Colors";
+import { WindowSize } from "../components/constants/Layout";
 import { FlashList } from "@shopify/flash-list";
+import MediaItemCard from "../components/Designs/MediaItemCard";
 
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 
@@ -29,17 +18,20 @@ const ImageContainer = ({ ContentTitle }: any) => {
         width: "100%",
         height: WindowSize.Height * 0.7,
         position: "absolute",
-      }}>
+      }}
+    >
       <LinearGradient
         start={{ x: 0, y: 0.1 }}
         end={{ x: 0, y: 1 }}
         colors={["rgb(16, 23, 36)", "rgba(16, 23, 36, 0)"]}
-        style={{ height: "5%", width: "100%", position: "absolute", zIndex: 1 }}></LinearGradient>
+        style={{ height: "5%", width: "100%", position: "absolute", zIndex: 1 }}
+      ></LinearGradient>
       <Image
         source={Cover2}
         resizeMethod="scale"
         style={{ width: "100%", height: "100%", marginTop: "0%", zIndex: 0 }}
-        resizeMode="cover"></Image>
+        resizeMode="cover"
+      ></Image>
       <Text
         onLayout={(e) => setTextHeight(e.nativeEvent.layout.height)}
         style={{
@@ -51,7 +43,8 @@ const ImageContainer = ({ ContentTitle }: any) => {
           marginTop: WindowSize.Width * 0.85 - (getTextHeight - WindowSize.Width * 0.1), //"85%",
           marginLeft: "5%",
           maxWidth: "90%",
-        }}>
+        }}
+      >
         {ContentTitle}
       </Text>
       <LinearGradient
@@ -64,7 +57,8 @@ const ImageContainer = ({ ContentTitle }: any) => {
           position: "absolute",
           zIndex: 1,
           marginTop: "70%",
-        }}></LinearGradient>
+        }}
+      ></LinearGradient>
     </View>
   );
 };
@@ -78,19 +72,18 @@ const ContentInfo = () => (
 );
 
 const SelectionBox = () => (
-  <>
-    <View style={styles.SelectionBox}>
-      <Text
-        style={{
-          fontSize: WindowSize.Width * 0.05,
-          color: "white",
-          textAlign: "center",
-          letterSpacing: 2,
-        }}>
-        FOLGEN
-      </Text>
-    </View>
-  </>
+  <View style={styles.SelectionBox}>
+    <Text
+      style={{
+        fontSize: WindowSize.Width * 0.05,
+        color: "white",
+        textAlign: "center",
+        letterSpacing: 2,
+      }}
+    >
+      FOLGEN
+    </Text>
+  </View>
 );
 const Season_SelectionBox = ({ TitleText }: any) => {
   return (
@@ -99,80 +92,20 @@ const Season_SelectionBox = ({ TitleText }: any) => {
         <MaterialIcons
           name="keyboard-arrow-down"
           size={WindowSize.Width * 0.09}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
       </View>
       <View style={{ flex: 1, justifyContent: "center" }}>
         <Text
           style={{
             color: "white",
             fontSize: WindowSize.Width * 0.06,
-          }}>
+          }}
+        >
           {TitleText}
         </Text>
       </View>
     </View>
-  );
-};
-
-const ContentItem = ({ ID, Title, onPress, navigation }: any) => {
-  return (
-    <TouchableHighlight
-      activeOpacity={0.6}
-      underlayColor="#385180"
-      style={{ ...styles.ContentItem_Container }}
-      onPress={() => navigation.navigate("MediaScreen", { ID: ID })}>
-      <>
-        <View style={{ backgroundColor: "green", width: "45%", ...styles.ContainerMiddle }}>
-          <Image
-            source={Cover2}
-            resizeMode="cover"
-            style={{ width: "100%", height: "100%" }}></Image>
-          <Octicons
-            name="play"
-            size={WindowSize.Width * 0.15}
-            color="white"
-            style={{ position: "absolute" }}></Octicons>
-        </View>
-
-        <View style={{ flex: 1 }}>
-          <Text
-            numberOfLines={2}
-            style={{
-              marginLeft: "5%",
-              marginTop: "3%",
-              maxWidth: "90%",
-              color: "white",
-              fontSize: WindowSize.Width * 0.04,
-            }}>
-            <Text style={{ fontWeight: "bold" }}>{ID}. </Text>
-            <Text>{Title}</Text>
-          </Text>
-
-          <View
-            style={{
-              height: "30%",
-              // justifyContent: "space-around",
-              alignItems: "center",
-              flexDirection: "row",
-              marginTop: "auto",
-            }}>
-            <Text
-              style={{
-                color: "white",
-                fontSize: WindowSize.Width * 0.04,
-                marginLeft: "5%",
-              }}>
-              24 Min
-            </Text>
-            <Octicons
-              name="download"
-              size={WindowSize.Width * 0.07}
-              style={{ marginLeft: "auto", marginRight: "7%" }}
-              color="white"></Octicons>
-          </View>
-        </View>
-      </>
-    </TouchableHighlight>
   );
 };
 
@@ -193,8 +126,14 @@ const ViewContent = ({ navigation }: any) => {
           estimatedItemSize={20}
           contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
           renderItem={({ item }) => (
-            <ContentItem ID={item.ID + 1} Title={item.Title} navigation={navigation}></ContentItem>
-          )}></FlashList>
+            <MediaItemCard
+              ID_Path={item.ID + 1}
+              Title={item.Title}
+              navigation={navigation}
+              CoverSrc={Cover2}
+            ></MediaItemCard>
+          )}
+        ></FlashList>
       </View>
     </ScrollView>
   );
@@ -240,14 +179,6 @@ const styles = StyleSheet.create({
     //borderRadius: 5,
     backgroundColor: "#22314d",
     marginTop: "4%",
-    alignSelf: "center",
-    flexDirection: "row",
-  },
-  ContentItem_Container: {
-    width: "100%",
-    height: WindowSize.Height * 0.14,
-    marginTop: "4%",
-    backgroundColor: "#22314d",
     alignSelf: "center",
     flexDirection: "row",
   },

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Text, Image, Animated, TouchableHighlight } from "react-native";
-import { backgroundColor, selectionColor } from "../constants/Colors";
-import { WindowSize } from "../constants/Layout";
+import { backgroundColor, selectionColor } from "../components/constants/Colors";
+import { WindowSize } from "../components/constants/Layout";
 import { Foundation, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 
@@ -23,7 +23,8 @@ const TilteContainer = () => {
         name="play-video"
         style={{ marginLeft: "5%" }}
         size={WindowSize.Width * 0.1}
-        color={selectionColor}></Foundation>
+        color={selectionColor}
+      ></Foundation>
       <Text style={styles.title}>Streamcal</Text>
     </View>
   );
@@ -61,20 +62,23 @@ const RenderItem = ({ onPress }: any) => {
         marginLeft: "5%",
         marginTop: "10%",
         transform: [{ scale }],
-      }}>
+      }}
+    >
       <TouchableHighlight
         style={{ flex: 1, borderRadius: 5 }}
         underlayColor="#2c4063"
         onPressIn={onPressIn}
         onPressOut={onPressOut}
-        onPress={onPress}>
+        onPress={onPress}
+      >
         <>
           <View style={{ height: "80%", width: "100%" }}>
             <Image
               borderRadius={5}
               source={Cover2}
               style={{ width: "100%", height: "100%" }}
-              resizeMode="contain"></Image>
+              resizeMode="contain"
+            ></Image>
           </View>
           <View style={{ flex: 1 }}>
             <Text numberOfLines={2} style={{ ...styles.ContentText, marginTop: "4%" }}>
@@ -99,7 +103,8 @@ const ContentContainer = ({ navigation }: any) => {
       data={data}
       renderItem={({}) => (
         <RenderItem onPress={() => navigation.navigate("ViewContent")}></RenderItem>
-      )}></FlashList>
+      )}
+    ></FlashList>
   );
 };
 export default function HomeScreen({ navigation }: any) {
