@@ -9,14 +9,17 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { backgroundColor, selectionColor } from "../constants/Colors";
 import { WindowSize } from "../constants/Layout";
 
-const Vid = require("../assets/MediaTest/CCTEST.mp4");
+//const Vid = require("../assets/MediaTest/CCTEST.mp4");
 
 const VideoPlayer = ({ navigation }: any) => {
   const [status, setStatus] = React.useState<any>({});
   const [isLoaded, setLoaded] = React.useState<any>(false);
   const [getCurrentPosition, setCurrentPosition] = React.useState<any>(0); // Miliseconds
+  const [wasPlaying, setwasPlaying] = React.useState(false);
 
   const video = React.useRef<any>(null);
+  const videoLayout = React.useRef<any>(null);
+
   const Duration = React.useRef<any>(0);
 
   const IconSize = WindowSize.Width * 0.15;
@@ -24,33 +27,46 @@ const VideoPlayer = ({ navigation }: any) => {
 
   const Middle_Buttons = () => {
     return (
-      <View style={{ flexDirection: "row", alignSelf: "center", marginTop: "25%" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignSelf: "center",
+          height: IconSize,
+          marginTop: (WindowSize.Height * 0.3) / 2 - IconSize / 2,
+          position: "absolute",
+          //backgroundColor: "red",
+          width: "100%",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <MaterialIcons
           name="replay-10"
           onPress={async () => {
             await video.current.replayAsync();
           }}
-          size={IconSize}
+          size={IconSize * 0.8}
           style={{ marginRight: "5%" }}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
         <MaterialIcons
           name={status.isPlaying ? "pause" : "play-arrow"}
-          size={IconSize}
+          size={IconSize * 1.1}
+          style={{ bottom: "1%" }}
           color="white"
           onPress={async () => {
-            console.log(status.isPlaying);
-            //await video.current.playAsync();
             status.isPlaying ? await video.current.pauseAsync() : await video.current.playAsync();
-            //console.log(status.isPlaying);
-          }}></MaterialIcons>
+          }}
+        ></MaterialIcons>
         <MaterialIcons
           name="forward-10"
           onPress={async () => {
-            await video.current.pauseAsync();
+            console.log(videoLayout.current.nativeEvent);
           }}
-          size={IconSize}
+          size={IconSize * 0.8}
           style={{ marginLeft: "5%" }}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
       </View>
     );
   };
@@ -62,8 +78,9 @@ const VideoPlayer = ({ navigation }: any) => {
     <View style={styles.video_container}>
       <>
         <Video
-          //ref={(e)=> console.log(e?.props.)}
+          //ref={(e)=> console.log(e.)}
           ref={video}
+          onLayout={(e) => (videoLayout.current = e)}
           onLoadStart={() => console.log("on load start")}
           onLoad={(e: any) => {
             Duration.current = e.durationMillis;
@@ -75,7 +92,9 @@ const VideoPlayer = ({ navigation }: any) => {
           onPlaybackStatusUpdate={(status: any) => {
             setStatus(() => status);
           }}
-          source={{ uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" }}></Video>
+          source={{ uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" }}
+        ></Video>
+
         <View
           style={{
             width: "100%",
@@ -86,7 +105,8 @@ const VideoPlayer = ({ navigation }: any) => {
             alignItems: "center",
             paddingRight: "5%",
             paddingLeft: "5%",
-          }}>
+          }}
+        >
           <MaterialIcons
             name="arrow-back"
             size={Mini_IconSize}
@@ -100,25 +120,35 @@ const VideoPlayer = ({ navigation }: any) => {
 
         <Spinner
           size={IconSize}
+          animation={"fade"}
           indicatorStyle={{
-            position: "absolute",
-            top: "15%",
+            //position: "absolute",
+            bottom: "30%",
+            //height: "10%",
+            //backgroundColor: "red",
           }}
           color={selectionColor}
-          visible={!isLoaded}></Spinner>
+          visible={!isLoaded}
+        ></Spinner>
 
         <MaterialIcons
           name="open-in-full"
           size={Mini_IconSize}
-          style={{ position: "absolute", marginLeft: "90%", marginTop: "45%" }}
-          color="white"></MaterialIcons>
+          style={{
+            position: "absolute",
+            marginLeft: "90%",
+            marginTop: WindowSize.Height * 0.3 - WindowSize.Width * 0.15,
+          }}
+          color="white"
+        ></MaterialIcons>
 
         <Slider
           style={{
             width: "102%",
             height: "20%",
-            marginTop: "12%",
+            //marginTop: WindowSize.Height * 0.05,
             // backgroundColor: "red",
+            marginTop: WindowSize.Height * 0.25, // - WindowSize.Width * 0.48,
             right: "2%",
           }}
           minimumValue={0}
@@ -129,11 +159,15 @@ const VideoPlayer = ({ navigation }: any) => {
           onValueChange={(e) => setCurrentPosition(e)}
           value={status.positionMillis}
           onSlidingStart={async () => {
+            setwasPlaying(status.isPlaying);
             await video.current.pauseAsync();
           }}
-          onSlidingComplete={async () =>
-            await video?.current.playFromPositionAsync(getCurrentPosition)
-          }></Slider>
+          onSlidingComplete={async () => {
+            wasPlaying
+              ? await video?.current.playFromPositionAsync(getCurrentPosition)
+              : await video?.current.setPositionAsync(getCurrentPosition);
+          }}
+        ></Slider>
       </>
     </View>
   );
@@ -154,8 +188,8 @@ const styles = StyleSheet.create({
   video: { width: "100%", height: "100%", backgroundColor: "black", position: "absolute" },
   ContainerMiddle: { justifyContent: "center", alignItems: "center" },
   video_container: {
-    width: "100%",
-    height: "30%",
+    width: WindowSize.Width,
+    height: WindowSize.Height * 0.3,
     backgroundColor: "black",
     //justifyContent: "center",
     //alignItems: "center",
