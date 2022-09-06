@@ -37,6 +37,7 @@ const VideoPlayer = ({ navigation }: any) => {
   const videoLayout = React.useRef<any>(null);
   const a = React.useRef<any>(null);
   const isSliding2 = React.useRef<any>(false);
+  const isMoving = React.useRef<any>(false);
 
   const Duration = React.useRef<any>(0);
 
@@ -98,7 +99,7 @@ const VideoPlayer = ({ navigation }: any) => {
   const fadeIn = () => {
     Animated.timing(IconsOpacity, {
       toValue: 1,
-      duration: 300,
+      duration: 500,
       useNativeDriver: true,
     }).start(() => setIcons(true));
   };
@@ -106,19 +107,24 @@ const VideoPlayer = ({ navigation }: any) => {
   const fadeOut = () => {
     Animated.timing(IconsOpacity, {
       toValue: 0,
-      duration: 300,
+      duration: 500,
       useNativeDriver: true,
     }).start(() => setIcons(false));
   };
 
   let timer: any = null;
   const autoFade = () => {
-    //console.log("Start");
-    if (timer) clearTimeout(timer);
+    // if (timer) {
+    //   console.log("clearTimeout");
+    //   clearTimeout(timer);
+    // }
+    clearTimeout(timer);
+    console.log(timer);
+    timer = setTimeout((e) => {
+      console.log("Execute...");
+      !isMoving.current && fadeOut();
 
-    timer = setTimeout(() => {
-      fadeOut();
-      timer = null;
+      //timer = null;
       //console.log("Timeout");
     }, 3000);
   };
@@ -152,10 +158,14 @@ const VideoPlayer = ({ navigation }: any) => {
 
     return (
       <Animated.View
-        // onTouchStart={() => console.log("OnTouchStart")}
-        //onTouchStart={autoFade}
-        //onTouchEnd={isIcons ? fadeOut : fadeIn}
-        style={{ ...styles.video_container, opacity: 1, backgroundColor: "" }}>
+        onTouchStart={() => (isIcons ? fadeOut() : fadeIn())}
+        onTouchMove={() => (isMoving.current = true)}
+        onTouchEnd={() => {
+          //isIcons ? fadeOut() : fadeIn();
+          isMoving.current = false;
+          autoFade();
+        }}
+        style={{ ...styles.video_container, opacity: IconsOpacity, backgroundColor: "" }}>
         <TopButton></TopButton>
         <View style={{ flex: 2, justifyContent: "center", alignItems: "center", marginTop: "3%" }}>
           <Middle_Buttons></Middle_Buttons>
