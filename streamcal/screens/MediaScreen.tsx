@@ -128,6 +128,11 @@ const VideoPlayer = ({ navigation }: any) => {
       //console.log("Timeout");
     }, 3000);
   };
+
+  React.useEffect(() => {
+    const a = autoFade();
+    return a;
+  }, []);
   //console.log(video.current.getStatusAsync());
   //  {/* <MaterialIcons name="close-fullscreen" size={24} color="black" />
   //opacity: IconsOpacity
