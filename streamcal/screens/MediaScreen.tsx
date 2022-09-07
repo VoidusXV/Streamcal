@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Button, ScrollView, Animated } from "react-native";
 import React from "react";
 import { Video, AVPlaybackStatus, ResizeMode } from "expo-av";
+import * as ScreenOrientation from "expo-screen-orientation";
 
 import Slider from "@react-native-community/slider";
 import Spinner from "react-native-loading-spinner-overlay";
@@ -24,6 +25,14 @@ function MilisecondsToTimespamp(num: any) {
 
   return `0${min}:${sec % 60}`;
 }
+async function changeScreenOrientation() {
+  const Orientation: any = await ScreenOrientation.getOrientationAsync();
+  console.log(Orientation);
+  if (Orientation != ScreenOrientation.OrientationLock.LANDSCAPE)
+    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+  else await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.DEFAULT);
+}
+let timer: any = null;
 
 const VideoPlayer = ({ navigation }: any) => {
   const [status, setStatus] = React.useState<any>({});
@@ -37,7 +46,6 @@ const VideoPlayer = ({ navigation }: any) => {
   const videoLayout = React.useRef<any>(null);
   const a = React.useRef<any>(null);
   const isSliding2 = React.useRef<any>(false);
-  const isMoving = React.useRef<any>(false);
 
   const Duration = React.useRef<any>(0);
 
@@ -57,7 +65,8 @@ const VideoPlayer = ({ navigation }: any) => {
           width: "100%",
           justifyContent: "center",
           alignItems: "center",
-        }}>
+        }}
+      >
         <MaterialIcons
           name="replay-10"
           onPress={async () => {
@@ -66,7 +75,8 @@ const VideoPlayer = ({ navigation }: any) => {
           }}
           size={IconSize * 0.8}
           style={{ marginRight: "5%" }}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
         <MaterialIcons
           name={status.isPlaying ? "pause" : "play-arrow"}
           size={IconSize * 1.1}
@@ -80,7 +90,8 @@ const VideoPlayer = ({ navigation }: any) => {
           onPress={async () => {
             console.log("PlayPause");
             status.isPlaying ? await video.current.pauseAsync() : await video.current.playAsync();
-          }}></MaterialIcons>
+          }}
+        ></MaterialIcons>
         <MaterialIcons
           name="forward-10"
           onPress={async () => {
@@ -89,7 +100,8 @@ const VideoPlayer = ({ navigation }: any) => {
           }}
           size={IconSize * 0.8}
           style={{ marginLeft: "5%" }}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
       </View>
     );
   };
@@ -102,6 +114,7 @@ const VideoPlayer = ({ navigation }: any) => {
       duration: 500,
       useNativeDriver: true,
     }).start(() => setIcons(true));
+    autoFade();
   };
 
   const fadeOut = () => {
@@ -112,65 +125,68 @@ const VideoPlayer = ({ navigation }: any) => {
     }).start(() => setIcons(false));
   };
 
-  let timer: any = null;
   const autoFade = () => {
-    // if (timer) {
-    //   console.log("clearTimeout");
-    //   clearTimeout(timer);
-    // }
-    clearTimeout(timer);
-    console.log(timer);
+    if (timer || isSliding2.current) {
+      clearTimeout(timer);
+    }
     timer = setTimeout((e) => {
-      console.log("Execute...");
-      !isMoving.current && fadeOut();
-
-      //timer = null;
+      if (!isIcons) {
+        //console.log("Execute..."), isIcons;
+        fadeOut();
+      }
       //console.log("Timeout");
-    }, 3000);
+    }, 2500);
   };
 
   React.useEffect(() => {
-    const a = autoFade();
-    return a;
+    //  autoFade();
+    fadeOut();
   }, []);
+
   //console.log(video.current.getStatusAsync());
   //  {/* <MaterialIcons name="close-fullscreen" size={24} color="black" />
   //opacity: IconsOpacity
-  const Button_Overlay = () => {
-    const TopButton = () => (
-      <View
-        style={{
-          alignItems: "center",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingLeft: "3%",
-          paddingRight: "3%",
-          marginTop: "4%",
-        }}>
-        <MaterialIcons
-          name="arrow-back"
-          size={Mini_IconSize}
-          onPress={() => navigation.goBack()}
-          color="white"></MaterialIcons>
-        <MaterialIcons
-          name="open-in-full"
-          size={Mini_IconSize}
-          style={{ left: WindowSize.Width * 0.26 }}
-          color="white"></MaterialIcons>
-        <MaterialIcons name="settings" size={Mini_IconSize} color="white"></MaterialIcons>
-      </View>
-    );
 
+  const TopButton = () => (
+    <View
+      style={{
+        alignItems: "center",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingLeft: "3%",
+        paddingRight: "3%",
+        marginTop: "4%",
+      }}
+    >
+      <MaterialIcons
+        name="arrow-back"
+        size={Mini_IconSize}
+        onPress={() => navigation.goBack()}
+        color="white"
+      ></MaterialIcons>
+      <MaterialIcons
+        name="settings"
+        size={Mini_IconSize}
+        style={{ left: WindowSize.Width * 0.26 }}
+        color="white"
+      ></MaterialIcons>
+
+      <MaterialIcons
+        onPress={() => changeScreenOrientation()}
+        name="open-in-full"
+        size={Mini_IconSize}
+        //style={{ left: WindowSize.Width * 0.26 }}
+        color="white"
+      ></MaterialIcons>
+    </View>
+  );
+
+  const Button_Overlay = () => {
     return (
       <Animated.View
         onTouchStart={() => (isIcons ? fadeOut() : fadeIn())}
-        onTouchMove={() => (isMoving.current = true)}
-        onTouchEnd={() => {
-          //isIcons ? fadeOut() : fadeIn();
-          isMoving.current = false;
-          autoFade();
-        }}
-        style={{ ...styles.video_container, opacity: IconsOpacity, backgroundColor: "" }}>
+        style={{ ...styles.video_container, opacity: IconsOpacity, backgroundColor: "" }}
+      >
         <TopButton></TopButton>
         <View style={{ flex: 2, justifyContent: "center", alignItems: "center", marginTop: "3%" }}>
           <Middle_Buttons></Middle_Buttons>
@@ -182,7 +198,8 @@ const VideoPlayer = ({ navigation }: any) => {
             //backgroundColor: "yellow",
             justifyContent: "flex-end",
             flex: 1,
-          }}>
+          }}
+        >
           <View
             style={{
               width: "100%",
@@ -192,55 +209,61 @@ const VideoPlayer = ({ navigation }: any) => {
               paddingLeft: "3%",
               paddingRight: "4%",
               marginBottom: "3%",
-            }}>
+            }}
+          >
             <Text
               style={{
                 color: "white",
-              }}>
+              }}
+            >
               {status.positionMillis ? MilisecondsToTimespamp(status.positionMillis) : "00:00"}
             </Text>
 
             <Text
               style={{
                 color: "white",
-              }}>
+              }}
+            >
               {status.durationMillis ? MilisecondsToTimespamp(status.durationMillis) : "00:00"}
             </Text>
           </View>
 
-          <Slider
-            style={{
-              width: "102%",
-              height: "50%",
-              //flex: 1,
-              //backgroundColor: "pink",
-              right: "2%",
-            }}
-            minimumValue={0}
-            maximumValue={Duration?.current}
-            minimumTrackTintColor={selectionColor}
-            maximumTrackTintColor="white"
-            thumbTintColor={selectionColor}
-            onValueChange={(e) => {
-              //setCurrentPosition(e);
-              //a.current = e;
-              //status.positionMillis = e;
-              //console.log("onValueChange:", a.current);
-              // status.positionMillis = e;
-            }}
-            value={status.positionMillis}
-            onTouchStart={() => (isSliding2.current = true)}
-            onSlidingStart={(e) => {
-              console.log("onSlidingStart", e);
-              //setwasPlaying(status.isPlaying);
-              //video?.current.pauseAsync();
-            }}
-            onSlidingComplete={async (e) => {
-              console.log("onSlidingComplete", e);
-              await video?.current.setPositionAsync(e);
-              //await video?.current.playFromPositionAsync(a.current);
-              isSliding2.current = false;
-            }}></Slider>
+          <>
+            <Slider
+              style={{
+                width: "102%",
+                height: "50%",
+                //flex: 1,
+                //backgroundColor: "pink",
+                right: "2%",
+              }}
+              minimumValue={0}
+              maximumValue={Duration?.current}
+              minimumTrackTintColor={selectionColor}
+              maximumTrackTintColor="white"
+              thumbTintColor={selectionColor}
+              onValueChange={(e) => {
+                //setCurrentPosition(e);
+                //a.current = e;
+                //status.positionMillis = e;
+                //console.log("onValueChange:", a.current);
+                // status.positionMillis = e;
+              }}
+              value={status.positionMillis}
+              onTouchStart={() => (isSliding2.current = true)}
+              onSlidingStart={(e) => {
+                console.log("onSlidingStart", e);
+                //setwasPlaying(status.isPlaying);
+                //video?.current.pauseAsync();
+              }}
+              onSlidingComplete={async (e) => {
+                console.log("onSlidingComplete", e);
+                await video?.current.setPositionAsync(e);
+                //await video?.current.playFromPositionAsync(a.current);
+                isSliding2.current = false;
+              }}
+            ></Slider>
+          </>
         </View>
       </Animated.View>
     );
@@ -249,7 +272,7 @@ const VideoPlayer = ({ navigation }: any) => {
   return (
     <View style={styles.video_container}>
       <Video
-        //ref={(e)=> console.log(e.)}
+        //ref={(e)=> e?.presentFullscreenPlayer()}
         ref={video}
         //onTouchStart={autoFade}
         //onTouchEnd={isIcons ? fadeOut : fadeIn}
@@ -267,7 +290,8 @@ const VideoPlayer = ({ navigation }: any) => {
         onPlaybackStatusUpdate={(status: any) => {
           !isSliding2.current && setStatus(() => status);
         }}
-        source={{ uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" }}></Video>
+        source={{ uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" }}
+      ></Video>
 
       <Button_Overlay></Button_Overlay>
 
@@ -310,7 +334,8 @@ const VideoPlayer = ({ navigation }: any) => {
           //backgroundColor: "red",
         }}
         color={selectionColor}
-        visible={!isLoaded}></Spinner>
+        visible={!isLoaded}
+      ></Spinner>
 
       {/* <Animated.View
           style={{
@@ -414,7 +439,8 @@ const MediaScreen = ({ navigation }: any) => {
             //backgroundColor: "red",
             flexDirection: "column",
             justifyContent: "center",
-          }}>
+          }}
+        >
           <Text
             style={{
               ...styles.EpisodeText,
@@ -423,7 +449,8 @@ const MediaScreen = ({ navigation }: any) => {
               marginTop: "4%",
               color: "#95b9fc",
               //textDecorationLine: "underline",
-            }}>
+            }}
+          >
             One Piece
           </Text>
 
@@ -432,10 +459,12 @@ const MediaScreen = ({ navigation }: any) => {
             wdwdwdwd dwwdw
           </Text>
           <Octicons
+            onPress={() => clearTimeout(timer)}
             name="download"
             size={WindowSize.Width * 0.07}
             style={{ marginLeft: "auto", marginRight: "7%" }}
-            color="white"></Octicons>
+            color="white"
+          ></Octicons>
         </View>
         <Seperator style={{ marginTop: "5%" }}></Seperator>
         <NextEpisode_Container></NextEpisode_Container>
