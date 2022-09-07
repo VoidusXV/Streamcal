@@ -76,8 +76,6 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   };
 
   const fadeOut = () => {
-    return;
-
     if (isSliding2.current) return;
     Animated.timing(IconsOpacity, {
       toValue: 0,
@@ -90,7 +88,6 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   };
 
   const autoFade = () => {
-    return;
     if (timer) {
       clearTimeout(timer);
     }
@@ -110,7 +107,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   //  {/* <MaterialIcons name="close-fullscreen" size={24} color="black" />
 
   const TopButton = () => (
-    <View style={styles.TopButtonContainer_Normal}>
+    <View style={{ ...styles.TopButtonContainer_Normal, width: isFullscreen ? "90%" : "100%" }}>
       <MaterialIcons
         name="arrow-back"
         size={Mini_IconSize}
@@ -137,48 +134,51 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
     return (
       <View
         style={{
-          flexDirection: "row",
           alignSelf: "center",
           height: IconSize,
           // marginTop: (WindowSize.Height * 0.3) / 2 - IconSize / 2,
           //position: "absolute",
           //backgroundColor: "red",
-          width: "100%",
+          //width: "100%",
+          width: isFullscreen ? "90%" : "100%",
+          marginRight: isFullscreen ? WindowSize.Width * 0.2 : 0,
           justifyContent: "center",
           alignItems: "center",
         }}>
-        <MaterialIcons
-          name="replay-10"
-          onPress={async () => {
-            //await video.current.replayAsync();
-            await video?.current.setPositionAsync(status.positionMillis - 10000);
-          }}
-          size={IconSize * 0.8}
-          style={{ marginRight: "5%" }}
-          color="white"></MaterialIcons>
-        <MaterialIcons
-          name={status.isPlaying ? "pause" : "play-arrow"}
-          size={IconSize * 1.1}
-          style={{
-            bottom: "1%",
-            //backgroundColor: "red",
-            minWidth: "20%",
-            textAlign: "center",
-          }}
-          color="white"
-          onPress={async () => {
-            console.log("PlayPause");
-            status.isPlaying ? await video.current.pauseAsync() : await video.current.playAsync();
-          }}></MaterialIcons>
-        <MaterialIcons
-          name="forward-10"
-          onPress={async () => {
-            //console.log(status.positionMillis);
-            await video?.current.setPositionAsync(status.positionMillis + 10000);
-          }}
-          size={IconSize * 0.8}
-          style={{ marginLeft: "5%" }}
-          color="white"></MaterialIcons>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <MaterialIcons
+            name="replay-10"
+            onPress={async () => {
+              //await video.current.replayAsync();
+              await video?.current.setPositionAsync(status.positionMillis - 10000);
+            }}
+            size={IconSize * 0.8}
+            style={{ marginRight: "5%" }}
+            color="white"></MaterialIcons>
+          <MaterialIcons
+            name={status.isPlaying ? "pause" : "play-arrow"}
+            size={IconSize * 1.1}
+            style={{
+              bottom: WindowSize.Width * 0.01,
+              //backgroundColor: "red",
+              minWidth: "20%",
+              textAlign: "center",
+            }}
+            color="white"
+            onPress={async () => {
+              console.log("PlayPause");
+              status.isPlaying ? await video.current.pauseAsync() : await video.current.playAsync();
+            }}></MaterialIcons>
+          <MaterialIcons
+            name="forward-10"
+            onPress={async () => {
+              //console.log(status.positionMillis);
+              await video?.current.setPositionAsync(status.positionMillis + 10000);
+            }}
+            size={IconSize * 0.8}
+            style={{ marginLeft: "5%" }}
+            color="white"></MaterialIcons>
+        </View>
       </View>
     );
   };
@@ -227,6 +227,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
             //backgroundColor: "yellow",
             justifyContent: "flex-end",
             flex: 1,
+            width: isFullscreen ? "90%" : "100%",
           }}>
           {isIcons && (
             <>
@@ -299,7 +300,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
     <View
       style={[
         isFullscreen
-          ? { width: WindowSize.Height, height: WindowSize.Width }
+          ? { width: WindowSize.Height * 0.9, height: WindowSize.Width, alignSelf: "center" }
           : styles.video_container,
         ,
       ]}>
@@ -368,10 +369,19 @@ const FollowingEpisodes_Container = () => {
 const MediaScreen = ({ navigation }: any) => {
   const [isFullscreen, setFullscreen] = React.useState<any>(false);
 
+  // React.useEffect(() => {
+  //   return () => {
+  //     (async () => {
+  //       await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+  //       console.log("Left MediaScreen");
+  //     })();
+  //   };
+  // }, []);
+
   return (
     <ScrollView
       scrollEnabled={isFullscreen ? false : true}
-      style={styles.container}
+      style={!isFullscreen ? styles.container : { backgroundColor: "black" }}
       contentContainerStyle={{ paddingBottom: 50 }}>
       {isFullscreen && <StatusBar hidden></StatusBar>}
       <VideoPlayer
