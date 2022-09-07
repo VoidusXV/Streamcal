@@ -8,10 +8,11 @@ import { WindowSize } from "../components/constants/Layout";
 import { FlashList } from "@shopify/flash-list";
 import MediaItemCard from "../components/Designs/MediaItemCard";
 import FadingEdgesView from "../components/Designs/FadingEdgesView";
+import { getEpisodeAmount, getMediaLocations, getSeasonAmount } from "../backend/serverConnection";
 
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 
-const ImageContainer = ({ ContentTitle }: any) => {
+const ImageContainer = ({ ContentTitle, CoverURL }: any) => {
   const [getTextHeight, setTextHeight] = React.useState<any>(0);
   return (
     <View
@@ -25,7 +26,7 @@ const ImageContainer = ({ ContentTitle }: any) => {
         BottomGradient_Position={WindowSize.Width * 0.3}
         ParentBackgroundColor={backgroundColor}>
         <Image
-          source={Cover2}
+          source={{ uri: CoverURL }}
           resizeMethod="scale"
           style={{
             width: "100%",
@@ -42,7 +43,8 @@ const ImageContainer = ({ ContentTitle }: any) => {
             zIndex: 3,
             marginTop: WindowSize.Width * 0.85 - (getTextHeight - WindowSize.Width * 0.1), //"85%",
             marginLeft: "5%",
-            maxWidth: "90%",
+            //maxWidth: "90%",
+            // backgroundColor: "red",
           }}>
           {ContentTitle}
         </Text>
@@ -51,11 +53,11 @@ const ImageContainer = ({ ContentTitle }: any) => {
   );
 };
 
-const ContentInfo = () => (
+const ContentInfo = ({ SeasonNum, EpisodeNum }: any) => (
   <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
     <Text style={styles.InfoText}>&#9679; Serie</Text>
-    <Text style={styles.InfoText}>&#9679; 2 Staffel</Text>
-    <Text style={styles.InfoText}>&#9679; 10 Folgen</Text>
+    <Text style={styles.InfoText}>&#9679; {SeasonNum} Staffel</Text>
+    <Text style={styles.InfoText}>&#9679; {EpisodeNum} Folgen</Text>
   </View>
 );
 
@@ -96,28 +98,52 @@ const Season_SelectionBox = ({ TitleText }: any) => {
 
 const data = [{ ID: 0, Title: "Testus_" }];
 
-const ViewContent = ({ navigation }: any) => {
+const ViewContent = ({ route, navigation }: any) => {
+  const { contentData } = route.params;
+  const [isLoaded, setLoaded] = React.useState(false);
+
+  const [getMediaLocation, setMediaLocation] = React.useState<any>([]);
+  // console.log(getMediaLocation.Series.Seasons[0]);
+  //console.log(getSeasonAmount(contentData.ID));
+
+  React.useEffect(() => {
+    (async () => {
+      const data = await getMediaLocations(contentData.ID);
+      console.log("Effect:", data.Series.Seasons[0].Episodes);
+      setMediaLocation(data);
+      setLoaded(true);
+    })();
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
-      <ImageContainer ContentTitle="One Piece"></ImageContainer>
-      <View style={styles.ContentContainer}>
-        <ContentInfo></ContentInfo>
-        <SelectionBox></SelectionBox>
-        <Season_SelectionBox TitleText="Staffel 1"></Season_SelectionBox>
+      {isLoaded && (
+        <>
+          <ImageContainer
+            CoverURL={contentData?.Cover}
+            ContentTitle={contentData?.Title}></ImageContainer>
+          <View style={styles.ContentContainer}>
+            <ContentInfo
+              SeasonNum={getSeasonAmount(getMediaLocation)}
+              EpisodeNum={getEpisodeAmount(getMediaLocation)}></ContentInfo>
+            <SelectionBox></SelectionBox>
+            <Season_SelectionBox TitleText="Staffel 1"></Season_SelectionBox>
 
-        <FlashList
-          data={data}
-          keyExtractor={(item: any) => item.ID}
-          estimatedItemSize={20}
-          contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
-          renderItem={({ item }) => (
-            <MediaItemCard
-              ID_Path={item.ID + 1}
-              Title={item.Title}
-              navigation={navigation}
-              CoverSrc={Cover2}></MediaItemCard>
-          )}></FlashList>
-      </View>
+            <FlashList
+              data={getMediaLocation.Series.Seasons[0].Episodes} // Staffel 1
+              //keyExtractor={(item: any) => item.ID}
+              estimatedItemSize={20}
+              contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
+              renderItem={({ item, index }: any) => (
+                <MediaItemCard
+                  ID_Path={index + 1}
+                  Title={item.Title}
+                  navigation={navigation}
+                  CoverSrc={Cover2}></MediaItemCard>
+              )}></FlashList>
+          </View>
+        </>
+      )}
     </ScrollView>
   );
 };

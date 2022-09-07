@@ -16,7 +16,6 @@ function getContentAPI(ID) {
 }
 function contentExists(ID) {
   const data = require(`./Data/Content.json`);
-  console.log(data.length, ID, data.length > ID);
   return data.length > ID && ID >= 0;
 }
 //const image = require(__dirname + "/public/Cover.jpg"); //`./Data/${ID}/Cover.jpg`);
@@ -35,7 +34,6 @@ app.get("/v1/Media", (req, res) => {
     const ContentID = new URLSearchParams(req.url).get("/v1/Media?id");
     if (!ContentID) return res.status(403);
 
-    console.log(ContentID);
     res.send(getContentAPI(ContentID));
   } catch (e) {
     return res.status(403);

@@ -103,7 +103,11 @@ const ContentContainer = ({ navigation, data }: any) => {
         <RenderItem
           TitleText={item.Title}
           CoverURL={getCoverURL(item.ID)}
-          onPress={() => navigation.navigate("ViewContent")}></RenderItem>
+          onPress={() =>
+            navigation.navigate("ViewContent", {
+              contentData: { ID: item.ID, Title: item.Title, Cover: getCoverURL(item.ID) },
+            })
+          }></RenderItem>
       )}></FlashList>
   );
 };
@@ -114,7 +118,6 @@ export default function HomeScreen({ navigation }: any) {
     (async () => {
       const data = await getAllContent();
       setContent(data);
-      console.log(data);
     })();
   }, []);
 
