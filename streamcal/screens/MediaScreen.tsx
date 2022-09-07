@@ -56,7 +56,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
 
   const video = React.useRef<any>(null);
   const videoLayout = React.useRef<any>(null);
-  const isSliding2 = React.useRef<any>(false);
+  const isSliding = React.useRef<any>(false);
 
   const Duration = React.useRef<any>(0);
 
@@ -76,14 +76,14 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   };
 
   const fadeOut = () => {
-    if (isSliding2.current) return;
+    if (isSliding.current) return;
     Animated.timing(IconsOpacity, {
       toValue: 0,
       duration: 400,
       useNativeDriver: true,
     }).start(() => {
       setIcons(false);
-      isSliding2.current = false;
+      isSliding.current = false;
     });
   };
 
@@ -102,9 +102,6 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   React.useEffect(() => {
     fadeOut();
   }, []);
-
-  //console.log(video.current.getStatusAsync());
-  //  {/* <MaterialIcons name="close-fullscreen" size={24} color="black" />
 
   const TopButton = () => (
     <View style={{ ...styles.TopButtonContainer_Normal, width: isFullscreen ? "90%" : "100%" }}>
@@ -187,11 +184,6 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
     return (
       <Animated.View
         onTouchStart={() => (isIcons ? autoFade() : fadeIn())}
-        onTouchEnd={() => {
-          //console.log("onTouchEnd");
-          // console.log(isSliding2.current, isIcons);
-          // isIcons ? fadeOut() : fadeIn();
-        }}
         style={[
           {
             ...styles.video_container,
@@ -269,15 +261,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
                 minimumTrackTintColor={selectionColor}
                 maximumTrackTintColor="white"
                 thumbTintColor={selectionColor}
-                onValueChange={(e) => {
-                  //setCurrentPosition(e);
-                  //a.current = e;
-                  //status.positionMillis = e;
-                  //console.log("onValueChange:", a.current);
-                  // status.positionMillis = e;
-                }}
                 value={status.positionMillis}
-                onTouchStart={() => (isSliding2.current = true)}
+                onTouchStart={() => (isSliding.current = true)}
                 onSlidingStart={(e) => {
                   // console.log("onSlidingStart", e);
                   //setwasPlaying(status.isPlaying);
@@ -286,7 +271,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
                 onSlidingComplete={async (e) => {
                   await video?.current.setPositionAsync(e);
                   //await video?.current.playFromPositionAsync(a.current);
-                  isSliding2.current = false;
+                  isSliding.current = false;
                   autoFade();
                 }}></Slider>
             </>
@@ -320,7 +305,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
         resizeMode={ResizeMode.COVER}
         // progressUpdateIntervalMillis={500}
         onPlaybackStatusUpdate={(status: any) => {
-          !isSliding2.current && setStatus(() => status);
+          !isSliding.current && setStatus(() => status);
         }}
         source={{ uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" }}></Video>
 
@@ -369,14 +354,14 @@ const FollowingEpisodes_Container = () => {
 const MediaScreen = ({ navigation }: any) => {
   const [isFullscreen, setFullscreen] = React.useState<any>(false);
 
-  // React.useEffect(() => {
-  //   return () => {
-  //     (async () => {
-  //       await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
-  //       console.log("Left MediaScreen");
-  //     })();
-  //   };
-  // }, []);
+  React.useEffect(() => {
+    return () => {
+      (async () => {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+        console.log("Left MediaScreen");
+      })();
+    };
+  }, []);
 
   return (
     <ScrollView

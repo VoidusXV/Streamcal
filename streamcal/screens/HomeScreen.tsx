@@ -2,19 +2,20 @@ import React from "react";
 import { View, StyleSheet, Text, Image, Animated, TouchableHighlight } from "react-native";
 import { backgroundColor, selectionColor } from "../components/constants/Colors";
 import { WindowSize } from "../components/constants/Layout";
-import { Foundation, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Foundation } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
+import { getAllContent, getCoverURL } from "../backend/serverConnection";
 
 const Cover = require("../assets/covers/kurokos-basketball-stream-cover-DCQ2LYPVqVRk0cyMCmDlMQPzkRHLtyqZ_220x330.jpeg");
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 //<FontAwesome5 name="list-ul" size={24} color="black" />
 //<MaterialIcons name="grid-view" size={24} color="black" />
-const data = [
-  { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
-  { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
-  { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
-  { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
-];
+// const data = [
+//   { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
+//   { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
+//   { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
+//   { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
+// ];
 
 const TilteContainer = () => {
   return (
@@ -23,14 +24,13 @@ const TilteContainer = () => {
         name="play-video"
         style={{ marginLeft: "5%" }}
         size={WindowSize.Width * 0.1}
-        color={selectionColor}
-      ></Foundation>
+        color={selectionColor}></Foundation>
       <Text style={styles.title}>Streamcal</Text>
     </View>
   );
 };
 
-const RenderItem = ({ onPress }: any) => {
+const RenderItem = ({ onPress, TitleText, CoverURL, Availability }: any) => {
   //const AnimValue = React.useState(0);
   const animation = new Animated.Value(0);
   const inputRange = [0, 1];
@@ -62,27 +62,24 @@ const RenderItem = ({ onPress }: any) => {
         marginLeft: "5%",
         marginTop: "10%",
         transform: [{ scale }],
-      }}
-    >
+      }}>
       <TouchableHighlight
         style={{ flex: 1, borderRadius: 5 }}
         underlayColor="#2c4063"
         onPressIn={onPressIn}
         onPressOut={onPressOut}
-        onPress={onPress}
-      >
+        onPress={onPress}>
         <>
           <View style={{ height: "80%", width: "100%" }}>
             <Image
               borderRadius={5}
-              source={Cover2}
+              source={{ uri: CoverURL }}
               style={{ width: "100%", height: "100%" }}
-              resizeMode="contain"
-            ></Image>
+              resizeMode="contain"></Image>
           </View>
           <View style={{ flex: 1 }}>
             <Text numberOfLines={2} style={{ ...styles.ContentText, marginTop: "4%" }}>
-              Kuroko`s Basketball
+              {TitleText}
             </Text>
             <Text style={{ ...styles.ContentText, marginTop: "2%", color: "#acc0e3" }}>
               &#9679; Serie
@@ -94,26 +91,39 @@ const RenderItem = ({ onPress }: any) => {
   );
 };
 
-const ContentContainer = ({ navigation }: any) => {
+const ContentContainer = ({ navigation, data }: any) => {
+  const [getMediaData, setMediaData] = React.useState([]);
   return (
     <FlashList
       numColumns={2}
       contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
       estimatedItemSize={20}
       data={data}
-      renderItem={({}) => (
-        <RenderItem onPress={() => navigation.navigate("ViewContent")}></RenderItem>
-      )}
-    ></FlashList>
+      renderItem={({ item }: any) => (
+        <RenderItem
+          TitleText={item.Title}
+          CoverURL={getCoverURL(item.ID)}
+          onPress={() => navigation.navigate("ViewContent")}></RenderItem>
+      )}></FlashList>
   );
 };
 export default function HomeScreen({ navigation }: any) {
+  const [getContent, setContent] = React.useState({});
+
+  React.useEffect(() => {
+    (async () => {
+      const data = await getAllContent();
+      setContent(data);
+      console.log(data);
+    })();
+  }, []);
+
   return (
     <View style={styles.container}>
       <TilteContainer></TilteContainer>
       <View style={styles.separator}></View>
       <View style={{ flex: 1 }}>
-        <ContentContainer navigation={navigation}></ContentContainer>
+        <ContentContainer data={getContent} navigation={navigation}></ContentContainer>
       </View>
     </View>
   );

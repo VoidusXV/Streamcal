@@ -1,8 +1,10 @@
 node_modules/
 MediaTest/
+server/Data/
 .expo/
 dist/
 npm-debug.*
+*.mp4
 *.jks
 *.p8
 *.p12
