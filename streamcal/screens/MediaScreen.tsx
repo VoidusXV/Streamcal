@@ -77,68 +77,20 @@ const FollowingEpisodes_Container = () => {
 
 let timer: any = null;
 const videoURL = "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
+const Cover = require("../assets/covers/One_Piece.jpg");
 
-const SliderTest = ({ onValueChange, test }: any) => {
-  const [getSliderPercent, setSliderPercent] = React.useState<any>(test);
-
-  React.useEffect(() => {
-    console.log("first", test);
-  }, [test]);
-
-  return (
-    <Slider
-      //ref={onValueChange}
-      style={{
-        width: "102%",
-        height: "50%",
-        position: "absolute",
-        right: WindowSize.Width * 0.01,
-        top: 100,
-      }}
-      minimumValue={0}
-      maximumValue={100}
-      value={getSliderPercent}
-      minimumTrackTintColor={selectionColor}
-      maximumTrackTintColor="white"
-      thumbTintColor={selectionColor}
-      onValueChange={onValueChange}></Slider>
-  );
-};
-
-const Slider_Container = ({ status, video, isSliding, autoFade, Duration, onValueChange }: any) => {
-  return (
-    <Slider
-      style={{
-        width: "102%",
-        height: "50%",
-        //flex: 1,
-        //backgroundColor: "pink",
-        right: WindowSize.Width * 0.01,
-        position: "absolute",
-      }}
-      //minimumValue={0}
-      //maximumValue={Duration?.current}
-      minimumTrackTintColor={selectionColor}
-      maximumTrackTintColor="white"
-      thumbTintColor={selectionColor}
-      //onValueChange={(e) => setSliderPercent(e / status.durationMillis)}
-      onValueChange={onValueChange}
-      // value={status.positionMillis}
-      // onTouchStart={() => (isSliding.current = true)}
-      // onSlidingComplete={async (e) => {
-      //   await video?.current.setPositionAsync(e);
-      //   isSliding.current = false;
-      //   autoFade();
-      // }}
-    ></Slider>
-  );
-};
-const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
+const VideoPlayer = ({
+  navigation,
+  setFullscreen,
+  isFullscreen,
+  previewVideoRef,
+  currentVideoRef,
+}: any) => {
   const [status, setStatus] = React.useState<any>({});
-  const [isLoaded, setLoaded] = React.useState<any>(false);
+  const [isLoaded, setLoaded] = React.useState<any>(true);
   const [isIcons, setIcons] = React.useState(true);
 
-  const video = React.useRef<any>(null);
+  //const video = React.useRef<any>(null);
   const videoLayout = React.useRef<any>(null);
   const isSliding = React.useRef<any>(false);
 
@@ -148,8 +100,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   const Mini_IconSize = WindowSize.Width * 0.08;
 
   const IconsOpacity = React.useRef(new Animated.Value(1)).current;
-  const Cover = require("../assets/covers/One_Piece.jpg");
-
+  //console.log(previewVideoRef.current);
   const fadeIn = () => {
     //console.log("fadeIN");
     Animated.timing(IconsOpacity, {
@@ -190,8 +141,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   }, []);
 
   const Slider_Preview = ({ sliderPercent, sliderPos, isSliding }: any) => {
-    const video = React.useRef<any>(null);
-    const [getImage, setImage] = React.useState<any>("");
+    const [status, setStatus] = React.useState<any>({});
 
     function pos() {
       const a = WindowSize.Width * sliderPercent - (WindowSize.Width * 0.4) / 2;
@@ -206,24 +156,11 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
       return a;
     }
 
-    // if (video.current) {
-    //   (async () => {
-    //     //  console.log(sliderPos.current);
-    //     await video?.current.setPositionAsync(sliderPos.current);
-    //     console.log("setPositionAsync");
-    //   })();
-    // }
-    // if (isSliding.current) {
-    //   (async () => {
-    //     const a = await generateThumbnail(videoURL, sliderPos.current, 0);
-    //     setImage(a);
-    //     console.log(a);
-    //   })();
-
+    //console.log(sliderPos.current);
     return (
       <View
         style={{
-          opacity: isSliding.current ? 1 : 0,
+          //opacity: isSliding.current ? 1 : 0,
           backgroundColor: "red",
           width: WindowSize.Width * 0.4,
           height: WindowSize.Width * 0.25,
@@ -231,12 +168,20 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
           top: WindowSize.Width * 0.15,
           left: pos(),
         }}>
-        <Image style={{ width: "100%", height: "100%" }} resizeMode="cover" source={Cover}></Image>
-        {/* <Video
-          ref={video}
-          style={{ width: "100%", height: "100%" }}
+        <Video
+          //ref={(e)=> e?.loadAsync({uri:videoURL})}
+          ref={previewVideoRef}
+          //source={{ uri: videoURL }}
+          // style={{ width: "100%", height: "100%" }}
+          style={{ ...styles.video }}
           resizeMode={ResizeMode.COVER}
-          source={{ uri: videoURL }}></Video> */}
+          onPlaybackStatusUpdate={(status: any) => {
+            setStatus(() => status);
+            console.log("onPlaybackStatusUpdate PreviewVid");
+          }}
+          //positionMillis={sliderPos.current}
+          //rate={32}
+          volume={0}></Video>
         <Text style={{ color: "white", textAlign: "center" }}>
           {MilisecondsToTimespamp(sliderPos.current)}
         </Text>
@@ -290,7 +235,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
             name="replay-10"
             onPress={async () => {
               //await video.current.replayAsync();
-              await video?.current.setPositionAsync(status.positionMillis - 10000);
+              await currentVideoRef?.current.setPositionAsync(status.positionMillis - 10000);
             }}
             size={IconSize * 0.8}
             style={{ marginRight: "5%" }}
@@ -307,13 +252,15 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
             color="white"
             onPress={async () => {
               console.log("PlayPause");
-              status.isPlaying ? await video.current.pauseAsync() : await video.current.playAsync();
+              status.isPlaying
+                ? await currentVideoRef.current.pauseAsync()
+                : await currentVideoRef.current.playAsync();
             }}></MaterialIcons>
           <MaterialIcons
             name="forward-10"
             onPress={async () => {
               //console.log(status.positionMillis);
-              await video?.current.setPositionAsync(status.positionMillis + 10000);
+              await currentVideoRef?.current.setPositionAsync(status.positionMillis + 10000);
             }}
             size={IconSize * 0.8}
             style={{ marginLeft: "5%" }}
@@ -420,7 +367,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
                 value={status.positionMillis}
                 onTouchStart={() => (isSliding.current = true)}
                 onSlidingComplete={async (e) => {
-                  await video?.current.setPositionAsync(e);
+                  await currentVideoRef?.current.setPositionAsync(e);
                   isSliding.current = false;
                   autoFade();
                 }}></Slider>
@@ -441,10 +388,11 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
       ]}>
       <Video
         //ref={(e)=> e?.presentFullscreenPlayer()}
-        ref={video}
+        ref={currentVideoRef}
         onLayout={(e) => (videoLayout.current = e)}
         onLoadStart={() => {
-          console.log("on load start");
+          //  console.log("on load start");
+          setLoaded(false);
         }}
         onError={(e) => console.log("Error:", e)}
         onLoad={(e: any) => {
@@ -458,7 +406,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
           // console.log("onPlaybackStatusUpdate");
           !isSliding.current && setStatus(() => status);
         }}
-        source={{ uri: videoURL }}></Video>
+        // source={{ uri: videoURL }}
+      ></Video>
 
       <Button_Overlay></Button_Overlay>
       {/* <Button_Overlay2></Button_Overlay2> */}
@@ -479,8 +428,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
 
 const MediaScreen = ({ navigation }: any) => {
   const [isFullscreen, setFullscreen] = React.useState<any>(false);
-
-  // const [getV, setV] = React.useState<any>(0);
+  const currentVideo = React.useRef<any>(null);
+  const previewVideo = React.useRef<any>(null);
 
   React.useEffect(() => {
     const backAction = () => {
@@ -499,6 +448,21 @@ const MediaScreen = ({ navigation }: any) => {
     };
   }, [isFullscreen]);
 
+  React.useEffect(() => {
+    (async () => {
+      console.log("Start Loading Video");
+      const vid = currentVideo?.current?.loadAsync({ uri: videoURL });
+      const preview = previewVideo?.current?.loadAsync({ uri: videoURL });
+
+      await Promise.all([vid, preview]).then(async () => {
+        console.log("Video Loaded");
+        await previewVideo?.current?.playAsync();
+      });
+
+      //await previewVideo?.current.setRateAsync({ uri: videoURL });
+    })();
+  }, []);
+
   return (
     <ScrollView
       scrollEnabled={isFullscreen ? false : true}
@@ -506,7 +470,18 @@ const MediaScreen = ({ navigation }: any) => {
       contentContainerStyle={{ paddingBottom: 50 }}>
       {isFullscreen && <StatusBar hidden></StatusBar>}
       {/* <Slider onValueChange={(e) => setV(e)}></Slider> */}
+
+      {/* <Video
+        ref={previewVideo}
+        style={{
+          width: "50%",
+          height: "30%",
+          position: "absolute",
+          backgroundColor: "green",
+        }}></Video> */}
       <VideoPlayer
+        previewVideoRef={previewVideo}
+        currentVideoRef={currentVideo}
         setFullscreen={setFullscreen}
         isFullscreen={isFullscreen}
         navigation={navigation}></VideoPlayer>
