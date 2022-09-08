@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
+import Local_IP from "./Local_IP";
 
 const APIKEY = "";
 const port = 3005;
-const Local_IP = "192.168.2.121";
 
 const baseURL = `http://localhost:` + port;
 const baseIPURL = `http://${Local_IP}:` + port;

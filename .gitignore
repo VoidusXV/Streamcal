@@ -1,6 +1,5 @@
 node_modules/
 MediaTest/
-
 .expo/
 dist/
 npm-debug.*
@@ -12,6 +11,7 @@ npm-debug.*
 *.key
 *.mobileprovision
 *.orig.*
+Local_IP.ts
 
 web-build/
 
