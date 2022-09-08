@@ -11,7 +11,7 @@ npm-debug.*
 *.key
 *.mobileprovision
 *.orig.*
-Local_IP.ts
+Local_IP.*
 
 web-build/
 

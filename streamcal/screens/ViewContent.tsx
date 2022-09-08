@@ -18,6 +18,7 @@ import MediaItemCard from "../components/Designs/MediaItemCard";
 import FadingEdgesView from "../components/Designs/FadingEdgesView";
 import { getEpisodeAmount, getMediaLocations, getSeasonAmount } from "../backend/serverConnection";
 import { generateThumbnail } from "../components/media/Functions";
+import Slider from "@react-native-community/slider";
 
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 
@@ -29,8 +30,7 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
         width: "100%",
         height: WindowSize.Width * 1.1,
         position: "absolute",
-      }}
-    >
+      }}>
       <View
         style={{
           width: "100%",
@@ -38,14 +38,12 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
           backgroundColor: `rgba(${backgrounColorRGB},${scrollValue / WindowSize.Width})`,
           position: "absolute",
           zIndex: 2,
-        }}
-      ></View>
+        }}></View>
 
       <FadingEdgesView
         style={{ width: "100%", height: "100%", backgroundColor: "red" }}
         // BottomGradient_Position={WindowSize.Width * 0.2}
-        ParentBackgroundColor={backgroundColor}
-      >
+        ParentBackgroundColor={backgroundColor}>
         <Image
           source={{ uri: CoverURL }}
           resizeMethod="scale"
@@ -53,8 +51,7 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
             width: "100%",
             height: "100%",
             zIndex: 0,
-          }}
-        ></Image>
+          }}></Image>
         <Text
           onLayout={(e) => setTextHeight(e.nativeEvent.layout.height)}
           style={{
@@ -67,8 +64,7 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
             marginLeft: "5%",
             //maxWidth: "90%",
             // backgroundColor: "red",
-          }}
-        >
+          }}>
           {ContentTitle}
         </Text>
       </FadingEdgesView>
@@ -92,8 +88,7 @@ const SelectionBox = () => (
         color: "white",
         textAlign: "center",
         letterSpacing: 2,
-      }}
-    >
+      }}>
       FOLGEN
     </Text>
   </View>
@@ -105,16 +100,14 @@ const Season_SelectionBox = ({ TitleText }: any) => {
         <MaterialIcons
           name="keyboard-arrow-down"
           size={WindowSize.Width * 0.09}
-          color="white"
-        ></MaterialIcons>
+          color="white"></MaterialIcons>
       </View>
       <View style={{ flex: 1, justifyContent: "center" }}>
         <Text
           style={{
             color: "white",
             fontSize: WindowSize.Width * 0.06,
-          }}
-        >
+          }}>
           {TitleText}
         </Text>
       </View>
@@ -138,15 +131,13 @@ const TopBar = ({ navigation, Title, scrollValue }: any) => {
         justifyContent: "center",
         alignItems: "flex-start",
         paddingLeft: "2%",
-      }}
-    >
+      }}>
       <View style={{ flexDirection: "row" }}>
         <MaterialIcons
           name="arrow-back"
           size={Mini_IconSize}
           onPress={() => navigation.goBack()}
-          color="white"
-        ></MaterialIcons>
+          color="white"></MaterialIcons>
         <Text
           numberOfLines={1}
           style={{
@@ -156,8 +147,7 @@ const TopBar = ({ navigation, Title, scrollValue }: any) => {
             color: "white",
             maxWidth: "85%",
             opacity: scrollEnd,
-          }}
-        >
+          }}>
           {Title}
         </Text>
       </View>
@@ -196,25 +186,21 @@ const ViewContent = ({ route, navigation }: any) => {
         scrollValue={getScrollValue}
         navigation={navigation}
         alphaColor={getScrollValue}
-        Title={contentData.Title}
-      ></TopBar>
+        Title={contentData.Title}></TopBar>
 
       <ScrollView
         onScroll={(e) => setScrollValue(e.nativeEvent.contentOffset.y)}
-        style={styles.container}
-      >
+        style={styles.container}>
         {isLoaded && (
           <>
             <ImageContainer
               scrollValue={getScrollValue}
               CoverURL={contentData?.Cover}
-              ContentTitle={contentData?.Title}
-            ></ImageContainer>
+              ContentTitle={contentData?.Title}></ImageContainer>
             <View style={styles.ContentContainer}>
               <ContentInfo
                 SeasonNum={getSeasonAmount(getMediaLocation)}
-                EpisodeNum={getEpisodeAmount(getMediaLocation)}
-              ></ContentInfo>
+                EpisodeNum={getEpisodeAmount(getMediaLocation)}></ContentInfo>
               <SelectionBox></SelectionBox>
               <Season_SelectionBox TitleText="Staffel 1"></Season_SelectionBox>
 
@@ -228,10 +214,8 @@ const ViewContent = ({ route, navigation }: any) => {
                     ID_Path={index + 1}
                     Title={item.Title}
                     navigation={navigation}
-                    Source={{ uri: getVideoThumbnailURLs[0] }}
-                  ></MediaItemCard>
-                )}
-              ></FlashList>
+                    Source={{ uri: getVideoThumbnailURLs[0] }}></MediaItemCard>
+                )}></FlashList>
             </View>
           </>
         )}

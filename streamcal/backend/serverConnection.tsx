@@ -19,7 +19,9 @@ async function getServerData(URL: any) {
     const request = await fetch(URL);
     const data = request.json();
     return data;
-  } catch {}
+  } catch (e: any) {
+    console.log("getServerData_Error:", e.message);
+  }
 }
 
 async function getAllContent() {

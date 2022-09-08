@@ -27,7 +27,8 @@ app.get("/v1/image", (req, res) => {
 });
 
 app.get("/v1/Content", (req, res) => {
-  res.send(All_Content);
+  console.log("Trying to get Content");
+  res.send(All_Content).end();
 });
 
 app.get("/v1/Media", (req, res) => {
@@ -103,5 +104,6 @@ app.get("*", (req, res) => {
 
   //res.writeHead(401);
 });
-
 app.listen(port, () => console.log("Server listening at Port:", port));
+
+app.listen(port, "192.168.2.121", () => console.log("Server listening at Port:", port));

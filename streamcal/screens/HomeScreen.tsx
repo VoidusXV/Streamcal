@@ -24,8 +24,7 @@ const TilteContainer = () => {
         name="play-video"
         style={{ marginLeft: "5%" }}
         size={WindowSize.Width * 0.1}
-        color={selectionColor}
-      ></Foundation>
+        color={selectionColor}></Foundation>
       <Text style={styles.title}>Streamcal</Text>
     </View>
   );
@@ -63,23 +62,20 @@ const RenderItem = ({ onPress, TitleText, CoverURL, Availability }: any) => {
         marginLeft: "5%",
         marginTop: "10%",
         transform: [{ scale }],
-      }}
-    >
+      }}>
       <TouchableHighlight
         style={{ flex: 1, borderRadius: 5 }}
         underlayColor="#2c4063"
         onPressIn={onPressIn}
         onPressOut={onPressOut}
-        onPress={onPress}
-      >
+        onPress={onPress}>
         <>
           <View style={{ height: "80%", width: "100%" }}>
             <Image
               borderRadius={5}
               source={{ uri: CoverURL }}
               style={{ width: "100%", height: "100%" }}
-              resizeMode="contain"
-            ></Image>
+              resizeMode="contain"></Image>
           </View>
           <View style={{ flex: 1 }}>
             <Text numberOfLines={2} style={{ ...styles.ContentText, marginTop: "4%" }}>
@@ -111,10 +107,8 @@ const ContentContainer = ({ navigation, data }: any) => {
             navigation.navigate("ViewContent", {
               contentData: { ID: item.ID, Title: item.Title, Cover: getCoverURL(item.ID) },
             })
-          }
-        ></RenderItem>
-      )}
-    ></FlashList>
+          }></RenderItem>
+      )}></FlashList>
   );
 };
 export default function HomeScreen({ navigation }: any) {
