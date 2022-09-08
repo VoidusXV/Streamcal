@@ -1,0 +1,21 @@
+{
+   "Series":{
+      "Seasons":[
+         {
+            "Episodes":[
+               {
+                  "ID":0, 
+                  "Cover":"Cover.jpg",
+                  "Path":"/Series/Season_1/7.mp4",
+                  "Title":"Du wirst etwas einmaliges sehen",
+                  "Description":""
+               }
+            ]      
+         }
+      ]
+      
+   },
+   "Movies":{
+      
+   }
+}
