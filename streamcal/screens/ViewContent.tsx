@@ -1,10 +1,18 @@
-import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  Animated,
+  TouchableWithoutFeedback,
+} from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
 
-import { backgroundColor, selectionColor } from "../components/constants/Colors";
-import { WindowSize } from "../components/constants/Layout";
+import { backgrounColorRGB, backgroundColor, selectionColor } from "../components/constants/Colors";
+import { Mini_IconSize, WindowSize } from "../components/constants/Layout";
 import { FlashList } from "@shopify/flash-list";
 import MediaItemCard from "../components/Designs/MediaItemCard";
 import FadingEdgesView from "../components/Designs/FadingEdgesView";
@@ -13,7 +21,7 @@ import { generateThumbnail } from "../components/media/Functions";
 
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 
-const ImageContainer = ({ ContentTitle, CoverURL }: any) => {
+const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
   const [getTextHeight, setTextHeight] = React.useState<any>(0);
   return (
     <View
@@ -23,8 +31,18 @@ const ImageContainer = ({ ContentTitle, CoverURL }: any) => {
         position: "absolute",
       }}
     >
+      <View
+        style={{
+          width: "100%",
+          height: "100%",
+          backgroundColor: `rgba(${backgrounColorRGB},${scrollValue / WindowSize.Width})`,
+          position: "absolute",
+          zIndex: 2,
+        }}
+      ></View>
+
       <FadingEdgesView
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "100%", height: "100%", backgroundColor: "red" }}
         // BottomGradient_Position={WindowSize.Width * 0.2}
         ParentBackgroundColor={backgroundColor}
       >
@@ -104,6 +122,49 @@ const Season_SelectionBox = ({ TitleText }: any) => {
   );
 };
 
+const TopBar = ({ navigation, Title, scrollValue }: any) => {
+  const scrollStart = -(WindowSize.Width * 0.7);
+  const scrollEnd = (scrollStart + scrollValue) / (WindowSize.Width * 0.3);
+  const alphaColor = scrollValue / WindowSize.Width;
+  return (
+    <Animated.View
+      style={{
+        width: "100%",
+        height: WindowSize.Width * 0.1,
+        // backgroundColor: `rgba(${backgrounColorRGB},${scrollEnd})`,
+        backgroundColor: alphaColor >= 1 ? backgroundColor : "transparent",
+        position: "absolute",
+        zIndex: 1,
+        justifyContent: "center",
+        alignItems: "flex-start",
+        paddingLeft: "2%",
+      }}
+    >
+      <View style={{ flexDirection: "row" }}>
+        <MaterialIcons
+          name="arrow-back"
+          size={Mini_IconSize}
+          onPress={() => navigation.goBack()}
+          color="white"
+        ></MaterialIcons>
+        <Text
+          numberOfLines={1}
+          style={{
+            fontSize: WindowSize.Width * 0.06,
+            fontWeight: "500",
+            marginLeft: "4%",
+            color: "white",
+            maxWidth: "85%",
+            opacity: scrollEnd,
+          }}
+        >
+          {Title}
+        </Text>
+      </View>
+    </Animated.View>
+  );
+};
+
 const data = [{ ID: 0, Title: "Testus_" }];
 
 const ViewContent = ({ route, navigation }: any) => {
@@ -113,6 +174,7 @@ const ViewContent = ({ route, navigation }: any) => {
   const [getMediaLocation, setMediaLocation] = React.useState<any>([]);
   const [getVideoThumbnailURLs, setVideoThumbnailURLs] = React.useState<any>([]);
 
+  const [getScrollValue, setScrollValue] = React.useState(0);
   // console.log(getMediaLocation.Series.Seasons[0]);
   //console.log(getSeasonAmount(contentData.ID));
 
@@ -129,39 +191,52 @@ const ViewContent = ({ route, navigation }: any) => {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
-      {isLoaded && (
-        <>
-          <ImageContainer
-            CoverURL={contentData?.Cover}
-            ContentTitle={contentData?.Title}
-          ></ImageContainer>
-          <View style={styles.ContentContainer}>
-            <ContentInfo
-              SeasonNum={getSeasonAmount(getMediaLocation)}
-              EpisodeNum={getEpisodeAmount(getMediaLocation)}
-            ></ContentInfo>
-            <SelectionBox></SelectionBox>
-            <Season_SelectionBox TitleText="Staffel 1"></Season_SelectionBox>
+    <>
+      <TopBar
+        scrollValue={getScrollValue}
+        navigation={navigation}
+        alphaColor={getScrollValue}
+        Title={contentData.Title}
+      ></TopBar>
 
-            <FlashList
-              data={getMediaLocation.Series.Seasons[0].Episodes} // Staffel 1
-              //keyExtractor={(item: any) => item.ID}
-              estimatedItemSize={20}
-              contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
-              renderItem={({ item, index }: any) => (
-                <MediaItemCard
-                  ID_Path={index + 1}
-                  Title={item.Title}
-                  navigation={navigation}
-                  Source={{ uri: getVideoThumbnailURLs[0] }}
-                ></MediaItemCard>
-              )}
-            ></FlashList>
-          </View>
-        </>
-      )}
-    </ScrollView>
+      <ScrollView
+        onScroll={(e) => setScrollValue(e.nativeEvent.contentOffset.y)}
+        style={styles.container}
+      >
+        {isLoaded && (
+          <>
+            <ImageContainer
+              scrollValue={getScrollValue}
+              CoverURL={contentData?.Cover}
+              ContentTitle={contentData?.Title}
+            ></ImageContainer>
+            <View style={styles.ContentContainer}>
+              <ContentInfo
+                SeasonNum={getSeasonAmount(getMediaLocation)}
+                EpisodeNum={getEpisodeAmount(getMediaLocation)}
+              ></ContentInfo>
+              <SelectionBox></SelectionBox>
+              <Season_SelectionBox TitleText="Staffel 1"></Season_SelectionBox>
+
+              <FlashList
+                data={getMediaLocation.Series.Seasons[0].Episodes} // Staffel 1
+                //keyExtractor={(item: any) => item.ID}
+                estimatedItemSize={20}
+                contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
+                renderItem={({ item, index }: any) => (
+                  <MediaItemCard
+                    ID_Path={index + 1}
+                    Title={item.Title}
+                    navigation={navigation}
+                    Source={{ uri: getVideoThumbnailURLs[0] }}
+                  ></MediaItemCard>
+                )}
+              ></FlashList>
+            </View>
+          </>
+        )}
+      </ScrollView>
+    </>
   );
 };
 
