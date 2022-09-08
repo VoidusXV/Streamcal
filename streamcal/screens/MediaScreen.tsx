@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   BackHandler,
+  Image,
 } from "react-native";
 import React from "react";
 import { Video, AVPlaybackStatus, ResizeMode } from "expo-av";
@@ -54,6 +55,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   const [status, setStatus] = React.useState<any>({});
   const [isLoaded, setLoaded] = React.useState<any>(false);
   const [isIcons, setIcons] = React.useState(true);
+  const [getSliderPercent, setSliderPercent] = React.useState(0);
 
   const video = React.useRef<any>(null);
   const videoLayout = React.useRef<any>(null);
@@ -65,6 +67,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   const Mini_IconSize = WindowSize.Width * 0.08;
 
   const IconsOpacity = React.useRef(new Animated.Value(1)).current;
+  const Cover = require("../assets/covers/One_Piece.jpg");
 
   const fadeIn = () => {
     //console.log("fadeIN");
@@ -77,6 +80,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   };
 
   const fadeOut = () => {
+    return;
     if (isSliding.current) return;
     Animated.timing(IconsOpacity, {
       toValue: 0,
@@ -101,8 +105,37 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
   };
 
   React.useEffect(() => {
-    fadeOut();
+    // fadeOut();
   }, []);
+
+  const Slider_Preview = ({ sliderPercent }: any) => {
+    // console.log("getSliderPercent:", getSliderPercent);
+    const a = WindowSize.Width * sliderPercent - (WindowSize.Width * 0.4) / 2;
+    return (
+      <View
+        style={{
+          backgroundColor: "red",
+          width: WindowSize.Width * 0.4,
+          height: WindowSize.Width * 0.25,
+          position: "absolute",
+          top: WindowSize.Width * 0.15,
+          left: a,
+        }}
+      >
+        <Image source={Cover} resizeMode="cover" style={{ height: "100%", width: "100%" }}></Image>
+        <Text style={{ color: "white", textAlign: "center" }}>04:51</Text>
+      </View>
+    );
+  };
+
+  const kokTest = React.useCallback(
+    (e: any) => {
+      isSliding.current = true;
+      setSliderPercent(e);
+      console.log(getSliderPercent);
+    },
+    [getSliderPercent]
+  );
 
   const TopButton = () => (
     <View style={{ ...styles.TopButtonContainer_Normal, width: isFullscreen ? "90%" : "100%" }}>
@@ -223,6 +256,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
           {isIcons && <Middle_Buttons></Middle_Buttons>}
         </TouchableOpacity>
 
+        <Slider_Preview sliderPercent={getSliderPercent}></Slider_Preview>
+
         <TouchableOpacity
           onPress={() => (isIcons ? fadeOut() : fadeIn())}
           activeOpacity={1}
@@ -265,6 +300,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
               </View>
 
               <Slider
+                // ref={(e)=>e?.props.onValueChange((e:any)=> console.log(e))}
                 style={{
                   width: "102%",
                   height: "50%",
@@ -279,11 +315,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
                 thumbTintColor={selectionColor}
                 value={status.positionMillis}
                 onTouchStart={() => (isSliding.current = true)}
-                onSlidingStart={(e) => {
-                  // console.log("onSlidingStart", e);
-                  //setwasPlaying(status.isPlaying);
-                  //video?.current.pauseAsync();
-                }}
+                onValueChange={kokTest} //{(e) => setSliderPercent(e / status.durationMillis)}
                 onSlidingComplete={async (e) => {
                   await video?.current.setPositionAsync(e);
                   //await video?.current.playFromPositionAsync(a.current);
