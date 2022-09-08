@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, Image, TouchableHighlight } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableHighlight,
+  ImageSourcePropType,
+} from "react-native";
 import React from "react";
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
 import { WindowSize } from "../../components/constants/Layout";
@@ -8,6 +15,7 @@ interface IMediaItemCard {
   onPress?: () => void;
   navigation?: any;
   CoverSrc?: any;
+  Source?: ImageSourcePropType | ImageSourcePropType[];
 }
 
 const MediaItemCard: React.FC<IMediaItemCard> = ({
@@ -15,7 +23,7 @@ const MediaItemCard: React.FC<IMediaItemCard> = ({
   Title,
   onPress,
   navigation,
-  CoverSrc,
+  Source,
 }: any) => {
   return (
     <TouchableHighlight
@@ -27,7 +35,7 @@ const MediaItemCard: React.FC<IMediaItemCard> = ({
       <>
         <View style={{ backgroundColor: "green", width: "45%", ...styles.ContainerMiddle }}>
           <Image
-            source={CoverSrc}
+            source={Source}
             resizeMode="cover"
             style={{ width: "100%", height: "100%" }}
           ></Image>

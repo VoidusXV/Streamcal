@@ -9,6 +9,7 @@ import { FlashList } from "@shopify/flash-list";
 import MediaItemCard from "../components/Designs/MediaItemCard";
 import FadingEdgesView from "../components/Designs/FadingEdgesView";
 import { getEpisodeAmount, getMediaLocations, getSeasonAmount } from "../backend/serverConnection";
+import { generateThumbnail } from "../components/media/Functions";
 
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 
@@ -18,13 +19,15 @@ const ImageContainer = ({ ContentTitle, CoverURL }: any) => {
     <View
       style={{
         width: "100%",
-        height: WindowSize.Height * 0.7,
+        height: WindowSize.Width * 1.1,
         position: "absolute",
-      }}>
+      }}
+    >
       <FadingEdgesView
         style={{ width: "100%", height: "100%" }}
-        BottomGradient_Position={WindowSize.Width * 0.3}
-        ParentBackgroundColor={backgroundColor}>
+        // BottomGradient_Position={WindowSize.Width * 0.2}
+        ParentBackgroundColor={backgroundColor}
+      >
         <Image
           source={{ uri: CoverURL }}
           resizeMethod="scale"
@@ -32,7 +35,8 @@ const ImageContainer = ({ ContentTitle, CoverURL }: any) => {
             width: "100%",
             height: "100%",
             zIndex: 0,
-          }}></Image>
+          }}
+        ></Image>
         <Text
           onLayout={(e) => setTextHeight(e.nativeEvent.layout.height)}
           style={{
@@ -45,7 +49,8 @@ const ImageContainer = ({ ContentTitle, CoverURL }: any) => {
             marginLeft: "5%",
             //maxWidth: "90%",
             // backgroundColor: "red",
-          }}>
+          }}
+        >
           {ContentTitle}
         </Text>
       </FadingEdgesView>
@@ -69,7 +74,8 @@ const SelectionBox = () => (
         color: "white",
         textAlign: "center",
         letterSpacing: 2,
-      }}>
+      }}
+    >
       FOLGEN
     </Text>
   </View>
@@ -81,14 +87,16 @@ const Season_SelectionBox = ({ TitleText }: any) => {
         <MaterialIcons
           name="keyboard-arrow-down"
           size={WindowSize.Width * 0.09}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
       </View>
       <View style={{ flex: 1, justifyContent: "center" }}>
         <Text
           style={{
             color: "white",
             fontSize: WindowSize.Width * 0.06,
-          }}>
+          }}
+        >
           {TitleText}
         </Text>
       </View>
@@ -103,13 +111,18 @@ const ViewContent = ({ route, navigation }: any) => {
   const [isLoaded, setLoaded] = React.useState(false);
 
   const [getMediaLocation, setMediaLocation] = React.useState<any>([]);
+  const [getVideoThumbnailURLs, setVideoThumbnailURLs] = React.useState<any>([]);
+
   // console.log(getMediaLocation.Series.Seasons[0]);
   //console.log(getSeasonAmount(contentData.ID));
 
   React.useEffect(() => {
     (async () => {
+      const URL = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
+      const thumbnailURL = await generateThumbnail(URL);
+      setVideoThumbnailURLs([thumbnailURL]);
+
       const data = await getMediaLocations(contentData.ID);
-      console.log("Effect:", data.Series.Seasons[0].Episodes);
       setMediaLocation(data);
       setLoaded(true);
     })();
@@ -121,11 +134,13 @@ const ViewContent = ({ route, navigation }: any) => {
         <>
           <ImageContainer
             CoverURL={contentData?.Cover}
-            ContentTitle={contentData?.Title}></ImageContainer>
+            ContentTitle={contentData?.Title}
+          ></ImageContainer>
           <View style={styles.ContentContainer}>
             <ContentInfo
               SeasonNum={getSeasonAmount(getMediaLocation)}
-              EpisodeNum={getEpisodeAmount(getMediaLocation)}></ContentInfo>
+              EpisodeNum={getEpisodeAmount(getMediaLocation)}
+            ></ContentInfo>
             <SelectionBox></SelectionBox>
             <Season_SelectionBox TitleText="Staffel 1"></Season_SelectionBox>
 
@@ -139,8 +154,10 @@ const ViewContent = ({ route, navigation }: any) => {
                   ID_Path={index + 1}
                   Title={item.Title}
                   navigation={navigation}
-                  CoverSrc={Cover2}></MediaItemCard>
-              )}></FlashList>
+                  Source={{ uri: getVideoThumbnailURLs[0] }}
+                ></MediaItemCard>
+              )}
+            ></FlashList>
           </View>
         </>
       )}

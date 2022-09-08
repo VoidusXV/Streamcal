@@ -52,7 +52,8 @@ const FadingEdgesView: React.FC<IFadingEdgesView> = ({
           width: "100%",
           zIndex: 1,
           position: "absolute",
-        }}></LinearGradient>
+        }}
+      ></LinearGradient>
 
       {children}
 
@@ -68,7 +69,8 @@ const FadingEdgesView: React.FC<IFadingEdgesView> = ({
           marginTop: getContainerLayout.width
             ? getContainerLayout.height - getBottomLayout.height - (BottomGradient_Position || 0) // - WindowSize.Width * 0.25
             : 0, //+ WindowSize.Width * 0.3 : 0,
-        }}></LinearGradient>
+        }}
+      ></LinearGradient>
     </View>
   );
 };

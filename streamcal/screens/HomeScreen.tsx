@@ -123,7 +123,6 @@ export default function HomeScreen({ navigation }: any) {
   React.useEffect(() => {
     (async () => {
       const data = await getAllContent();
-      console.log(data);
       setContent(data);
     })();
   }, []);

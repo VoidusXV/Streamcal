@@ -7,6 +7,7 @@ import {
   Animated,
   TouchableWithoutFeedback,
   TouchableOpacity,
+  BackHandler,
 } from "react-native";
 import React from "react";
 import { Video, AVPlaybackStatus, ResizeMode } from "expo-av";
@@ -108,21 +109,26 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
       <MaterialIcons
         name="arrow-back"
         size={Mini_IconSize}
-        onPress={() => navigation.goBack()}
-        color="white"></MaterialIcons>
+        style={{ opacity: isFullscreen ? 0 : 1 }}
+        onPress={() => !isFullscreen && navigation.goBack()}
+        color="white"
+      ></MaterialIcons>
+
       <View style={{ flexDirection: "row" }}>
         <MaterialIcons
           name="settings"
           size={Mini_IconSize}
           style={{ marginRight: WindowSize.Width * 0.1 }}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
 
         <MaterialIcons
           onPress={async () => setFullscreen(await changeScreenOrientation())}
           name={!isFullscreen ? "open-in-full" : "close-fullscreen"}
           size={Mini_IconSize}
           //style={{ left: WindowSize.Width * 0.26 }}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
       </View>
     </View>
   );
@@ -141,7 +147,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
           marginRight: isFullscreen ? WindowSize.Width * 0.2 : 0,
           justifyContent: "center",
           alignItems: "center",
-        }}>
+        }}
+      >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <MaterialIcons
             name="replay-10"
@@ -151,7 +158,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
             }}
             size={IconSize * 0.8}
             style={{ marginRight: "5%" }}
-            color="white"></MaterialIcons>
+            color="white"
+          ></MaterialIcons>
           <MaterialIcons
             name={status.isPlaying ? "pause" : "play-arrow"}
             size={IconSize * 1.1}
@@ -165,7 +173,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
             onPress={async () => {
               console.log("PlayPause");
               status.isPlaying ? await video.current.pauseAsync() : await video.current.playAsync();
-            }}></MaterialIcons>
+            }}
+          ></MaterialIcons>
           <MaterialIcons
             name="forward-10"
             onPress={async () => {
@@ -174,7 +183,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
             }}
             size={IconSize * 0.8}
             style={{ marginLeft: "5%" }}
-            color="white"></MaterialIcons>
+            color="white"
+          ></MaterialIcons>
         </View>
       </View>
     );
@@ -191,7 +201,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
             backgroundColor: isIcons ? "rgba(0,0,0,0.7)" : "",
           },
           isFullscreen && { width: WindowSize.Height, height: WindowSize.Width },
-        ]}>
+        ]}
+      >
         <TouchableOpacity activeOpacity={1} onPress={() => (isIcons ? fadeOut() : fadeIn())}>
           {isIcons && <TopButton></TopButton>}
         </TouchableOpacity>
@@ -207,7 +218,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
             alignItems: "center",
             marginTop: "3%",
             // backgroundColor: "red",
-          }}>
+          }}
+        >
           {isIcons && <Middle_Buttons></Middle_Buttons>}
         </TouchableOpacity>
 
@@ -220,7 +232,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
             justifyContent: "flex-end",
             flex: 1,
             width: isFullscreen ? "90%" : "100%",
-          }}>
+          }}
+        >
           {isIcons && (
             <>
               <View
@@ -232,18 +245,21 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
                   paddingLeft: "3%",
                   paddingRight: "4%",
                   marginBottom: "3%",
-                }}>
+                }}
+              >
                 <Text
                   style={{
                     color: "white",
-                  }}>
+                  }}
+                >
                   {status.positionMillis ? MilisecondsToTimespamp(status.positionMillis) : "00:00"}
                 </Text>
 
                 <Text
                   style={{
                     color: "white",
-                  }}>
+                  }}
+                >
                   {status.durationMillis ? MilisecondsToTimespamp(status.durationMillis) : "00:00"}
                 </Text>
               </View>
@@ -273,7 +289,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
                   //await video?.current.playFromPositionAsync(a.current);
                   isSliding.current = false;
                   autoFade();
-                }}></Slider>
+                }}
+              ></Slider>
             </>
           )}
         </TouchableOpacity>
@@ -288,7 +305,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
           ? { width: WindowSize.Height * 0.9, height: WindowSize.Width, alignSelf: "center" }
           : styles.video_container,
         ,
-      ]}>
+      ]}
+    >
       <Video
         //ref={(e)=> e?.presentFullscreenPlayer()}
         ref={video}
@@ -307,7 +325,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
         onPlaybackStatusUpdate={(status: any) => {
           !isSliding.current && setStatus(() => status);
         }}
-        source={{ uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" }}></Video>
+        source={{ uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" }}
+      ></Video>
 
       <Button_Overlay></Button_Overlay>
 
@@ -321,7 +340,8 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
           //backgroundColor: "red",
         }}
         color={selectionColor}
-        visible={!isLoaded}></Spinner>
+        visible={!isLoaded}
+      ></Spinner>
     </View>
   );
 };
@@ -355,24 +375,34 @@ const MediaScreen = ({ navigation }: any) => {
   const [isFullscreen, setFullscreen] = React.useState<any>(false);
 
   React.useEffect(() => {
-    return () => {
-      (async () => {
-        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
-        console.log("Left MediaScreen");
-      })();
+    const backAction = () => {
+      if (!isFullscreen) {
+        navigation.goBack();
+        return true;
+      }
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+      setFullscreen(false);
+
+      return true;
     };
-  }, []);
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+    return () => {
+      backHandler.remove();
+    };
+  }, [isFullscreen]);
 
   return (
     <ScrollView
       scrollEnabled={isFullscreen ? false : true}
       style={!isFullscreen ? styles.container : { backgroundColor: "black" }}
-      contentContainerStyle={{ paddingBottom: 50 }}>
+      contentContainerStyle={{ paddingBottom: 50 }}
+    >
       {isFullscreen && <StatusBar hidden></StatusBar>}
       <VideoPlayer
         setFullscreen={setFullscreen}
         isFullscreen={isFullscreen}
-        navigation={navigation}></VideoPlayer>
+        navigation={navigation}
+      ></VideoPlayer>
       <View style={{ flex: 1 }}>
         <View
           style={{
@@ -381,7 +411,8 @@ const MediaScreen = ({ navigation }: any) => {
             //backgroundColor: "red",
             flexDirection: "column",
             justifyContent: "center",
-          }}>
+          }}
+        >
           <Text
             style={{
               ...styles.EpisodeText,
@@ -390,7 +421,8 @@ const MediaScreen = ({ navigation }: any) => {
               marginTop: "4%",
               color: "#95b9fc",
               //textDecorationLine: "underline",
-            }}>
+            }}
+          >
             One Piece
           </Text>
 
@@ -403,7 +435,8 @@ const MediaScreen = ({ navigation }: any) => {
             name="download"
             size={WindowSize.Width * 0.07}
             style={{ marginLeft: "auto", marginRight: "7%" }}
-            color="white"></Octicons>
+            color="white"
+          ></Octicons>
         </View>
         <Seperator style={{ marginTop: "5%" }}></Seperator>
         <NextEpisode_Container></NextEpisode_Container>
