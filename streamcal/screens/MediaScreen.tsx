@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   BackHandler,
   Image,
+  ImageSourcePropType,
 } from "react-native";
 import React from "react";
 import { Video, AVPlaybackStatus, ResizeMode } from "expo-av";
@@ -23,6 +24,7 @@ import { WindowSize } from "../components/constants/Layout";
 import Seperator from "../components/Designs/Seperator";
 import MediaItemCard from "../components/Designs/MediaItemCard";
 import { StatusBar } from "expo-status-bar";
+import { generateThumbnail } from "../components/media/Functions";
 
 function MilisecondsToTimespamp(num: any) {
   const sec = Math.trunc(num / 1000);
@@ -74,6 +76,7 @@ const FollowingEpisodes_Container = () => {
 };
 
 let timer: any = null;
+const videoURL = "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
 
 const SliderTest = ({ onValueChange, test }: any) => {
   const [getSliderPercent, setSliderPercent] = React.useState<any>(test);
@@ -186,13 +189,15 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
     // fadeOut();
   }, []);
 
-  const Slider_Preview = ({ sliderPercent, Timestamp }: any) => {
+  const Slider_Preview = ({ sliderPercent, sliderPos, isSliding }: any) => {
+    const video = React.useRef<any>(null);
+    const [getImage, setImage] = React.useState<any>("");
+
     function pos() {
       const a = WindowSize.Width * sliderPercent - (WindowSize.Width * 0.4) / 2;
       const leftMargin = WindowSize.Width * 0.03;
       const rightMargin = WindowSize.Width * 0.55;
 
-      //console.log(rightMargin, a);
       if (leftMargin < a) {
         if (rightMargin < a) return rightMargin;
         return a;
@@ -200,11 +205,25 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
       if (leftMargin > a) return leftMargin;
       return a;
     }
-    // console.log(WindowSize.Width * 0.55);
+
+    // if (video.current) {
+    //   (async () => {
+    //     //  console.log(sliderPos.current);
+    //     await video?.current.setPositionAsync(sliderPos.current);
+    //     console.log("setPositionAsync");
+    //   })();
+    // }
+    // if (isSliding.current) {
+    //   (async () => {
+    //     const a = await generateThumbnail(videoURL, sliderPos.current, 0);
+    //     setImage(a);
+    //     console.log(a);
+    //   })();
 
     return (
       <View
         style={{
+          opacity: isSliding.current ? 1 : 0,
           backgroundColor: "red",
           width: WindowSize.Width * 0.4,
           height: WindowSize.Width * 0.25,
@@ -212,8 +231,15 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
           top: WindowSize.Width * 0.15,
           left: pos(),
         }}>
-        <Image source={Cover} resizeMode="cover" style={{ height: "100%", width: "100%" }}></Image>
-        <Text style={{ color: "white", textAlign: "center" }}>{Timestamp}</Text>
+        <Image style={{ width: "100%", height: "100%" }} resizeMode="cover" source={Cover}></Image>
+        {/* <Video
+          ref={video}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode={ResizeMode.COVER}
+          source={{ uri: videoURL }}></Video> */}
+        <Text style={{ color: "white", textAlign: "center" }}>
+          {MilisecondsToTimespamp(sliderPos.current)}
+        </Text>
       </View>
     );
   };
@@ -331,12 +357,12 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
           {isIcons && <Middle_Buttons></Middle_Buttons>}
         </TouchableOpacity>
 
-        {isSliding.current && (
+        {isSliding && (
           <Slider_Preview
-            Timestamp={MilisecondsToTimespamp(slidingPos.current)}
+            isSliding={isSliding}
+            sliderPos={slidingPos}
             sliderPercent={getSliderPercent || 0}></Slider_Preview>
         )}
-
         <TouchableOpacity
           onPress={() => (isIcons ? fadeOut() : fadeIn())}
           activeOpacity={1}
@@ -432,7 +458,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
           // console.log("onPlaybackStatusUpdate");
           !isSliding.current && setStatus(() => status);
         }}
-        source={{ uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" }}></Video>
+        source={{ uri: videoURL }}></Video>
 
       <Button_Overlay></Button_Overlay>
       {/* <Button_Overlay2></Button_Overlay2> */}
@@ -453,6 +479,7 @@ const VideoPlayer = ({ navigation, setFullscreen, isFullscreen }: any) => {
 
 const MediaScreen = ({ navigation }: any) => {
   const [isFullscreen, setFullscreen] = React.useState<any>(false);
+
   // const [getV, setV] = React.useState<any>(0);
 
   React.useEffect(() => {
