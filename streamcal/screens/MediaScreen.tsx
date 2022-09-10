@@ -12,7 +12,7 @@ import {
   ImageSourcePropType,
 } from "react-native";
 import React from "react";
-import { Video, AVPlaybackStatus, ResizeMode } from "expo-av";
+import { Video, AVPlaybackStatus, ResizeMode, PitchCorrectionQuality } from "expo-av";
 import * as ScreenOrientation from "expo-screen-orientation";
 
 import Slider from "@react-native-community/slider";
@@ -25,6 +25,7 @@ import Seperator from "../components/Designs/Seperator";
 import MediaItemCard from "../components/Designs/MediaItemCard";
 import { StatusBar } from "expo-status-bar";
 import { generateThumbnail } from "../components/media/Functions";
+import { loadAsync } from "expo-font";
 
 function MilisecondsToTimespamp(num: any) {
   const sec = Math.trunc(num / 1000);
@@ -85,6 +86,7 @@ const VideoPlayer = ({
   isFullscreen,
   previewVideoRef,
   currentVideoRef,
+  onValueChange,
 }: any) => {
   const [status, setStatus] = React.useState<any>({});
   const [isLoaded, setLoaded] = React.useState<any>(true);
@@ -141,8 +143,6 @@ const VideoPlayer = ({
   }, []);
 
   const Slider_Preview = ({ sliderPercent, sliderPos, isSliding }: any) => {
-    const [status, setStatus] = React.useState<any>({});
-
     function pos() {
       const a = WindowSize.Width * sliderPercent - (WindowSize.Width * 0.4) / 2;
       const leftMargin = WindowSize.Width * 0.03;
@@ -167,21 +167,19 @@ const VideoPlayer = ({
           position: "absolute",
           top: WindowSize.Width * 0.15,
           left: pos(),
-        }}>
+        }}
+      >
         <Video
           //ref={(e)=> e?.loadAsync({uri:videoURL})}
-          ref={previewVideoRef}
-          //source={{ uri: videoURL }}
+          // ref={previewVideoRef}
+          source={{ uri: videoURL }}
           // style={{ width: "100%", height: "100%" }}
-          style={{ ...styles.video }}
-          resizeMode={ResizeMode.COVER}
-          onPlaybackStatusUpdate={(status: any) => {
-            setStatus(() => status);
-            console.log("onPlaybackStatusUpdate PreviewVid");
-          }}
-          //positionMillis={sliderPos.current}
+          style={{ ...styles.video, zIndex: 2 }}
+          resizeMode={ResizeMode.STRETCH}
+          positionMillis={sliderPos.current}
           //rate={32}
-          volume={0}></Video>
+          volume={0}
+        ></Video>
         <Text style={{ color: "white", textAlign: "center" }}>
           {MilisecondsToTimespamp(sliderPos.current)}
         </Text>
@@ -196,21 +194,24 @@ const VideoPlayer = ({
         size={Mini_IconSize}
         style={{ opacity: isFullscreen ? 0 : 1 }}
         onPress={() => !isFullscreen && navigation.goBack()}
-        color="white"></MaterialIcons>
+        color="white"
+      ></MaterialIcons>
 
       <View style={{ flexDirection: "row" }}>
         <MaterialIcons
           name="settings"
           size={Mini_IconSize}
           style={{ marginRight: WindowSize.Width * 0.1 }}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
 
         <MaterialIcons
           onPress={async () => setFullscreen(await changeScreenOrientation())}
           name={!isFullscreen ? "open-in-full" : "close-fullscreen"}
           size={Mini_IconSize}
           //style={{ left: WindowSize.Width * 0.26 }}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
       </View>
     </View>
   );
@@ -229,7 +230,8 @@ const VideoPlayer = ({
           marginRight: isFullscreen ? WindowSize.Width * 0.2 : 0,
           justifyContent: "center",
           alignItems: "center",
-        }}>
+        }}
+      >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <MaterialIcons
             name="replay-10"
@@ -239,7 +241,8 @@ const VideoPlayer = ({
             }}
             size={IconSize * 0.8}
             style={{ marginRight: "5%" }}
-            color="white"></MaterialIcons>
+            color="white"
+          ></MaterialIcons>
           <MaterialIcons
             name={status.isPlaying ? "pause" : "play-arrow"}
             size={IconSize * 1.1}
@@ -255,7 +258,8 @@ const VideoPlayer = ({
               status.isPlaying
                 ? await currentVideoRef.current.pauseAsync()
                 : await currentVideoRef.current.playAsync();
-            }}></MaterialIcons>
+            }}
+          ></MaterialIcons>
           <MaterialIcons
             name="forward-10"
             onPress={async () => {
@@ -264,7 +268,8 @@ const VideoPlayer = ({
             }}
             size={IconSize * 0.8}
             style={{ marginLeft: "5%" }}
-            color="white"></MaterialIcons>
+            color="white"
+          ></MaterialIcons>
         </View>
       </View>
     );
@@ -284,7 +289,8 @@ const VideoPlayer = ({
             backgroundColor: isIcons ? "rgba(0,0,0,0.7)" : "",
           },
           isFullscreen && { width: WindowSize.Height, height: WindowSize.Width },
-        ]}>
+        ]}
+      >
         <TouchableOpacity activeOpacity={1} onPress={() => (isIcons ? fadeOut() : fadeIn())}>
           {isIcons && <TopButton></TopButton>}
         </TouchableOpacity>
@@ -300,16 +306,17 @@ const VideoPlayer = ({
             alignItems: "center",
             marginTop: "3%",
             // backgroundColor: "red",
-          }}>
+          }}
+        >
           {isIcons && <Middle_Buttons></Middle_Buttons>}
         </TouchableOpacity>
 
-        {isSliding && (
-          <Slider_Preview
-            isSliding={isSliding}
-            sliderPos={slidingPos}
-            sliderPercent={getSliderPercent || 0}></Slider_Preview>
-        )}
+        {/* <Slider_Preview
+          isSliding={isSliding}
+          sliderPos={slidingPos}
+          sliderPercent={getSliderPercent || 0}
+        ></Slider_Preview> */}
+
         <TouchableOpacity
           onPress={() => (isIcons ? fadeOut() : fadeIn())}
           activeOpacity={1}
@@ -319,7 +326,8 @@ const VideoPlayer = ({
             justifyContent: "flex-end",
             flex: 1,
             width: isFullscreen ? "90%" : "100%",
-          }}>
+          }}
+        >
           {isIcons && (
             <>
               <View
@@ -331,18 +339,21 @@ const VideoPlayer = ({
                   paddingLeft: "3%",
                   paddingRight: "4%",
                   marginBottom: "3%",
-                }}>
+                }}
+              >
                 <Text
                   style={{
                     color: "white",
-                  }}>
+                  }}
+                >
                   {status.positionMillis ? MilisecondsToTimespamp(status.positionMillis) : "00:00"}
                 </Text>
 
                 <Text
                   style={{
                     color: "white",
-                  }}>
+                  }}
+                >
                   {status.durationMillis ? MilisecondsToTimespamp(status.durationMillis) : "00:00"}
                 </Text>
               </View>
@@ -363,6 +374,7 @@ const VideoPlayer = ({
                 onValueChange={(e) => {
                   slidingPos.current = e;
                   setSliderPercent(e / status.durationMillis);
+                  onValueChange && onValueChange({ pos: e, SliderPercent: getSliderPercent });
                 }}
                 value={status.positionMillis}
                 onTouchStart={() => (isSliding.current = true)}
@@ -370,7 +382,8 @@ const VideoPlayer = ({
                   await currentVideoRef?.current.setPositionAsync(e);
                   isSliding.current = false;
                   autoFade();
-                }}></Slider>
+                }}
+              ></Slider>
             </>
           )}
         </TouchableOpacity>
@@ -385,9 +398,9 @@ const VideoPlayer = ({
           ? { width: WindowSize.Height * 0.9, height: WindowSize.Width, alignSelf: "center" }
           : styles.video_container,
         ,
-      ]}>
+      ]}
+    >
       <Video
-        //ref={(e)=> e?.presentFullscreenPlayer()}
         ref={currentVideoRef}
         onLayout={(e) => (videoLayout.current = e)}
         onLoadStart={() => {
@@ -410,7 +423,6 @@ const VideoPlayer = ({
       ></Video>
 
       <Button_Overlay></Button_Overlay>
-      {/* <Button_Overlay2></Button_Overlay2> */}
       <Spinner
         size={IconSize}
         animation={"fade"}
@@ -421,7 +433,8 @@ const VideoPlayer = ({
           //backgroundColor: "red",
         }}
         color={selectionColor}
-        visible={!isLoaded}></Spinner>
+        visible={!isLoaded}
+      ></Spinner>
     </View>
   );
 };
@@ -430,6 +443,8 @@ const MediaScreen = ({ navigation }: any) => {
   const [isFullscreen, setFullscreen] = React.useState<any>(false);
   const currentVideo = React.useRef<any>(null);
   const previewVideo = React.useRef<any>(null);
+  const [getA, setA] = React.useState<any>(false);
+  const ImagesPath: any = [];
 
   React.useEffect(() => {
     const backAction = () => {
@@ -450,13 +465,36 @@ const MediaScreen = ({ navigation }: any) => {
 
   React.useEffect(() => {
     (async () => {
-      console.log("Start Loading Video");
-      const vid = currentVideo?.current?.loadAsync({ uri: videoURL });
-      const preview = previewVideo?.current?.loadAsync({ uri: videoURL });
+      const ImageSeekGenerator = async () => {
+        const duration = 27;
+        const ImageDivi = 10;
+        const ImagesAfterSeconds = Math.round(duration / ImageDivi);
+        const ImagesAfterMiliseconds = ImagesAfterSeconds * 1000;
 
+        console.log("ImageSeek Generator");
+        for (let index = 0; index < ImageDivi; index++) {
+          let ImageMili = Math.floor(index * ImagesAfterMiliseconds);
+          if (index == ImageDivi - 1) ImageMili -= 1000;
+          console.log(ImageMili);
+
+          ImagesPath[index] = await generateThumbnail(
+            videoURL,
+            1, //Math.floor(index * ImagesAfterMiliseconds),
+            0.1
+          );
+        }
+      };
+
+      const vid = currentVideo?.current?.loadAsync({ uri: videoURL });
+      const preview = previewVideo?.current?.loadAsync({ uri: videoURL, width: 100, height: 100 });
+
+      console.log("Start Loading Video");
       await Promise.all([vid, preview]).then(async () => {
         console.log("Video Loaded");
-        await previewVideo?.current?.playAsync();
+        previewVideo?.current?.setStatusAsync({
+          pitchCorrectionQuality: PitchCorrectionQuality.Low,
+        });
+        //console.log("Image:", ImagesPath);
       });
 
       //await previewVideo?.current.setRateAsync({ uri: videoURL });
@@ -467,24 +505,17 @@ const MediaScreen = ({ navigation }: any) => {
     <ScrollView
       scrollEnabled={isFullscreen ? false : true}
       style={!isFullscreen ? styles.container : { backgroundColor: "black" }}
-      contentContainerStyle={{ paddingBottom: 50 }}>
+      contentContainerStyle={{ paddingBottom: 50 }}
+    >
       {isFullscreen && <StatusBar hidden></StatusBar>}
-      {/* <Slider onValueChange={(e) => setV(e)}></Slider> */}
 
-      {/* <Video
-        ref={previewVideo}
-        style={{
-          width: "50%",
-          height: "30%",
-          position: "absolute",
-          backgroundColor: "green",
-        }}></Video> */}
       <VideoPlayer
         previewVideoRef={previewVideo}
         currentVideoRef={currentVideo}
         setFullscreen={setFullscreen}
         isFullscreen={isFullscreen}
-        navigation={navigation}></VideoPlayer>
+        navigation={navigation}
+      ></VideoPlayer>
 
       <View style={{ flex: 1 }}>
         <View
@@ -494,7 +525,8 @@ const MediaScreen = ({ navigation }: any) => {
             //backgroundColor: "red",
             flexDirection: "column",
             justifyContent: "center",
-          }}>
+          }}
+        >
           <Text
             style={{
               ...styles.EpisodeText,
@@ -503,7 +535,8 @@ const MediaScreen = ({ navigation }: any) => {
               marginTop: "4%",
               color: "#95b9fc",
               //textDecorationLine: "underline",
-            }}>
+            }}
+          >
             One Piece
           </Text>
 
@@ -516,7 +549,8 @@ const MediaScreen = ({ navigation }: any) => {
             name="download"
             size={WindowSize.Width * 0.07}
             style={{ marginLeft: "auto", marginRight: "7%" }}
-            color="white"></Octicons>
+            color="white"
+          ></Octicons>
         </View>
         <Seperator style={{ marginTop: "5%" }}></Seperator>
         <NextEpisode_Container></NextEpisode_Container>
