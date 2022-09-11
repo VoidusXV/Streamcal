@@ -20,6 +20,12 @@ function contentExists(ID) {
 }
 //const image = require(__dirname + "/public/Cover.jpg"); //`./Data/${ID}/Cover.jpg`);
 
+app.get("/v1/test", (req, res) => {
+  const testVid = __dirname + "/Data/0/Series/Season_1/7.mp4";
+  console.log(testVid);
+  res.sendFile(testVid);
+});
+
 app.get("/v1/image", (req, res) => {
   //res.send(__dirname);
   //fs.readFile(__dirname + "/Cover.jpg", (e) => {});
@@ -57,20 +63,30 @@ app.get("/v1/Media/Cover", (req, res) => {
     res.status(403).end();
   }
 });
+
 app.get("/v1/watch", (req, res) => {
   try {
+    res.sendFile(__dirname + "/index.html");
+  } catch (e) {
+    console.log("Watch_Error:", e);
+    res.status(403).end();
+  }
+});
+
+app.get("/v1/video", (req, res) => {
+  try {
     const range = req.headers.range;
+
     if (!range) {
       res.status(400).send("Requires Range header");
     }
 
     // get video stats (about 61MB)
-    const videoPath = "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"; //"bigbuck.mp4";
-    const videoSize = fs.statSync("bigbuck.mp4").size;
-
+    const videoPath = __dirname + "/Data/big_buck_bunny.mp4";
+    const videoSize = fs.statSync(videoPath).size;
     // Parse Range
     // Example: "bytes=32324-"
-    const CHUNK_SIZE = 10 ** 6; // 1MB
+    const CHUNK_SIZE = 10 ** 6; // byte to 1MB
     const start = Number(range.replace(/\D/g, ""));
     const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
 
@@ -92,18 +108,17 @@ app.get("/v1/watch", (req, res) => {
     // Stream the video chunk to the client
     videoStream.pipe(res);
   } catch (e) {
+    // console.log("Watch_Error:", e);
     res.status(403).end();
   }
 });
 
 app.get("*", (req, res) => {
   //res.send(mediaData);
-  //res.send("mediaData");
+
   res.status(403);
   res.end();
-
-  //res.writeHead(401);
 });
 app.listen(port, () => console.log("Server listening at Port:", port));
 
-app.listen(port, "192.168.2.121", () => console.log("Server listening at Port:", port));
+//app.listen(port, "192.168.2.121", () => console.log("Server listening at Port:", port));

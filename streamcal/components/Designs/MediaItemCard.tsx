@@ -16,11 +16,17 @@ interface IMediaItemCard {
   navigation?: any;
   CoverSrc?: any;
   Source?: ImageSourcePropType | ImageSourcePropType[];
+  Duration?: number;
+}
+
+function MilisecondsToMinutes(num: any) {
+  return Math.round(num / 1000 / 60);
 }
 
 const MediaItemCard: React.FC<IMediaItemCard> = ({
   ID_Path,
   Title,
+  Duration,
   onPress,
   navigation,
   Source,
@@ -30,21 +36,18 @@ const MediaItemCard: React.FC<IMediaItemCard> = ({
       activeOpacity={0.6}
       underlayColor="#385180"
       style={{ ...styles.MediaItemCard_Container }}
-      onPress={() => navigation.navigate("MediaScreen", { ID: ID_Path })}
-    >
+      onPress={() => navigation.navigate("MediaScreen", { ID: ID_Path })}>
       <>
         <View style={{ backgroundColor: "green", width: "45%", ...styles.ContainerMiddle }}>
           <Image
             source={Source}
             resizeMode="cover"
-            style={{ width: "100%", height: "100%" }}
-          ></Image>
+            style={{ width: "100%", height: "100%" }}></Image>
           <Octicons
             name="play"
             size={WindowSize.Width * 0.15}
             color="white"
-            style={{ position: "absolute" }}
-          ></Octicons>
+            style={{ position: "absolute" }}></Octicons>
         </View>
 
         <View style={{ flex: 1 }}>
@@ -56,8 +59,7 @@ const MediaItemCard: React.FC<IMediaItemCard> = ({
               maxWidth: "90%",
               color: "white",
               fontSize: WindowSize.Width * 0.04,
-            }}
-          >
+            }}>
             <Text style={{ fontWeight: "bold" }}>{ID_Path}. </Text>
             <Text>{Title}</Text>
           </Text>
@@ -69,23 +71,20 @@ const MediaItemCard: React.FC<IMediaItemCard> = ({
               alignItems: "center",
               flexDirection: "row",
               marginTop: "auto",
-            }}
-          >
+            }}>
             <Text
               style={{
                 color: "white",
                 fontSize: WindowSize.Width * 0.04,
                 marginLeft: "5%",
-              }}
-            >
-              24 Min
+              }}>
+              {MilisecondsToMinutes(Duration)} Min
             </Text>
             <Octicons
               name="download"
               size={WindowSize.Width * 0.07}
               style={{ marginLeft: "auto", marginRight: "7%" }}
-              color="white"
-            ></Octicons>
+              color="white"></Octicons>
           </View>
         </View>
       </>

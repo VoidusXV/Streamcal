@@ -28,17 +28,19 @@ import { generateThumbnail } from "../components/media/Functions";
 import { loadAsync } from "expo-font";
 
 function MilisecondsToTimespamp(num: any) {
-  const sec = Math.trunc(num / 1000);
-  const min = Math.trunc(sec / 60);
+  let sec = Math.trunc(num / 1000);
+  let min = Math.trunc(sec / 60);
+  let result = "";
 
-  if (sec < 60) {
-    if (sec >= 10) return `00:${sec}`;
-    return `00:0${sec}`;
-  }
+  if (sec > 60) sec = sec % 60;
 
-  if (sec <= 10) return `0${min}:0${sec % 60}`;
+  if (min < 10) result += `0${min}:`;
+  else result += `${min}:`;
 
-  return `0${min}:${sec % 60}`;
+  if (sec < 10) result += `0${sec}`;
+  else result += sec;
+
+  return result;
 }
 
 async function changeScreenOrientation() {
@@ -77,7 +79,7 @@ const FollowingEpisodes_Container = () => {
 };
 
 let timer: any = null;
-const videoURL = "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
+const videoURL = "http://localhost:3005/v1/test";
 const Cover = require("../assets/covers/One_Piece.jpg");
 
 const VideoPlayer = ({
@@ -107,18 +109,18 @@ const VideoPlayer = ({
     //console.log("fadeIN");
     Animated.timing(IconsOpacity, {
       toValue: 1,
-      duration: 400,
+      duration: 200,
       useNativeDriver: true,
     }).start(() => setIcons(true));
     autoFade();
   };
 
   const fadeOut = () => {
-    return;
+    //  return;
     if (isSliding.current) return;
     Animated.timing(IconsOpacity, {
       toValue: 0,
-      duration: 400,
+      duration: 200,
       useNativeDriver: true,
     }).start(() => {
       setIcons(false);
@@ -139,7 +141,7 @@ const VideoPlayer = ({
   };
 
   React.useEffect(() => {
-    // fadeOut();
+    fadeOut();
   }, []);
 
   const Slider_Preview = ({ sliderPercent, sliderPos, isSliding }: any) => {
@@ -167,8 +169,7 @@ const VideoPlayer = ({
           position: "absolute",
           top: WindowSize.Width * 0.15,
           left: pos(),
-        }}
-      >
+        }}>
         <Video
           //ref={(e)=> e?.loadAsync({uri:videoURL})}
           // ref={previewVideoRef}
@@ -178,8 +179,7 @@ const VideoPlayer = ({
           resizeMode={ResizeMode.STRETCH}
           positionMillis={sliderPos.current}
           //rate={32}
-          volume={0}
-        ></Video>
+          volume={0}></Video>
         <Text style={{ color: "white", textAlign: "center" }}>
           {MilisecondsToTimespamp(sliderPos.current)}
         </Text>
@@ -194,24 +194,21 @@ const VideoPlayer = ({
         size={Mini_IconSize}
         style={{ opacity: isFullscreen ? 0 : 1 }}
         onPress={() => !isFullscreen && navigation.goBack()}
-        color="white"
-      ></MaterialIcons>
+        color="white"></MaterialIcons>
 
       <View style={{ flexDirection: "row" }}>
         <MaterialIcons
           name="settings"
           size={Mini_IconSize}
           style={{ marginRight: WindowSize.Width * 0.1 }}
-          color="white"
-        ></MaterialIcons>
+          color="white"></MaterialIcons>
 
         <MaterialIcons
           onPress={async () => setFullscreen(await changeScreenOrientation())}
           name={!isFullscreen ? "open-in-full" : "close-fullscreen"}
           size={Mini_IconSize}
           //style={{ left: WindowSize.Width * 0.26 }}
-          color="white"
-        ></MaterialIcons>
+          color="white"></MaterialIcons>
       </View>
     </View>
   );
@@ -230,8 +227,7 @@ const VideoPlayer = ({
           marginRight: isFullscreen ? WindowSize.Width * 0.2 : 0,
           justifyContent: "center",
           alignItems: "center",
-        }}
-      >
+        }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <MaterialIcons
             name="replay-10"
@@ -241,8 +237,7 @@ const VideoPlayer = ({
             }}
             size={IconSize * 0.8}
             style={{ marginRight: "5%" }}
-            color="white"
-          ></MaterialIcons>
+            color="white"></MaterialIcons>
           <MaterialIcons
             name={status.isPlaying ? "pause" : "play-arrow"}
             size={IconSize * 1.1}
@@ -258,8 +253,7 @@ const VideoPlayer = ({
               status.isPlaying
                 ? await currentVideoRef.current.pauseAsync()
                 : await currentVideoRef.current.playAsync();
-            }}
-          ></MaterialIcons>
+            }}></MaterialIcons>
           <MaterialIcons
             name="forward-10"
             onPress={async () => {
@@ -268,8 +262,7 @@ const VideoPlayer = ({
             }}
             size={IconSize * 0.8}
             style={{ marginLeft: "5%" }}
-            color="white"
-          ></MaterialIcons>
+            color="white"></MaterialIcons>
         </View>
       </View>
     );
@@ -289,8 +282,7 @@ const VideoPlayer = ({
             backgroundColor: isIcons ? "rgba(0,0,0,0.7)" : "",
           },
           isFullscreen && { width: WindowSize.Height, height: WindowSize.Width },
-        ]}
-      >
+        ]}>
         <TouchableOpacity activeOpacity={1} onPress={() => (isIcons ? fadeOut() : fadeIn())}>
           {isIcons && <TopButton></TopButton>}
         </TouchableOpacity>
@@ -306,8 +298,7 @@ const VideoPlayer = ({
             alignItems: "center",
             marginTop: "3%",
             // backgroundColor: "red",
-          }}
-        >
+          }}>
           {isIcons && <Middle_Buttons></Middle_Buttons>}
         </TouchableOpacity>
 
@@ -326,8 +317,7 @@ const VideoPlayer = ({
             justifyContent: "flex-end",
             flex: 1,
             width: isFullscreen ? "90%" : "100%",
-          }}
-        >
+          }}>
           {isIcons && (
             <>
               <View
@@ -339,21 +329,18 @@ const VideoPlayer = ({
                   paddingLeft: "3%",
                   paddingRight: "4%",
                   marginBottom: "3%",
-                }}
-              >
+                }}>
                 <Text
                   style={{
                     color: "white",
-                  }}
-                >
+                  }}>
                   {status.positionMillis ? MilisecondsToTimespamp(status.positionMillis) : "00:00"}
                 </Text>
 
                 <Text
                   style={{
                     color: "white",
-                  }}
-                >
+                  }}>
                   {status.durationMillis ? MilisecondsToTimespamp(status.durationMillis) : "00:00"}
                 </Text>
               </View>
@@ -382,8 +369,7 @@ const VideoPlayer = ({
                   await currentVideoRef?.current.setPositionAsync(e);
                   isSliding.current = false;
                   autoFade();
-                }}
-              ></Slider>
+                }}></Slider>
             </>
           )}
         </TouchableOpacity>
@@ -398,8 +384,7 @@ const VideoPlayer = ({
           ? { width: WindowSize.Height * 0.9, height: WindowSize.Width, alignSelf: "center" }
           : styles.video_container,
         ,
-      ]}
-    >
+      ]}>
       <Video
         ref={currentVideoRef}
         onLayout={(e) => (videoLayout.current = e)}
@@ -433,8 +418,7 @@ const VideoPlayer = ({
           //backgroundColor: "red",
         }}
         color={selectionColor}
-        visible={!isLoaded}
-      ></Spinner>
+        visible={!isLoaded}></Spinner>
     </View>
   );
 };
@@ -443,7 +427,6 @@ const MediaScreen = ({ navigation }: any) => {
   const [isFullscreen, setFullscreen] = React.useState<any>(false);
   const currentVideo = React.useRef<any>(null);
   const previewVideo = React.useRef<any>(null);
-  const [getA, setA] = React.useState<any>(false);
   const ImagesPath: any = [];
 
   React.useEffect(() => {
@@ -491,13 +474,11 @@ const MediaScreen = ({ navigation }: any) => {
       console.log("Start Loading Video");
       await Promise.all([vid, preview]).then(async () => {
         console.log("Video Loaded");
-        previewVideo?.current?.setStatusAsync({
-          pitchCorrectionQuality: PitchCorrectionQuality.Low,
-        });
+        // previewVideo?.current?.setStatusAsync({
+        //   pitchCorrectionQuality: PitchCorrectionQuality.Low,
+        // });
         //console.log("Image:", ImagesPath);
       });
-
-      //await previewVideo?.current.setRateAsync({ uri: videoURL });
     })();
   }, []);
 
@@ -505,8 +486,7 @@ const MediaScreen = ({ navigation }: any) => {
     <ScrollView
       scrollEnabled={isFullscreen ? false : true}
       style={!isFullscreen ? styles.container : { backgroundColor: "black" }}
-      contentContainerStyle={{ paddingBottom: 50 }}
-    >
+      contentContainerStyle={{ paddingBottom: 50 }}>
       {isFullscreen && <StatusBar hidden></StatusBar>}
 
       <VideoPlayer
@@ -514,8 +494,7 @@ const MediaScreen = ({ navigation }: any) => {
         currentVideoRef={currentVideo}
         setFullscreen={setFullscreen}
         isFullscreen={isFullscreen}
-        navigation={navigation}
-      ></VideoPlayer>
+        navigation={navigation}></VideoPlayer>
 
       <View style={{ flex: 1 }}>
         <View
@@ -525,8 +504,7 @@ const MediaScreen = ({ navigation }: any) => {
             //backgroundColor: "red",
             flexDirection: "column",
             justifyContent: "center",
-          }}
-        >
+          }}>
           <Text
             style={{
               ...styles.EpisodeText,
@@ -535,8 +513,7 @@ const MediaScreen = ({ navigation }: any) => {
               marginTop: "4%",
               color: "#95b9fc",
               //textDecorationLine: "underline",
-            }}
-          >
+            }}>
             One Piece
           </Text>
 
@@ -549,8 +526,7 @@ const MediaScreen = ({ navigation }: any) => {
             name="download"
             size={WindowSize.Width * 0.07}
             style={{ marginLeft: "auto", marginRight: "7%" }}
-            color="white"
-          ></Octicons>
+            color="white"></Octicons>
         </View>
         <Seperator style={{ marginTop: "5%" }}></Seperator>
         <NextEpisode_Container></NextEpisode_Container>

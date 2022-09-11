@@ -155,8 +155,6 @@ const TopBar = ({ navigation, Title, scrollValue }: any) => {
   );
 };
 
-const data = [{ ID: 0, Title: "Testus_" }];
-
 const ViewContent = ({ route, navigation }: any) => {
   const { contentData } = route.params;
   const [isLoaded, setLoaded] = React.useState(false);
@@ -211,8 +209,9 @@ const ViewContent = ({ route, navigation }: any) => {
                 contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
                 renderItem={({ item, index }: any) => (
                   <MediaItemCard
-                    ID_Path={index + 1}
+                    ID_Path={item.Episode}
                     Title={item.Title}
+                    Duration={item.Duration}
                     navigation={navigation}
                     Source={{ uri: getVideoThumbnailURLs[0] }}></MediaItemCard>
                 )}></FlashList>

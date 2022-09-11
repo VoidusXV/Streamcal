@@ -4,39 +4,15 @@
          {
             "Episodes":[
                {
-                  "ID":0, 
+                  "ID": 0, 
+                  "Episode": 7,
                   "Cover":"Cover.jpg",
                   "Path":"/Series/Season_1/7.mp4",
                   "Title":"Du wirst etwas einmaliges sehen",
-                  "Description":""
-               },
-               {
-                  "ID":1, 
-                  "Cover":"Cover.jpg",
-                  "Path":"/Series/Season_1/7.mp4",
-                  "Title":"Du wirst etwas einmaliges sehen",
-                  "Description":""
-               },
-               {
-                  "ID":2, 
-                  "Cover":"Cover.jpg",
-                  "Path":"/Series/Season_1/7.mp4",
-                  "Title":"Du wirst etwas einmaliges sehen",
-                  "Description":""
-               },{
-                  "ID":3, 
-                  "Cover":"Cover.jpg",
-                  "Path":"/Series/Season_1/7.mp4",
-                  "Title":"Du wirst etwas einmaliges sehen",
-                  "Description":""
-               },{
-                  "ID":4, 
-                  "Cover":"Cover.jpg",
-                  "Path":"/Series/Season_1/7.mp4",
-                  "Title":"Du wirst etwas einmaliges sehen",
-                  "Description":""
-               }
-            ]      
+                  "Description":"",
+                  "Duration" : 1450000
+               }        
+           ]      
          }
       ]
       
