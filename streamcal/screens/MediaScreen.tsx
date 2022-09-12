@@ -79,7 +79,7 @@ const FollowingEpisodes_Container = () => {
 };
 
 let timer: any = null;
-const videoURL = "http://localhost:3005/v1/test";
+const videoURL = "https://eea3-2003-ea-c73b-5f87-41fb-85e8-7931-729f.eu.ngrok.io/v1/test";
 const Cover = require("../assets/covers/One_Piece.jpg");
 
 const VideoPlayer = ({
