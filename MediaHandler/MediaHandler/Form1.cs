@@ -18,6 +18,7 @@ namespace MediaHandler
     {
 
         static WebClient webClient = new WebClient();
+        static FileHandler fileHandler = new FileHandler();
 
         string URL = "https://aniworld.to/anime/stream/kurokos-basketball/staffel-1/episode-1";//"https://anime-base.net/anime/kurokos-basketball";;
         static string currentPath = Directory.GetCurrentDirectory();
@@ -61,12 +62,12 @@ namespace MediaHandler
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-
+            Application.Exit();
         }
 
-        void KOK(object sender, EventArgs e)
+        void onProcessExited(object sender, EventArgs e)
         {
-            AddLog("KOKUSMILCH");
+            eventHandled.TrySetResult(true);
         }
         private TaskCompletionSource<bool> eventHandled;
 
@@ -81,28 +82,29 @@ namespace MediaHandler
             startInfo.WorkingDirectory = processesPath;
             startInfo.FileName = FileName;
             startInfo.Arguments = !systemArguments ? Arguments : $"/c {Arguments}";
+
             process.StartInfo = startInfo;
+            process.EnableRaisingEvents = true;
+            process.Exited += new EventHandler(onProcessExited);
             process.Start();
-            process.Exited += new EventHandler(KOK);
 
             await Task.WhenAny(eventHandled.Task);
 
             //process.WaitForExit();
         }
 
-        void ConvertTsToMp4(string fileName = "")
+        async Task ConvertTsToMp4(string fileName = "")
         {
-            this.Invoke((MethodInvoker)delegate
-            {
-                AddLog("Merging TS Files...");
-                RunCmd("ffmpeg -f concat -i tsList.txt -c copy all.ts", hidden: true, systemArguments: true);
 
-                AddLog("TS Files successfully merged");
-                AddLog("Converting TS To MP4...");
+            AddLog("Merging TS Files...");
+            await RunCmd("ffmpeg -f concat -i tsList.txt -c copy all.ts", hidden: true, systemArguments: true);
 
-                RunCmd("ffmpeg -i all.ts -acodec copy -vcodec copy all.mp4", hidden: true, systemArguments: true);
-                AddLog("TS To MP4 successfully converted");
-            });
+            AddLog("TS Files successfully merged");
+            AddLog("Converting TS To MP4...");
+
+            await RunCmd("ffmpeg -i all.ts -acodec copy -vcodec copy all.mp4", hidden: true, systemArguments: true);
+            AddLog("TS To MP4 successfully converted");
+
         }
 
         void Create_TsList(string path)
@@ -176,7 +178,6 @@ namespace MediaHandler
 
         }
 
-
         void AddLog(string text)
         {
             this.Invoke((MethodInvoker)delegate
@@ -184,6 +185,42 @@ namespace MediaHandler
                 richTextBox1.AppendText(text + "\n");
             });
 
+        }
+
+
+        void DeleteFiles()
+        {
+            File.Delete($"{processesPath}/all.ts");
+            File.Delete($"{processesPath}/index-v1-a1.m3u8");
+            File.Delete($"{processesPath}/master.m3u8");
+            File.Delete($"{processesPath}/tsList.txt");
+            File.Delete($"{processesPath}/video.html");
+            Directory.Delete($"{processesPath}/video.html", true);
+        }
+
+
+        FileHandler.Test Get_TitleSeasonEpisode(string[] htmlFile)
+        {//string output = input.Substring(input.IndexOf('.') + 1);
+            string a = htmlFile[4].Substring(0, htmlFile[4].IndexOf(".AAC"));
+            string b = a.Substring(a.IndexOf("Watch ")).Split(' ')[1];
+            int AmountOfDots = b.Split('.').Length - 1;
+            string TitleWithEpisodeAndSeason = b.Substring(0, b.LastIndexOf('.'));
+
+            string SeasonAndEpisode = TitleWithEpisodeAndSeason.Substring(TitleWithEpisodeAndSeason.LastIndexOf('.') + 1);
+            string Season = SeasonAndEpisode.Substring(1, SeasonAndEpisode.IndexOf("E") - 1);
+
+            int EpisodeTextLength = SeasonAndEpisode.Length - Season.Length - 2;
+            string Episode = SeasonAndEpisode.Substring(SeasonAndEpisode.IndexOf("E") + 1, EpisodeTextLength);
+
+            string Title = TitleWithEpisodeAndSeason.Replace($".{SeasonAndEpisode}", "").Replace(".", " ");
+            return new FileHandler.Test { Title = Title, Episode = Episode, Season = Season };
+
+        }
+        void GetContentInfo()
+        {
+            string[] htmlFile = File.ReadAllLines($"{processesPath}/video.html");
+            var title = Get_TitleSeasonEpisode(htmlFile);
+            Console.WriteLine(title.Season);
         }
         private async void button3_Click(object sender, EventArgs e)
         {
@@ -202,10 +239,10 @@ namespace MediaHandler
                 AddLog("Scrapping started");
                 //Task CmdTask = Task.Run(() => RunCmd(textBox1.Text, scrapperPath + "/scrapper.exe", hidden: true));
                 //await Task.WhenAll(CmdTask);
-                await RunCmd(textBox1.Text, scrapperPath + "/scrapper.exe", hidden: false);
+                await RunCmd(textBox1.Text, scrapperPath + "/scrapper.exe", hidden: true);
                 AddLog("Scrapping successfully ended");
                 progressBar1.Value = 10;
-                return;
+
                 string indexURL;
                 Download_MasterFile();
                 indexURL = File.ReadAllLines(processesPath + "/master.m3u8")[2];
@@ -220,9 +257,10 @@ namespace MediaHandler
                 Create_TsList($"{processesPath}/TS_Files");
                 progressBar1.Value = 80;
 
-                ConvertTsToMp4();
+                await ConvertTsToMp4();
 
                 progressBar1.Value = 100;
+                DeleteFiles();
                 MessageBox.Show("Media successfully downloaded", "Downloaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -258,6 +296,11 @@ namespace MediaHandler
         {
             richTextBox1.Clear();
 
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            GetContentInfo();
         }
     }
 }
