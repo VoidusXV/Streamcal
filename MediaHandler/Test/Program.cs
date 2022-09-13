@@ -9,10 +9,25 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.DevTools;
 using OpenQA.Selenium.Support.UI;
-
+using Newtonsoft.Json;
 
 namespace Test
 {
+    public class Series
+    {
+        public string EpisodeTitle { get; set; }
+        public string Episode { get; set; }
+        public string Season { get; set; }
+        public string Description { get; set; }
+        public string Started { get; set; }
+        public string Ended { get; set; }
+        public string Director { get; set; }
+        public string Producer { get; set; }
+        public string Episode_Description { get; set; }
+
+    }
+
+
     internal class Program
     {
         static IWebDriver driver;
@@ -21,11 +36,14 @@ namespace Test
         static string URL; //= "https://aniworld.to/anime/stream/kurokos-basketball/staffel-1/episode-1";//"https://anime-base.net/anime/kurokos-basketball";;
         static string VidozaButton = "//li[contains(@class,'col-md-3 col-xs-12 col-sm-6')][4]/div[@class='generateInlinePlayer'][1]/a[@class='watchEpisode'][1]/div[@class='hosterSiteVideoButton'][1]";
         static WebClient webClient = new WebClient();
+        static string currentPath = Directory.GetCurrentDirectory();
+
         //C:\Coding\Projects\Private Streaming Service\Streamcal\MediaHandler\MediaHandler\bin\Debug\Proccesses/Test.exe ada
         static void Main(string[] args)
         {
 
 
+           
             if (args.Length == 0)
                 return;
 
@@ -64,6 +82,51 @@ namespace Test
 
         }
 
+        static Series GetDetails()
+        {
+            string animeDetails = "//p[@class='seri_des']";
+            string director = "//li[@class='seriesDirector'][1]//span";
+            string producer = "//li[@itemprop='creator'][1]//span";
+            string episodeTitle = "//span[@class='episodeGermanTitle']";
+            string openDescription = "//span[@class='descriptionSpoilerLink'][1]";
+            string episodeDescription = "//p[@class='descriptionSpoiler'][1]";
+            string started = "//span[1]/a[1]";
+            string ended = "//span[2]/a[1]";
+
+
+            IWebElement animeDetailsElement = driver.FindElement(By.XPath(animeDetails));
+            IWebElement directorElement = driver.FindElement(By.XPath(director));
+            IWebElement producerElement = driver.FindElement(By.XPath(producer));
+            IWebElement episodeTitleElement = driver.FindElement(By.XPath(episodeTitle));
+            IWebElement openDescriptionElement = driver.FindElement(By.XPath(openDescription));
+            IWebElement episodeDescriptionElement = driver.FindElement(By.XPath(episodeDescription));
+            IWebElement startedElement = driver.FindElement(By.XPath(started));
+            IWebElement endedElement = driver.FindElement(By.XPath(ended));
+
+            int SlashAmount = driver.Url.Split("/").Length - 1;
+            string Season = driver.Url.Split("/")[SlashAmount - 1].Split("-")[1];
+            string Episode = driver.Url.Split("/")[SlashAmount].Split("-")[1];
+            openDescriptionElement.Click();
+
+            return new Series
+            {
+                EpisodeTitle = episodeTitleElement.Text,
+                Episode = Episode,
+                Season = Season,
+                Started = startedElement.Text,
+                Ended = endedElement.Text,
+                Director = directorElement.Text,
+                Episode_Description = episodeDescriptionElement.Text,
+                Producer = producerElement.Text,
+                Description = animeDetailsElement.Text,
+            };
+        }
+
+        static void CreateJson()
+        {
+            var details = GetDetails();
+            File.WriteAllText($"{currentPath}/{details.EpisodeTitle}.json", JsonConvert.SerializeObject(details,Formatting.Indented));
+        }
         private static void OnNetworkRequestSent(object sender, NetworkRequestSentEventArgs e)
         {
             StringBuilder builder = new StringBuilder();
@@ -101,6 +164,8 @@ namespace Test
                     Console.WriteLine($"{Directory.GetCurrentDirectory()}/video.html");
                     webClient.DownloadFile(e.ResponseUrl, $"{Directory.GetCurrentDirectory()}/video.html");
                     Console.WriteLine("Download done");
+                    CreateJson();
+
                     driver.Quit();
                     Environment.Exit(-1);
                     interceptor.StopMonitoring();

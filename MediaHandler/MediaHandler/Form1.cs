@@ -190,12 +190,16 @@ namespace MediaHandler
 
         void DeleteFiles()
         {
-            File.Delete($"{processesPath}/all.ts");
-            File.Delete($"{processesPath}/index-v1-a1.m3u8");
-            File.Delete($"{processesPath}/master.m3u8");
-            File.Delete($"{processesPath}/tsList.txt");
-            File.Delete($"{processesPath}/video.html");
-            Directory.Delete($"{processesPath}/video.html", true);
+            try
+            {
+                File.Delete($"{processesPath}/all.ts");
+                File.Delete($"{processesPath}/index-v1-a1.m3u8");
+                File.Delete($"{processesPath}/master.m3u8");
+                File.Delete($"{processesPath}/tsList.txt");
+                File.Delete($"{processesPath}/video.html");
+                Directory.Delete($"{processesPath}/TS_Files", true);
+            }
+            catch { }
         }
 
 
