@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaHandler", "MediaHandler\MediaHandler.csproj", "{1BD35B71-CF1E-4DE8-A464-B7B231CCD110}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{5FAF86CD-3BA4-48E4-89DF-1E7D0204EC18}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scrapper", "Test\scrapper.csproj", "{5FAF86CD-3BA4-48E4-89DF-1E7D0204EC18}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
