@@ -11,6 +11,8 @@ using System.IO;
 using System.Net;
 using System.Diagnostics;
 using System.Threading;
+using Newtonsoft.Json;
+using Ookii.Dialogs.WinForms;
 
 namespace MediaHandler
 {
@@ -28,6 +30,8 @@ namespace MediaHandler
         public Form1()
         {
             InitializeComponent();
+            textBox2.Text = File.ReadAllText($"{currentPath}/settings.ini");
+
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
 
@@ -93,16 +97,16 @@ namespace MediaHandler
             //process.WaitForExit();
         }
 
-        async Task ConvertTsToMp4(string fileName = "")
+        async Task ConvertTsToMp4(string fileName = "all")
         {
 
             AddLog("Merging TS Files...");
-            await RunCmd("ffmpeg -f concat -i tsList.txt -c copy all.ts", hidden: true, systemArguments: true);
+            await RunCmd($"ffmpeg -f concat -i tsList.txt -c copy {fileName}.ts", hidden: true, systemArguments: true);
 
             AddLog("TS Files successfully merged");
             AddLog("Converting TS To MP4...");
 
-            await RunCmd("ffmpeg -i all.ts -acodec copy -vcodec copy all.mp4", hidden: true, systemArguments: true);
+            await RunCmd($"ffmpeg -i all.ts -acodec copy -vcodec copy {fileName}.mp4", hidden: true, systemArguments: true);
             AddLog("TS To MP4 successfully converted");
 
         }
@@ -192,18 +196,21 @@ namespace MediaHandler
         {
             try
             {
-                File.Delete($"{processesPath}/all.ts");
-                File.Delete($"{processesPath}/index-v1-a1.m3u8");
-                File.Delete($"{processesPath}/master.m3u8");
-                File.Delete($"{processesPath}/tsList.txt");
-                File.Delete($"{processesPath}/video.html");
-                Directory.Delete($"{processesPath}/TS_Files", true);
+                string[] files = Directory.GetFiles(processesPath);
+                foreach (var item in files)
+                {
+                    if (item != "ffmpeg.exe")
+                        File.Delete(item);
+                }
+
+                if (Directory.Exists($"{processesPath}/TS_Files"))
+                    Directory.Delete($"{processesPath}/TS_Files", true);
             }
             catch { }
         }
 
 
-        FileHandler.Test Get_TitleSeasonEpisode(string[] htmlFile)
+        FileHandler.Series Get_TitleSeasonEpisode(string[] htmlFile)
         {//string output = input.Substring(input.IndexOf('.') + 1);
             string a = htmlFile[4].Substring(0, htmlFile[4].IndexOf(".AAC"));
             string b = a.Substring(a.IndexOf("Watch ")).Split(' ')[1];
@@ -217,7 +224,7 @@ namespace MediaHandler
             string Episode = SeasonAndEpisode.Substring(SeasonAndEpisode.IndexOf("E") + 1, EpisodeTextLength);
 
             string Title = TitleWithEpisodeAndSeason.Replace($".{SeasonAndEpisode}", "").Replace(".", " ");
-            return new FileHandler.Test { Title = Title, Episode = Episode, Season = Season };
+            return new FileHandler.Series { Title = Title, Episode = Episode, Season = Season };
 
         }
         void GetContentInfo()
@@ -261,7 +268,10 @@ namespace MediaHandler
                 Create_TsList($"{processesPath}/TS_Files");
                 progressBar1.Value = 80;
 
-                await ConvertTsToMp4();
+                string JsonFile = File.ReadAllText($"{processesPath}/Kurokos Basketball.json");
+                var JsonObject = JsonConvert.DeserializeObject<FileHandler.Series>(JsonFile);
+
+                await ConvertTsToMp4($"{JsonObject.Title}_{JsonObject.Season}_{JsonObject.Episode}");
 
                 progressBar1.Value = 100;
                 DeleteFiles();
@@ -274,6 +284,7 @@ namespace MediaHandler
             }
             finally
             {
+                progressBar1.Value = 0;
                 button3.Enabled = true;
             }
         }
@@ -305,6 +316,59 @@ namespace MediaHandler
         private void button4_Click(object sender, EventArgs e)
         {
             GetContentInfo();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string NewContent_JsonFile = File.ReadAllText($"{processesPath}/Kurokos Basketball.json");
+            var NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.Series>(NewContent_JsonFile);
+
+            string Content_JsonFile = File.ReadAllText($"{textBox2.Text}/Content.json");
+            List<FileHandler.Data_Content> Content_JsonObject = JsonConvert.DeserializeObject<List<FileHandler.Data_Content>>(Content_JsonFile);
+
+            for (int i = 0; i < Content_JsonObject.Count; i++)
+            {
+                if(Content_JsonObject[i].Title == NewContent_JsonObject.Title)
+                {
+                    Console.WriteLine("etetet");
+                    return;
+                }
+            }
+
+            //If NewContent doesnt exist
+
+            Console.WriteLine("KOkus");
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            MessageBox.Show("Select the 'Data' Folder in the 'Server' Folder", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            //FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+            //folderBrowserDialog.ShowDialog();
+            //Console.WriteLine(folderBrowserDialog.SelectedPath);
+
+            VistaFolderBrowserDialog vistaFolderBrowserDialog = new VistaFolderBrowserDialog();
+            vistaFolderBrowserDialog.SelectedPath = currentPath + "/";
+            DialogResult dialogResult = vistaFolderBrowserDialog.ShowDialog();
+            if (dialogResult != DialogResult.OK)
+                return;
+            if (Path.GetFileName(vistaFolderBrowserDialog.SelectedPath) != "Data")
+            {
+                MessageBox.Show("Please select the 'Data' Folder", "Wrong Folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            textBox2.Text = vistaFolderBrowserDialog.SelectedPath;
+            File.WriteAllText($"{currentPath}/settings.ini", textBox2.Text);
         }
     }
 }
