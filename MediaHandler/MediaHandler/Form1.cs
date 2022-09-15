@@ -26,16 +26,23 @@ namespace MediaHandler
         static string currentPath = Directory.GetCurrentDirectory();
         static string processesPath = currentPath + "/Processes";
         static string scrapperPath = currentPath + "/scrapper";
-
+        static string settingsIni_Path = currentPath + "/settings.ini";
+        static string serverDataPath;
         public Form1()
         {
             InitializeComponent();
-            textBox2.Text = File.ReadAllText($"{currentPath}/settings.ini");
-
+            Setup();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
 
 
+        void Setup()
+        {
+            if (File.Exists(settingsIni_Path))
+                serverDataPath = File.ReadAllText(settingsIni_Path);
+
+            textBox2.Text = serverDataPath;
+        }
         private void button1_Click(object sender, EventArgs e)
         {
 
@@ -108,6 +115,24 @@ namespace MediaHandler
 
             await RunCmd($"ffmpeg -i all.ts -acodec copy -vcodec copy {fileName}.mp4", hidden: true, systemArguments: true);
             AddLog("TS To MP4 successfully converted");
+
+        }
+
+        async Task GeneratePreviewImagesAndThumbnail(string fileName = "all")
+        {
+            //await RunCmd($"ffmpeg -i {fileName}.mp4 -vf fps=1/10 -q:v 50 img/image_%d.jpg", hidden: true, systemArguments: true);// Every 10 seconds one image
+            //await RunCmd($"ffmpeg -i img/image_%d.jpg -filter_complex 'scale = 80:-1, tile = 10x15' preview.png", hidden: true, systemArguments: true); // Merge all images to one image
+
+            /*string imagesFolder = $"{processesPath}/img";
+            string[] imageFiles = Directory.GetFiles(imagesFolder);
+            int ThumbnailIndex = Convert.ToInt32(imageFiles.Length / 2);
+            File.Copy($"{imagesFolder}/image_{ThumbnailIndex}.jpg", $"{processesPath}/Thumbnail.jpg");*/
+
+
+            var Duration = JsonConvert.DeserializeObject<FileHandler.NewContent>(File.ReadAllText($"{processesPath}/Kurokos Basketball.json")).Duration / 1000;
+            int MiddleContentLength = Convert.ToInt32(Duration / 2);
+            Console.WriteLine(MiddleContentLength);
+            await RunCmd($"ffmpeg -ss {MiddleContentLength} -i {fileName}.mp4 -qscale:v 1 -frames:v 1 Thumbnail.jpg", hidden: false, systemArguments: true);
 
         }
 
@@ -210,28 +235,28 @@ namespace MediaHandler
         }
 
 
-        FileHandler.Series Get_TitleSeasonEpisode(string[] htmlFile)
-        {//string output = input.Substring(input.IndexOf('.') + 1);
-            string a = htmlFile[4].Substring(0, htmlFile[4].IndexOf(".AAC"));
-            string b = a.Substring(a.IndexOf("Watch ")).Split(' ')[1];
-            int AmountOfDots = b.Split('.').Length - 1;
-            string TitleWithEpisodeAndSeason = b.Substring(0, b.LastIndexOf('.'));
+        /* FileHandler.Series Get_TitleSeasonEpisode(string[] htmlFile)
+         {//string output = input.Substring(input.IndexOf('.') + 1);
+             string a = htmlFile[4].Substring(0, htmlFile[4].IndexOf(".AAC"));
+             string b = a.Substring(a.IndexOf("Watch ")).Split(' ')[1];
+             int AmountOfDots = b.Split('.').Length - 1;
+             string TitleWithEpisodeAndSeason = b.Substring(0, b.LastIndexOf('.'));
 
-            string SeasonAndEpisode = TitleWithEpisodeAndSeason.Substring(TitleWithEpisodeAndSeason.LastIndexOf('.') + 1);
-            string Season = SeasonAndEpisode.Substring(1, SeasonAndEpisode.IndexOf("E") - 1);
+             string SeasonAndEpisode = TitleWithEpisodeAndSeason.Substring(TitleWithEpisodeAndSeason.LastIndexOf('.') + 1);
+             string Season = SeasonAndEpisode.Substring(1, SeasonAndEpisode.IndexOf("E") - 1);
 
-            int EpisodeTextLength = SeasonAndEpisode.Length - Season.Length - 2;
-            string Episode = SeasonAndEpisode.Substring(SeasonAndEpisode.IndexOf("E") + 1, EpisodeTextLength);
+             int EpisodeTextLength = SeasonAndEpisode.Length - Season.Length - 2;
+             string Episode = SeasonAndEpisode.Substring(SeasonAndEpisode.IndexOf("E") + 1, EpisodeTextLength);
 
-            string Title = TitleWithEpisodeAndSeason.Replace($".{SeasonAndEpisode}", "").Replace(".", " ");
-            return new FileHandler.Series { Title = Title, Episode = Episode, Season = Season };
+             string Title = TitleWithEpisodeAndSeason.Replace($".{SeasonAndEpisode}", "").Replace(".", " ");
+             return new FileHandler.Series { Title = Title, Episode = Episode, Season = Season };
 
-        }
+         }*/
         void GetContentInfo()
         {
-            string[] htmlFile = File.ReadAllLines($"{processesPath}/video.html");
-            var title = Get_TitleSeasonEpisode(htmlFile);
-            Console.WriteLine(title.Season);
+            //string[] htmlFile = File.ReadAllLines($"{processesPath}/video.html");
+            //var title = Get_TitleSeasonEpisode(htmlFile);
+            //Console.WriteLine(title.Season);
         }
         private async void button3_Click(object sender, EventArgs e)
         {
@@ -269,7 +294,7 @@ namespace MediaHandler
                 progressBar1.Value = 80;
 
                 string JsonFile = File.ReadAllText($"{processesPath}/Kurokos Basketball.json");
-                var JsonObject = JsonConvert.DeserializeObject<FileHandler.Series>(JsonFile);
+                var JsonObject = JsonConvert.DeserializeObject<FileHandler.NewContent>(JsonFile);
 
                 await ConvertTsToMp4($"{JsonObject.Title}_{JsonObject.Season}_{JsonObject.Episode}");
 
@@ -323,19 +348,45 @@ namespace MediaHandler
 
         }
 
+        void Move_ExistingContent(int index, FileHandler.NewContent NewContent_JsonObject, List<FileHandler.Data_Content> Content_JsonObject)
+        {
+            int NewContentSeason = NewContent_JsonObject.Season;
+            int ContentID = Content_JsonObject[index].ID;
+
+            string LocationFile_Path = $"{currentPath}/Locations.json";
+            string LocationFile = File.ReadAllText(LocationFile_Path); //File.ReadAllText($"{serverDataPath}/{ContentID}/Locations.json");
+            var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(LocationFile);
+
+            int Episode = NewContent_JsonObject.Episode;
+            string Path = $"/Series/Season_{NewContentSeason}/{NewContent_JsonObject.Episode}.mp4";
+            string Title = NewContent_JsonObject.EpisodeTitle;
+            string Description = NewContent_JsonObject.Episode_Description;
+            long Duration = NewContent_JsonObject.Duration;
+
+
+            if (!JsonHandler.SeasonExists(LocationFile_Path, NewContentSeason))
+                JsonHandler.Add_NewSeason(LocationFile_Path, NewContentSeason);
+
+            JsonHandler.Add_NewEpisode(Episode, Path, Title, Description, Duration, NewContentSeason, LocationFile_Path);
+
+
+            //File.Move(processesPath + "/all.mp4", $"{serverDataPath}/{ContentID}");
+        }
+
         private void button5_Click(object sender, EventArgs e)
         {
             string NewContent_JsonFile = File.ReadAllText($"{processesPath}/Kurokos Basketball.json");
-            var NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.Series>(NewContent_JsonFile);
+            var NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.NewContent>(NewContent_JsonFile);
 
             string Content_JsonFile = File.ReadAllText($"{textBox2.Text}/Content.json");
             List<FileHandler.Data_Content> Content_JsonObject = JsonConvert.DeserializeObject<List<FileHandler.Data_Content>>(Content_JsonFile);
 
             for (int i = 0; i < Content_JsonObject.Count; i++)
             {
-                if(Content_JsonObject[i].Title == NewContent_JsonObject.Title)
+                if (Content_JsonObject[i].Title == NewContent_JsonObject.Title)
                 {
-                    Console.WriteLine("etetet");
+                    Console.WriteLine("Found");
+                    Move_ExistingContent(i, NewContent_JsonObject, Content_JsonObject);
                     return;
                 }
             }
@@ -369,6 +420,11 @@ namespace MediaHandler
 
             textBox2.Text = vistaFolderBrowserDialog.SelectedPath;
             File.WriteAllText($"{currentPath}/settings.ini", textBox2.Text);
+        }
+
+        private async void button7_Click(object sender, EventArgs e)
+        {
+            await GeneratePreviewImagesAndThumbnail();
         }
     }
 }

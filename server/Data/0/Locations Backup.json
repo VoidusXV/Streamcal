@@ -1,11 +1,10 @@
 {
    "Series":{
-   
-		"Seasons":[
+      "Seasons":[
          {
-		    "SeasonNum": "1",
             "Episodes":[
                {
+                  "ID": 0, 
                   "Episode": 7,
                   "Cover":"Cover.jpg",
                   "Path":"/Series/Season_1/7.mp4",

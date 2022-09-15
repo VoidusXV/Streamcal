@@ -8,16 +8,18 @@ namespace MediaHandler
 {
     public class FileHandler
     {
-        public class Series
+        public class NewContent
         {
             public string Title { get; set; }
             public string Description { get; set; }
             public string EpisodeTitle { get; set; }
             public string Episode_Description { get; set; }
-            public string Episode { get; set; }
-            public string Season { get; set; }
-            public string Started { get; set; }
-            public string Ended { get; set; }
+            public int Episode { get; set; }
+            public int Season { get; set; }
+            public int Started { get; set; }
+            public int Ended { get; set; }
+            public long Duration { get; set; }
+
             public string Director { get; set; }
             public string Producer { get; set; }
 
@@ -30,6 +32,40 @@ namespace MediaHandler
             public string Description { get; set; }
             public string Availability { get; set; }
             public string Genre { get; set; }
+        }
+
+        public class Locations
+        {
+            public class Main
+            {
+                public Series Series { get; set; }
+                public Movies Movies { get; set; }
+            }
+
+            public class Movies
+            {
+            }
+
+            public class Series
+            {
+                public List<Season> Seasons { get; set; }
+            }
+
+            public class Season
+            {
+                public int SeasonNum { get; set; }
+                public List<Episodes> Episodes { get; set; }
+            }
+
+            public class Episodes
+            {
+                public int Episode { get; set; }
+                public string Cover { get; set; }
+                public string Path { get; set; }
+                public string Title { get; set; }
+                public string Description { get; set; }
+                public long Duration { get; set; }
+            }
         }
     }
 }
