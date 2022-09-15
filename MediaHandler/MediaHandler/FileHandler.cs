@@ -8,7 +8,7 @@ namespace MediaHandler
 {
     public class FileHandler
     {
-        public class NewContent
+        public class NewContent_Locations
         {
             public string Title { get; set; }
             public string Description { get; set; }
@@ -19,11 +19,20 @@ namespace MediaHandler
             public int Started { get; set; }
             public int Ended { get; set; }
             public long Duration { get; set; }
-
             public string Director { get; set; }
             public string Producer { get; set; }
 
         }
+        public class NewContent
+        {
+            public int ID { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+            public string Availability { get; set; }
+            public string Genre { get; set; }
+
+        }
+
 
         public class Data_Content
         {

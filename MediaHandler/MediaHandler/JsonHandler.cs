@@ -52,13 +52,39 @@ namespace MediaHandler
             File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));
         }
 
-
         public static bool SeasonExists(string jsonPath, int NewContentSeason)
         {
             var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(File.ReadAllText(jsonPath));
             for (int i = 0; i < LocationObject.Series.Seasons.Count; i++)
             {
                 if (NewContentSeason == LocationObject.Series.Seasons[i].SeasonNum)
+                    return true;
+            }
+            return false;
+        }
+
+        public static void Add_NewContent(string jsonPath, string ContentData, int ID, string Title, string Description, string Availability, string Genre)
+        {
+            var temp = JsonConvert.DeserializeObject<List<FileHandler.NewContent>>(ContentData);
+            FileHandler.NewContent NewContent = new FileHandler.NewContent
+            {
+                ID = ID,
+                Title = Title,
+                Description = Description,
+                Availability = Availability,
+                Genre = Genre
+            };
+
+            temp.Add(NewContent);
+            File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));
+        }
+
+        public static bool ContentExists(string ContentData, string Title)
+        {
+            var LocationObject = JsonConvert.DeserializeObject<List<FileHandler.NewContent>>(ContentData);
+            for (int i = 0; i < LocationObject.Count; i++)
+            {
+                if (Title == LocationObject[i].Title)
                     return true;
             }
             return false;

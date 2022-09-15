@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace Test
 {
-    public class Series
+    public class NewContent
     {
         public string Title { get; set; }
         public string Description { get; set; }
@@ -20,10 +20,13 @@ namespace Test
         public string Episode_Description { get; set; }
         public string Episode { get; set; }
         public string Season { get; set; }
+        public long Duration { get; set; }
         public string Started { get; set; }
         public string Ended { get; set; }
         public string Director { get; set; }
         public string Producer { get; set; }
+        public string CoverURL { get; set; }
+
 
     }
 
@@ -37,24 +40,17 @@ namespace Test
         static string VidozaButton = "//li[contains(@class,'col-md-3 col-xs-12 col-sm-6')][4]/div[@class='generateInlinePlayer'][1]/a[@class='watchEpisode'][1]/div[@class='hosterSiteVideoButton'][1]";
         static WebClient webClient = new WebClient();
         static string currentPath = Directory.GetCurrentDirectory();
+        static string NewContent_Path = $"{currentPath}/NewContent.json";
 
-        //C:\Coding\Projects\Private Streaming Service\Streamcal\MediaHandler\MediaHandler\bin\Debug\Proccesses/Test.exe ada
         static void Main(string[] args)
         {
-            //string akok = "//h1[1]/span[1]";
-           
-            /*driver = new ChromeDriver();
-            driver.Url = "https://aniworld.to/anime/stream/kurokos-basketball/staffel-1/episode-1";
+            /* driver = new ChromeDriver();
+             driver.Url = "https://aniworld.to/anime/stream/kurokos-basketball/staffel-1/episode-1";
 
-            string openEpisodeDescription = "//span[@class='descriptionSpoilerLink'][1]";
-            string episodeDescription = "//p[@class='descriptionSpoiler'][1]";
+             string CoverURL = "//img[@class='loaded'][1]";
+             IWebElement CoverURL_Element = driver.FindElement(By.XPath(CoverURL));
 
-            //IWebElement openEpisodeDescriptionElement = driver.FindElement(By.XPath(openEpisodeDescription));
-            //openEpisodeDescriptionElement.Click();
-
-            IWebElement episodeDescriptionElement = driver.FindElement(By.XPath(episodeDescription));
-            Debug.WriteLine(episodeDescriptionElement.GetAttribute("textContent"));
-            return;
+             return;
             */
 
             if (args.Length == 0)
@@ -79,24 +75,20 @@ namespace Test
             options.AddArgument("--disable-infobars");
             options.AddArgument("--user-agent=Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25");
             driver = new ChromeDriver(options);
-            // new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             //driver.Manage().Window.Minimize();
 
             Console.Clear();
-            //URL = Console.ReadLine();
             Console.WriteLine("Please wait...");
             Bla(URL);
-
-            //while (true)
-            //{
-
-            //}
             Console.ReadKey();
 
         }
 
-        static Series GetDetails()
+        static NewContent GetDetails()
         {
+            //Cover xPath
+            // //img[@class='loaded'][1]/@src
+
             string animeTitle = "//h1[1]/span[1]";
             string animeDetails = "//p[@class='seri_des']";
             string director = "//li[@class='seriesDirector'][1]//span";
@@ -105,6 +97,7 @@ namespace Test
             string episodeDescription = "//p[@class='descriptionSpoiler'][1]";
             string started = "//span[1]/a[1]";
             string ended = "//span[2]/a[1]";
+            string CoverURL = "//img[@class='loaded'][1]";
 
             IWebElement animeTitleElement = driver.FindElement(By.XPath(animeTitle));
             IWebElement animeDetailsElement = driver.FindElement(By.XPath(animeDetails));
@@ -114,12 +107,13 @@ namespace Test
             IWebElement startedElement = driver.FindElement(By.XPath(started));
             IWebElement endedElement = driver.FindElement(By.XPath(ended));
             IWebElement episodeDescriptionElement = driver.FindElement(By.XPath(episodeDescription));
+            IWebElement CoverURL_Element = driver.FindElement(By.XPath(CoverURL));
 
             int SlashAmount = driver.Url.Split("/").Length - 1;
             string Season = driver.Url.Split("/")[SlashAmount - 1].Split("-")[1];
             string Episode = driver.Url.Split("/")[SlashAmount].Split("-")[1];
 
-            return new Series
+            return new NewContent
             {
                 Title = animeTitleElement.Text.Replace("’", ""),
                 Description = animeDetailsElement.Text,
@@ -129,15 +123,17 @@ namespace Test
                 Season = Season,
                 Started = startedElement.Text,
                 Ended = endedElement.Text,
-                Director = directorElement.Text,        
+                Director = directorElement.Text,
                 Producer = producerElement.Text,
+                CoverURL = CoverURL_Element.GetAttribute("src"),
+                Duration = 0,
             };
         }
 
         static void CreateJson()
         {
             var details = GetDetails();
-            File.WriteAllText($"{currentPath}/{details.Title}.json", JsonConvert.SerializeObject(details, Formatting.Indented));
+            File.WriteAllText(NewContent_Path, JsonConvert.SerializeObject(details, Formatting.Indented));
         }
         private static void OnNetworkRequestSent(object sender, NetworkRequestSentEventArgs e)
         {
@@ -173,8 +169,8 @@ namespace Test
                     //https://delivery-node-hamid.voe-network.net/hls/,6oarncy6um33cszcr335fltuvigl4af3yqgl2z3t6aoorpjz4qfepiydchmq,.urlset/master.m3u8
                     //Console.WriteLine(e.ResponseUrl);
                     Console.WriteLine("Start downloading...");
-                    Console.WriteLine($"{Directory.GetCurrentDirectory()}/video.html");
-                    webClient.DownloadFile(e.ResponseUrl, $"{Directory.GetCurrentDirectory()}/video.html");
+                    Console.WriteLine($"{currentPath}/video.html");
+                    webClient.DownloadFile(e.ResponseUrl, $"{currentPath}/video.html");
                     Console.WriteLine("Download done");
                     CreateJson();
 

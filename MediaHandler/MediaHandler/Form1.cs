@@ -20,14 +20,13 @@ namespace MediaHandler
     {
 
         static WebClient webClient = new WebClient();
-        static FileHandler fileHandler = new FileHandler();
-
-        string URL = "https://aniworld.to/anime/stream/kurokos-basketball/staffel-1/episode-1";//"https://anime-base.net/anime/kurokos-basketball";;
         static string currentPath = Directory.GetCurrentDirectory();
         static string processesPath = currentPath + "/Processes";
         static string scrapperPath = currentPath + "/scrapper";
         static string settingsIni_Path = currentPath + "/settings.ini";
+        static string NewContentJsonPath = processesPath + "/NewContent.json";
         static string serverDataPath;
+
         public Form1()
         {
             InitializeComponent();
@@ -123,15 +122,10 @@ namespace MediaHandler
             //await RunCmd($"ffmpeg -i {fileName}.mp4 -vf fps=1/10 -q:v 50 img/image_%d.jpg", hidden: true, systemArguments: true);// Every 10 seconds one image
             //await RunCmd($"ffmpeg -i img/image_%d.jpg -filter_complex 'scale = 80:-1, tile = 10x15' preview.png", hidden: true, systemArguments: true); // Merge all images to one image
 
-            /*string imagesFolder = $"{processesPath}/img";
-            string[] imageFiles = Directory.GetFiles(imagesFolder);
-            int ThumbnailIndex = Convert.ToInt32(imageFiles.Length / 2);
-            File.Copy($"{imagesFolder}/image_{ThumbnailIndex}.jpg", $"{processesPath}/Thumbnail.jpg");*/
 
-
-            var Duration = JsonConvert.DeserializeObject<FileHandler.NewContent>(File.ReadAllText($"{processesPath}/Kurokos Basketball.json")).Duration / 1000;
+            var Duration = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(File.ReadAllText(NewContentJsonPath)).Duration / 1000;
             int MiddleContentLength = Convert.ToInt32(Duration / 2);
-            Console.WriteLine(MiddleContentLength);
+            Directory.CreateDirectory($"{processesPath}/img");
             await RunCmd($"ffmpeg -ss {MiddleContentLength} -i {fileName}.mp4 -qscale:v 1 -frames:v 1 Thumbnail.jpg", hidden: false, systemArguments: true);
 
         }
@@ -184,17 +178,17 @@ namespace MediaHandler
                 Directory.CreateDirectory(destinationPath);
 
             string videoRawURL = indexURL.Replace("/index-v1-a1.m3u8", "");
-            string[] a = File.ReadAllLines($"{processesPath}/index-v1-a1.m3u8");
-            var b = File.ReadAllLines($"{processesPath}/index-v1-a1.m3u8").Where(item => item.StartsWith("seg") && item.EndsWith(".ts"));
+            string[] indexFileContent = File.ReadAllLines($"{processesPath}/index-v1-a1.m3u8");
+            var segFiles = indexFileContent.Where(item => item.StartsWith("seg") && item.EndsWith(".ts"));
 
 
             AddLog("Downloading TS Files...");
             string kok = richTextBox1.Text;
 
             int index = 0;
-            foreach (var item in b)
+            foreach (var item in segFiles)
             {
-                AddLog($"Downloaded TS Files: {index}/{b.Count()}");
+                AddLog($"Downloaded TS Files: {index}/{segFiles.Count()}");
                 string segURLs = $"{videoRawURL}/{item}";
                 await webClient.DownloadFileTaskAsync(new Uri(segURLs), $"{destinationPath}/{item}");
                 index++;
@@ -202,9 +196,28 @@ namespace MediaHandler
 
             }
 
-            AddLog($"Downloaded TS Files: {index}/{b.Count()}");
+            AddLog($"Downloaded TS Files: {index}/{segFiles.Count()}");
             AddLog("TS Files successfully downloaded");
 
+        }
+
+        void Add_Duration(string[] indexFileContent2 = null)
+        {
+            string[] indexFileContent = File.ReadAllLines($"{processesPath}/index-v1-a1.m3u8");
+            AddLog("Starting calculating Media Duration");
+            var EXTINF_Files = indexFileContent.Where(item => item.StartsWith("#EXTINF:"));
+            double duration = 0;
+
+            // converting is kinda weird from ffmpeg so add 15 seconds
+            double addTime = 15000;
+            foreach (var item in EXTINF_Files)
+            {
+                //Console.WriteLine(item.Replace("#EXTINF:", "").Replace(",", ""));
+                duration += Convert.ToDouble(item.Replace("#EXTINF:", "").Replace(",", ""));
+            }
+            duration += addTime;
+            Console.WriteLine(duration);
+            AddLog("Media Duration calculated");
         }
 
         void AddLog(string text)
@@ -228,10 +241,15 @@ namespace MediaHandler
                         File.Delete(item);
                 }
 
-                if (Directory.Exists($"{processesPath}/TS_Files"))
-                    Directory.Delete($"{processesPath}/TS_Files", true);
+                string[] directories = Directory.GetDirectories(processesPath);
+                foreach (var item in directories)
+                    Directory.Delete(item, true);
+
             }
-            catch { }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "DeleteFiles", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
 
@@ -258,9 +276,38 @@ namespace MediaHandler
             //var title = Get_TitleSeasonEpisode(htmlFile);
             //Console.WriteLine(title.Season);
         }
+
+        async Task ScrappingProcess()
+        {
+            AddLog("Scrapping started");
+            await RunCmd(textBox1.Text, scrapperPath + "/scrapper.exe", hidden: true);
+            AddLog("Scrapping successfully ended");
+            progressBar1.Value = 10;
+
+            string indexURL;
+            Download_MasterFile();
+            indexURL = File.ReadAllLines(processesPath + "/master.m3u8")[2];
+            progressBar1.Value = 20;
+
+            Download_IndexFile(indexURL);
+            progressBar1.Value = 40;
+
+            await Download_TsFiles(indexURL, $"{processesPath}/TS_Files");
+            progressBar1.Value = 60;
+
+            Create_TsList($"{processesPath}/TS_Files");
+            progressBar1.Value = 80;
+
+            string JsonFile = File.ReadAllText(NewContentJsonPath);
+            var JsonObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(JsonFile);
+
+            await ConvertTsToMp4($"{JsonObject.Title}_{JsonObject.Season}_{JsonObject.Episode}");
+            progressBar1.Value = 100;
+
+        }
+
         private async void button3_Click(object sender, EventArgs e)
         {
-            //https://aniworld.to/anime/stream/kurokos-basketball/staffel-1/episode-1
             try
             {
                 if (!textBox1.Text.Contains("https://aniworld.to/anime/stream/"))
@@ -272,40 +319,15 @@ namespace MediaHandler
                 richTextBox1.Clear();
                 progressBar1.Value = 0;
                 button3.Enabled = false;
-                AddLog("Scrapping started");
-                //Task CmdTask = Task.Run(() => RunCmd(textBox1.Text, scrapperPath + "/scrapper.exe", hidden: true));
-                //await Task.WhenAll(CmdTask);
-                await RunCmd(textBox1.Text, scrapperPath + "/scrapper.exe", hidden: true);
-                AddLog("Scrapping successfully ended");
-                progressBar1.Value = 10;
 
-                string indexURL;
-                Download_MasterFile();
-                indexURL = File.ReadAllLines(processesPath + "/master.m3u8")[2];
-                progressBar1.Value = 20;
-
-                Download_IndexFile(indexURL);
-                progressBar1.Value = 40;
-
-                await Download_TsFiles(indexURL, $"{processesPath}/TS_Files");
-                progressBar1.Value = 60;
-
-                Create_TsList($"{processesPath}/TS_Files");
-                progressBar1.Value = 80;
-
-                string JsonFile = File.ReadAllText($"{processesPath}/Kurokos Basketball.json");
-                var JsonObject = JsonConvert.DeserializeObject<FileHandler.NewContent>(JsonFile);
-
-                await ConvertTsToMp4($"{JsonObject.Title}_{JsonObject.Season}_{JsonObject.Episode}");
-
-                progressBar1.Value = 100;
+                await ScrappingProcess();
+                await GeneratePreviewImagesAndThumbnail();
                 DeleteFiles();
                 MessageBox.Show("Media successfully downloaded", "Downloaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                MessageBox.Show(ex.Message, "Download Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -348,7 +370,7 @@ namespace MediaHandler
 
         }
 
-        void Move_ExistingContent(int index, FileHandler.NewContent NewContent_JsonObject, List<FileHandler.Data_Content> Content_JsonObject)
+        void Move_ExistingContent(int index, FileHandler.NewContent_Locations NewContent_JsonObject, List<FileHandler.Data_Content> Content_JsonObject)
         {
             int NewContentSeason = NewContent_JsonObject.Season;
             int ContentID = Content_JsonObject[index].ID;
@@ -375,25 +397,25 @@ namespace MediaHandler
 
         private void button5_Click(object sender, EventArgs e)
         {
-            string NewContent_JsonFile = File.ReadAllText($"{processesPath}/Kurokos Basketball.json");
-            var NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.NewContent>(NewContent_JsonFile);
+            string NewContent_JsonFile = File.ReadAllText(NewContentJsonPath);
+            var NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_JsonFile);
 
-            string Content_JsonFile = File.ReadAllText($"{textBox2.Text}/Content.json");
+            string ContentPath = $"{serverDataPath}/Content.json";
+            string Content_JsonFile = File.ReadAllText(ContentPath);
             List<FileHandler.Data_Content> Content_JsonObject = JsonConvert.DeserializeObject<List<FileHandler.Data_Content>>(Content_JsonFile);
 
             for (int i = 0; i < Content_JsonObject.Count; i++)
             {
                 if (Content_JsonObject[i].Title == NewContent_JsonObject.Title)
                 {
-                    Console.WriteLine("Found");
                     Move_ExistingContent(i, NewContent_JsonObject, Content_JsonObject);
                     return;
                 }
             }
 
-            //If NewContent doesnt exist
+            JsonHandler.Add_NewContent(ContentPath, Content_JsonFile, Content_JsonObject.Count, NewContent_JsonObject.Title, NewContent_JsonObject.Description, "", "");
+            Move_ExistingContent(Content_JsonObject.Count, NewContent_JsonObject, Content_JsonObject);
 
-            Console.WriteLine("KOkus");
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -403,9 +425,6 @@ namespace MediaHandler
 
         private void button6_Click(object sender, EventArgs e)
         {
-            //FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
-            //folderBrowserDialog.ShowDialog();
-            //Console.WriteLine(folderBrowserDialog.SelectedPath);
 
             VistaFolderBrowserDialog vistaFolderBrowserDialog = new VistaFolderBrowserDialog();
             vistaFolderBrowserDialog.SelectedPath = currentPath + "/";
@@ -425,6 +444,7 @@ namespace MediaHandler
         private async void button7_Click(object sender, EventArgs e)
         {
             await GeneratePreviewImagesAndThumbnail();
+            //Add_Duration();
         }
     }
 }
