@@ -408,7 +408,8 @@ namespace MediaHandler
                 return;
             
             Directory.CreateDirectory($"{serverDataPath}/{ContentID}/Series/Season_{NewContentSeason}");
-            File.Move(processesPath + "/all.mp4", $"{serverDataPath}/{ContentID}/{Path}");
+            //File.Move(processesPath + "/all.mp4", $"{serverDataPath}/{ContentID}/{Path}");
+            webClient.DownloadFile(NewContent_JsonObject.CoverURL, $"{serverDataPath}/{ContentID}/Cover.png");
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -433,7 +434,6 @@ namespace MediaHandler
             {
                 ID = Content_JsonObject.Count,
                 Title = NewContent_JsonObject.Title,
-                Cover = "Cover.jpg",
                 Description = NewContent_JsonObject.Description,
                 Availability = "",
                 Genre = ""
