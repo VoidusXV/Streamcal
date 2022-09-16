@@ -27,6 +27,8 @@ namespace MediaHandler
         {
             public int ID { get; set; }
             public string Description { get; set; }
+            public string Cover { get; set; }
+
             public string Title { get; set; }
             public string Availability { get; set; }
             public string Genre { get; set; }
@@ -69,7 +71,7 @@ namespace MediaHandler
             public class Episodes
             {
                 public int Episode { get; set; }
-                public string Cover { get; set; }
+                public string Thumbnail { get; set; }
                 public string Path { get; set; }
                 public string Title { get; set; }
                 public string Description { get; set; }

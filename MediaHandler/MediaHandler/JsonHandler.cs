@@ -15,7 +15,7 @@ namespace MediaHandler
             FileHandler.Locations.Episodes NewEpisode = new FileHandler.Locations.Episodes
             {
                 Episode = Episode,
-                Cover = "Cover.jpg",
+                Thumbnail = "Thumbnail.jpg",
                 Path = Path,
                 Title = Title,
                 Description = Description,
@@ -47,13 +47,34 @@ namespace MediaHandler
                 Episodes = Episode,
             };
 
-            var temp = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(File.ReadAllText(jsonPath));
-            temp.Series.Seasons.Add(NewSeason);
+
+            FileHandler.Locations.Main temp = new FileHandler.Locations.Main();
+
+            if (!File.Exists(jsonPath))
+            {
+                temp = new FileHandler.Locations.Main
+                {
+                    Series = new FileHandler.Locations.Series
+                    {
+                        Seasons = new List<FileHandler.Locations.Season> { NewSeason }
+                    },
+                    Movies = new FileHandler.Locations.Movies(),
+                };
+            }
+            else
+            {
+                temp = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(File.ReadAllText(jsonPath));
+                temp.Series.Seasons.Add(NewSeason);
+            }
+
             File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));
         }
 
         public static bool SeasonExists(string jsonPath, int NewContentSeason)
         {
+            if (!File.Exists(jsonPath))
+                return false;
+
             var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(File.ReadAllText(jsonPath));
             for (int i = 0; i < LocationObject.Series.Seasons.Count; i++)
             {
@@ -63,20 +84,12 @@ namespace MediaHandler
             return false;
         }
 
-        public static void Add_NewContent(string jsonPath, string ContentData, int ID, string Title, string Description, string Availability, string Genre)
+        public static void Add_NewContent(string jsonPath, string ContentData, FileHandler.NewContent NewContent)
         {
             var temp = JsonConvert.DeserializeObject<List<FileHandler.NewContent>>(ContentData);
-            FileHandler.NewContent NewContent = new FileHandler.NewContent
-            {
-                ID = ID,
-                Title = Title,
-                Description = Description,
-                Availability = Availability,
-                Genre = Genre
-            };
-
             temp.Add(NewContent);
             File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));
+
         }
 
         public static bool ContentExists(string ContentData, string Title)

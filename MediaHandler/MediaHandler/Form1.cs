@@ -119,8 +119,9 @@ namespace MediaHandler
 
         async Task GeneratePreviewImagesAndThumbnail(string fileName = "all")
         {
-            //await RunCmd($"ffmpeg -i {fileName}.mp4 -vf fps=1/10 -q:v 50 img/image_%d.jpg", hidden: true, systemArguments: true);// Every 10 seconds one image
-            //await RunCmd($"ffmpeg -i img/image_%d.jpg -filter_complex 'scale = 80:-1, tile = 10x15' preview.png", hidden: true, systemArguments: true); // Merge all images to one image
+            return;
+            await RunCmd($"ffmpeg -i {fileName}.mp4 -vf fps=1/10 -q:v 50 img/image_%d.jpg", hidden: true, systemArguments: true);// Every 10 seconds one image
+            await RunCmd($"ffmpeg -i img/image_%d.jpg -filter_complex 'scale = 80:-1, tile = 10x15' preview.png", hidden: true, systemArguments: true); // Merge all images to one image
 
 
             var Duration = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(File.ReadAllText(NewContentJsonPath)).Duration / 1000;
@@ -201,23 +202,31 @@ namespace MediaHandler
 
         }
 
-        void Add_Duration(string[] indexFileContent2 = null)
+        double GetContentDuration(string[] indexFileContent2 = null)
         {
             string[] indexFileContent = File.ReadAllLines($"{processesPath}/index-v1-a1.m3u8");
             AddLog("Starting calculating Media Duration");
             var EXTINF_Files = indexFileContent.Where(item => item.StartsWith("#EXTINF:"));
             double duration = 0;
 
-            // converting is kinda weird from ffmpeg so add 15 seconds
-            double addTime = 15000;
+            // converting is kinda weird from ffmpeg so add 11.633 seconds
+            double addTime = 11633;
             foreach (var item in EXTINF_Files)
             {
-                //Console.WriteLine(item.Replace("#EXTINF:", "").Replace(",", ""));
                 duration += Convert.ToDouble(item.Replace("#EXTINF:", "").Replace(",", ""));
             }
             duration += addTime;
-            Console.WriteLine(duration);
+            //Console.WriteLine(duration);
             AddLog("Media Duration calculated");
+            return duration;
+        }
+
+        void NewContent_AddDuration(string NewContent_JsonFile)
+        {
+            double duration = GetContentDuration();
+            var NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_JsonFile);
+            NewContent_JsonObject.Duration = Convert.ToInt64(duration);
+            File.WriteAllText(NewContentJsonPath, JsonConvert.SerializeObject(NewContent_JsonObject, Formatting.Indented));
         }
 
         void AddLog(string text)
@@ -320,9 +329,13 @@ namespace MediaHandler
                 progressBar1.Value = 0;
                 button3.Enabled = false;
 
-                await ScrappingProcess();
-                await GeneratePreviewImagesAndThumbnail();
-                DeleteFiles();
+                string ContentPath = $"{serverDataPath}/Content.json";
+                string Content_JsonFile = File.ReadAllText(ContentPath);
+
+
+                //await ScrappingProcess();
+                //await GeneratePreviewImagesAndThumbnail();
+                //DeleteFiles();
                 MessageBox.Show("Media successfully downloaded", "Downloaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -370,14 +383,14 @@ namespace MediaHandler
 
         }
 
-        void Move_ExistingContent(int index, FileHandler.NewContent_Locations NewContent_JsonObject, List<FileHandler.Data_Content> Content_JsonObject)
+        void Move_ExistingContent(int index, FileHandler.NewContent_Locations NewContent_JsonObject, List<FileHandler.Data_Content> Content_JsonObject, bool NewContent = false)
         {
+
             int NewContentSeason = NewContent_JsonObject.Season;
             int ContentID = Content_JsonObject[index].ID;
-
-            string LocationFile_Path = $"{currentPath}/Locations.json";
-            string LocationFile = File.ReadAllText(LocationFile_Path); //File.ReadAllText($"{serverDataPath}/{ContentID}/Locations.json");
-            var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(LocationFile);
+            string LocationFile_Path = $"{serverDataPath}/{ContentID}/Locations.json";// $"{currentPath}/Locations.json";
+            // string LocationFile = File.ReadAllText($"{serverDataPath}/{ContentID}/Locations.json");
+            //var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(LocationFile);
 
             int Episode = NewContent_JsonObject.Episode;
             string Path = $"/Series/Season_{NewContentSeason}/{NewContent_JsonObject.Episode}.mp4";
@@ -391,8 +404,11 @@ namespace MediaHandler
 
             JsonHandler.Add_NewEpisode(Episode, Path, Title, Description, Duration, NewContentSeason, LocationFile_Path);
 
-
-            //File.Move(processesPath + "/all.mp4", $"{serverDataPath}/{ContentID}");
+            if (!NewContent)
+                return;
+            
+            Directory.CreateDirectory($"{serverDataPath}/{ContentID}/Series/Season_{NewContentSeason}");
+            File.Move(processesPath + "/all.mp4", $"{serverDataPath}/{ContentID}/{Path}");
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -413,9 +429,24 @@ namespace MediaHandler
                 }
             }
 
-            JsonHandler.Add_NewContent(ContentPath, Content_JsonFile, Content_JsonObject.Count, NewContent_JsonObject.Title, NewContent_JsonObject.Description, "", "");
-            Move_ExistingContent(Content_JsonObject.Count, NewContent_JsonObject, Content_JsonObject);
+            FileHandler.NewContent NewContent = new FileHandler.NewContent
+            {
+                ID = Content_JsonObject.Count,
+                Title = NewContent_JsonObject.Title,
+                Cover = "Cover.jpg",
+                Description = NewContent_JsonObject.Description,
+                Availability = "",
+                Genre = ""
+            };
 
+            JsonHandler.Add_NewContent(ContentPath, Content_JsonFile, NewContent);
+            Directory.CreateDirectory($"{serverDataPath}/{Content_JsonObject.Count}");
+            Directory.CreateDirectory($"{serverDataPath}/{Content_JsonObject.Count}/Movie");
+            Directory.CreateDirectory($"{serverDataPath}/{Content_JsonObject.Count}/Series");
+
+            Content_JsonFile = File.ReadAllText(ContentPath);
+            Content_JsonObject = JsonConvert.DeserializeObject<List<FileHandler.Data_Content>>(Content_JsonFile);
+            Move_ExistingContent(Content_JsonObject.Count - 1, NewContent_JsonObject, Content_JsonObject, true);
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -444,7 +475,11 @@ namespace MediaHandler
         private async void button7_Click(object sender, EventArgs e)
         {
             await GeneratePreviewImagesAndThumbnail();
-            //Add_Duration();
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
