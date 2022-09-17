@@ -26,6 +26,7 @@ import MediaItemCard from "../components/Designs/MediaItemCard";
 import { StatusBar } from "expo-status-bar";
 import { generateThumbnail } from "../components/media/Functions";
 import { loadAsync } from "expo-font";
+import { FlashList } from "@shopify/flash-list";
 
 function MilisecondsToTimespamp(num: any) {
   let sec = Math.trunc(num / 1000);
@@ -66,18 +67,32 @@ const NextEpisode_Container = ({ data }: any) => {
   } else return <></>;
 };
 
-const FollowingEpisodes_Container = () => {
-  return (
-    <View style={{ marginTop: "5%" }}>
-      <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
-        Weitere Folgen
-      </Text>
-      <MediaItemCard ID_Path={1} Title="TestusKopf"></MediaItemCard>
-      <MediaItemCard ID_Path={2} Title="TestusKopf"></MediaItemCard>
-      <MediaItemCard ID_Path={3} Title="TestusKopf"></MediaItemCard>
-      <MediaItemCard ID_Path={4} Title="TestusKopf"></MediaItemCard>
-    </View>
-  );
+const FollowingEpisodes_Container = ({ data, index }: any) => {
+  //data.splice(0, 2);
+  const splicedData = [...data];
+  splicedData.splice(0, index + 2);
+  if (splicedData && splicedData.length > 0) {
+    return (
+      <View style={{ marginTop: "5%", flex: 1 }}>
+        <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
+          Weitere Folgen
+        </Text>
+        <FlashList
+          data={splicedData} // Staffel 1
+          estimatedItemSize={8}
+          contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
+          renderItem={({ item, index }: any) => (
+            <MediaItemCard
+              ID_Path={item.Episode}
+              Title={item.Title}
+              Duration={item.Duration}
+              Description={item.Description}></MediaItemCard>
+          )}></FlashList>
+      </View>
+    );
+  } else {
+    return <></>;
+  }
 };
 
 let timer: any = null;
@@ -432,7 +447,7 @@ const MediaScreen = ({ route, navigation }: any) => {
   const ImagesPath: any = [];
   const { item, AllData, ContentName, index } = route.params;
   //console.log("index:", index);
-  console.log(AllData[index + 1]);
+  //console.log(AllData[index + 1]);
 
   React.useEffect(() => {
     const backAction = () => {
@@ -535,7 +550,7 @@ const MediaScreen = ({ route, navigation }: any) => {
         </View>
         <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
         <NextEpisode_Container data={AllData[index + 1]}></NextEpisode_Container>
-        {/* <FollowingEpisodes_Container></FollowingEpisodes_Container>  */}
+        <FollowingEpisodes_Container index={index} data={AllData}></FollowingEpisodes_Container>
       </View>
     </ScrollView>
   );
