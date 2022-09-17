@@ -161,18 +161,19 @@ const ViewContent = ({ route, navigation }: any) => {
 
   const [getMediaLocation, setMediaLocation] = React.useState<any>([]);
   const [getVideoThumbnailURLs, setVideoThumbnailURLs] = React.useState<any>([]);
+  const [getSeason, setSeason] = React.useState(0);
 
   const [getScrollValue, setScrollValue] = React.useState(0);
   // console.log(getMediaLocation.Series.Seasons[0]);
   //console.log(getSeasonAmount(contentData.ID));
-
+  let data: any;
   React.useEffect(() => {
     (async () => {
       const URL = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
       const thumbnailURL = await generateThumbnail(URL);
       setVideoThumbnailURLs([thumbnailURL]);
 
-      const data = await getMediaLocations(contentData.ID);
+      data = await getMediaLocations(contentData.ID);
       setMediaLocation(data);
       setLoaded(true);
     })();
@@ -212,7 +213,14 @@ const ViewContent = ({ route, navigation }: any) => {
                     ID_Path={item.Episode}
                     Title={item.Title}
                     Duration={item.Duration}
+                    Description={item.Description}
                     navigation={navigation}
+                    routeParams={{
+                      item,
+                      ContentName: contentData?.Title,
+                      AllData: getMediaLocation.Series.Seasons[getSeason].Episodes,
+                      index: index,
+                    }}
                     Source={{ uri: getVideoThumbnailURLs[0] }}></MediaItemCard>
                 )}></FlashList>
             </View>

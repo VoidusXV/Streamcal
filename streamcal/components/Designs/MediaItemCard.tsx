@@ -17,6 +17,8 @@ interface IMediaItemCard {
   CoverSrc?: any;
   Source?: ImageSourcePropType | ImageSourcePropType[];
   Duration?: number;
+  Description?: any;
+  routeParams?: any;
 }
 
 function MilisecondsToMinutes(num: any) {
@@ -27,6 +29,8 @@ const MediaItemCard: React.FC<IMediaItemCard> = ({
   ID_Path,
   Title,
   Duration,
+  Description,
+  routeParams,
   onPress,
   navigation,
   Source,
@@ -36,7 +40,7 @@ const MediaItemCard: React.FC<IMediaItemCard> = ({
       activeOpacity={0.6}
       underlayColor="#385180"
       style={{ ...styles.MediaItemCard_Container }}
-      onPress={() => navigation.navigate("MediaScreen", { ID: ID_Path })}>
+      onPress={() => navigation.navigate("MediaScreen", routeParams)}>
       <>
         <View style={{ backgroundColor: "green", width: "45%", ...styles.ContainerMiddle }}>
           <Image

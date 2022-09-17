@@ -53,15 +53,17 @@ async function changeScreenOrientation() {
   await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
   return true;
 }
-const NextEpisode_Container = () => {
-  return (
-    <View style={{ marginTop: "5%" }}>
-      <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
-        Nächste Folge
-      </Text>
-      <MediaItemCard ID_Path={1} Title="TestusKopf"></MediaItemCard>
-    </View>
-  );
+const NextEpisode_Container = ({ data }: any) => {
+  if (data) {
+    return (
+      <View style={{ marginTop: "5%" }}>
+        <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
+          Nächste Folge
+        </Text>
+        <MediaItemCard ID_Path={data.Episode} Duration={1450000} Title={data.Title}></MediaItemCard>
+      </View>
+    );
+  } else return <></>;
 };
 
 const FollowingEpisodes_Container = () => {
@@ -79,7 +81,7 @@ const FollowingEpisodes_Container = () => {
 };
 
 let timer: any = null;
-const videoURL = "https://eea3-2003-ea-c73b-5f87-41fb-85e8-7931-729f.eu.ngrok.io/v1/test";
+const videoURL = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"; //"https://eea3-2003-ea-c73b-5f87-41fb-85e8-7931-729f.eu.ngrok.io/v1/test";
 const Cover = require("../assets/covers/One_Piece.jpg");
 
 const VideoPlayer = ({
@@ -423,11 +425,14 @@ const VideoPlayer = ({
   );
 };
 
-const MediaScreen = ({ navigation }: any) => {
+const MediaScreen = ({ route, navigation }: any) => {
   const [isFullscreen, setFullscreen] = React.useState<any>(false);
   const currentVideo = React.useRef<any>(null);
   const previewVideo = React.useRef<any>(null);
   const ImagesPath: any = [];
+  const { item, AllData, ContentName, index } = route.params;
+  //console.log("index:", index);
+  console.log(AllData[index + 1]);
 
   React.useEffect(() => {
     const backAction = () => {
@@ -514,12 +519,12 @@ const MediaScreen = ({ navigation }: any) => {
               color: "#95b9fc",
               //textDecorationLine: "underline",
             }}>
-            One Piece
+            {ContentName}
           </Text>
 
-          <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
-            Folge 1: Der Kampf der Giganten Ugus ggefe fef efe er e rer er er e r e red wdwdwddwd
-            wdwdwdwd dwwdw
+          <Text
+            style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
+            Folge {item.Episode}: {item.Title}
           </Text>
           <Octicons
             onPress={() => clearTimeout(timer)}
@@ -528,9 +533,9 @@ const MediaScreen = ({ navigation }: any) => {
             style={{ marginLeft: "auto", marginRight: "7%" }}
             color="white"></Octicons>
         </View>
-        <Seperator style={{ marginTop: "5%" }}></Seperator>
-        <NextEpisode_Container></NextEpisode_Container>
-        <FollowingEpisodes_Container></FollowingEpisodes_Container>
+        <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
+        <NextEpisode_Container data={AllData[index + 1]}></NextEpisode_Container>
+        {/* <FollowingEpisodes_Container></FollowingEpisodes_Container>  */}
       </View>
     </ScrollView>
   );

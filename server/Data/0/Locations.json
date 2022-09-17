@@ -5,11 +5,27 @@
         "SeasonNum": 1,
         "Episodes": [
           {
+            "Episode": 1,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/7.mp4",
+            "Title": "Du wirst etwas einmaliges sehen1",
+            "Description": "Serien Beschreibung Hier",
+            "Duration": 1450000
+          },
+          {
+            "Episode": 2,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/7.mp4",
+            "Title": "Du wirst etwas einmaliges sehen2",
+            "Description": "Serien Beschreibung Hier",
+            "Duration": 1450000
+          },
+          {
             "Episode": 7,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/7.mp4",
-            "Title": "Du wirst etwas einmaliges sehen",
-            "Description": "",
+            "Title": "Du wirst etwas einmaliges sehen7",
+            "Description": "Serien Beschreibung Hier",
             "Duration": 1450000
           }
         ]
