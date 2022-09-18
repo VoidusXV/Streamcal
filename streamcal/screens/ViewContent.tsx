@@ -16,7 +16,12 @@ import { Mini_IconSize, WindowSize } from "../components/constants/Layout";
 import { FlashList } from "@shopify/flash-list";
 import MediaItemCard from "../components/Designs/MediaItemCard";
 import FadingEdgesView from "../components/Designs/FadingEdgesView";
-import { getEpisodeAmount, getMediaLocations, getSeasonAmount } from "../backend/serverConnection";
+import {
+  getEpisodeAmount,
+  getMediaLocations,
+  getSeasonAmount,
+  getThumbnailURL,
+} from "../backend/serverConnection";
 import { generateThumbnail } from "../components/media/Functions";
 import Slider from "@react-native-community/slider";
 
@@ -165,7 +170,7 @@ const ViewContent = ({ route, navigation }: any) => {
 
   const [getScrollValue, setScrollValue] = React.useState(0);
   // console.log(getMediaLocation.Series.Seasons[0]);
-  //console.log(getSeasonAmount(contentData.ID));
+  //console.log(contentData.ID);
   let data: any;
   React.useEffect(() => {
     (async () => {
@@ -218,10 +223,13 @@ const ViewContent = ({ route, navigation }: any) => {
                     routeParams={{
                       item,
                       ContentName: contentData?.Title,
+                      ContentID: contentData?.ID,
                       AllData: getMediaLocation.Series.Seasons[getSeason].Episodes,
                       index: index,
                     }}
-                    Source={{ uri: getVideoThumbnailURLs[0] }}></MediaItemCard>
+                    Source={{
+                      uri: getThumbnailURL(contentData?.ID, getSeason + 1, item.Episode),
+                    }}></MediaItemCard>
                 )}></FlashList>
             </View>
           </>

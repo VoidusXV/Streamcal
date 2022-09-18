@@ -21,9 +21,38 @@ function contentExists(ID) {
 //const image = require(__dirname + "/public/Cover.jpg"); //`./Data/${ID}/Cover.jpg`);
 
 app.get("/v1/test", (req, res) => {
-  const testVid = __dirname + "/Data/0/Series/Season_1/7.mp4";
+  const testVid = __dirname + "/Data/0/Series/Season_1/7/7.mp4";
   console.log(testVid);
   res.sendFile(testVid);
+});
+
+app.get("/v1/test2", (req, res) => {
+  try {
+    const ContentID = new URLSearchParams(req.url).get("/v1/test2?id");
+    const SeasonID = new URLSearchParams(req.url).get("season");
+    const EpisodeID = new URLSearchParams(req.url).get("episode");
+    const dataRequest = new URLSearchParams(req.url).get("dr");
+
+    if (!ContentID || !SeasonID || !EpisodeID || !dataRequest) return res.status(403).end();
+    //if (!contentExists(ContentID)) return res.status(403).end();
+
+    const mainPath = __dirname + `/Data/${ContentID}/Series/Season_${SeasonID}/${EpisodeID}`;
+    let sendFilePath;
+
+    if (dataRequest == "thumb") sendFilePath = `${mainPath}/Thumbnail.jpg`;
+    else if (dataRequest == "sliderSeek") sendFilePath = `${mainPath}/SeekSliderPreview.png`;
+    else if (dataRequest == "video") sendFilePath = `${mainPath}/${EpisodeID}.mp4`;
+    else return res.status(403).end();
+
+    const fileExists = fs.existsSync(sendFilePath);
+    if (!fileExists) return res.status(403).end();
+
+    //console.log(fileExists);
+    res.sendFile(sendFilePath);
+  } catch (e) {
+    console.log("test2 error", e.message);
+    res.status(403).end();
+  }
 });
 
 app.get("/v1/image", (req, res) => {

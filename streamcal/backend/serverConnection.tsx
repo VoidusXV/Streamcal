@@ -7,6 +7,7 @@ const port = 3005;
 
 const baseURL = `http://localhost:` + port;
 const baseIPURL = `http://${Local_IP}:` + port;
+const baseAPIURL = baseIPURL + "/v1";
 
 const AllContentURL = baseIPURL + "/v1/Content";
 const mediaURL = baseIPURL + "/v1/Media";
@@ -48,5 +49,17 @@ function getEpisodeAmount(data: any) {
   }
   return Episodes;
 }
+function getThumbnailURL(ContentID: any, SeasonID: any, EpisodeID: any) {
+  const URL = `${baseAPIURL}/test2?id=${ContentID}&season=${SeasonID}&episode=${EpisodeID}&dr=thumb`;
+  //console.log(URL);
+  return URL;
+}
 
-export { getAllContent, getCoverURL, getSeasonAmount, getEpisodeAmount, getMediaLocations };
+export {
+  getAllContent,
+  getCoverURL,
+  getSeasonAmount,
+  getEpisodeAmount,
+  getMediaLocations,
+  getThumbnailURL,
+};

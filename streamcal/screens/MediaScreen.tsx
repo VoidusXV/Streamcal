@@ -67,7 +67,7 @@ const NextEpisode_Container = ({ data }: any) => {
   } else return <></>;
 };
 
-const FollowingEpisodes_Container = ({ data, index }: any) => {
+const FollowingEpisodes_Container = ({ data, ContentID, index }: any) => {
   //data.splice(0, 2);
   const splicedData = [...data];
   splicedData.splice(0, index + 2);
@@ -86,7 +86,10 @@ const FollowingEpisodes_Container = ({ data, index }: any) => {
               ID_Path={item.Episode}
               Title={item.Title}
               Duration={item.Duration}
-              Description={item.Description}></MediaItemCard>
+              Description={item.Description}
+              Source={{
+                uri: `http://192.168.2.121:3005/v1/test2?id=${ContentID}&season=1&episode=${item.Episode}&dr=thumb`,
+              }}></MediaItemCard>
           )}></FlashList>
       </View>
     );
@@ -96,7 +99,7 @@ const FollowingEpisodes_Container = ({ data, index }: any) => {
 };
 
 let timer: any = null;
-const videoURL = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"; //"https://eea3-2003-ea-c73b-5f87-41fb-85e8-7931-729f.eu.ngrok.io/v1/test";
+const videoURL = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"; //http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=video  //"https://eea3-2003-ea-c73b-5f87-41fb-85e8-7931-729f.eu.ngrok.io/v1/test";
 const Cover = require("../assets/covers/One_Piece.jpg");
 
 const VideoPlayer = ({
@@ -445,7 +448,7 @@ const MediaScreen = ({ route, navigation }: any) => {
   const currentVideo = React.useRef<any>(null);
   const previewVideo = React.useRef<any>(null);
   const ImagesPath: any = [];
-  const { item, AllData, ContentName, index } = route.params;
+  const { item, AllData, ContentName, ContentID, index } = route.params;
   //console.log("index:", index);
   //console.log(AllData[index + 1]);
 
@@ -550,7 +553,10 @@ const MediaScreen = ({ route, navigation }: any) => {
         </View>
         <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
         <NextEpisode_Container data={AllData[index + 1]}></NextEpisode_Container>
-        <FollowingEpisodes_Container index={index} data={AllData}></FollowingEpisodes_Container>
+        <FollowingEpisodes_Container
+          ContentID={ContentID}
+          index={index}
+          data={AllData}></FollowingEpisodes_Container>
       </View>
     </ScrollView>
   );
