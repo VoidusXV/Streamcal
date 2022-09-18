@@ -4,6 +4,8 @@ MediaTest/
 dist/
 npm-debug.*
 *.mp4
+*.png
+*.jpg
 *.exe
 *.jks
 *.p8
