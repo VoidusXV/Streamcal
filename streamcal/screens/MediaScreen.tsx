@@ -10,6 +10,7 @@ import {
   BackHandler,
   Image,
   ImageSourcePropType,
+  LogBox,
 } from "react-native";
 import React from "react";
 import { Video, AVPlaybackStatus, ResizeMode, PitchCorrectionQuality } from "expo-av";
@@ -27,6 +28,10 @@ import { StatusBar } from "expo-status-bar";
 import { generateThumbnail } from "../components/media/Functions";
 import { loadAsync } from "expo-font";
 import { FlashList } from "@shopify/flash-list";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import { Asset } from "expo-asset";
+
+//LogBox.ignoreAllLogs();
 
 function MilisecondsToTimespamp(num: any) {
   let sec = Math.trunc(num / 1000);
@@ -98,17 +103,49 @@ const FollowingEpisodes_Container = ({ data, ContentID, index }: any) => {
   }
 };
 
+async function zoomImage(imageURI: any, setImage: any, index: any) {
+  //console.log(WindowSize.Width * 0.14, WindowSize.Width * 0.22);
+  //console.log(sliderPos.current);
+  //const index = 2;
+  if (!imageURI) return;
+
+  const originX = index * WindowSize.Width * 0.22;
+  const originY = 0;
+
+  //console.log(imageURI);
+  //setImage(imageURI);
+
+  //return;
+  // console.log(originX);
+  const manipResult = await manipulateAsync(
+    "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=sliderSeek",
+    [
+      {
+        crop: {
+          height: WindowSize.Width * 0.14, //0.13,
+          width: WindowSize.Width * 0.22, // 0.22,
+          originX: originX, // index * 80
+          originY: originY,
+        },
+      },
+    ],
+    { compress: 1, format: SaveFormat.PNG }
+  );
+  //console.log("manipResult:", manipResult.uri);
+  setImage(manipResult.uri);
+}
+
 let timer: any = null;
-const videoURL = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"; //http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=video  //"https://eea3-2003-ea-c73b-5f87-41fb-85e8-7931-729f.eu.ngrok.io/v1/test";
+const videoURL = "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=video"; // //"http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"; //http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=video  //"https://eea3-2003-ea-c73b-5f87-41fb-85e8-7931-729f.eu.ngrok.io/v1/test";
 const Cover = require("../assets/covers/One_Piece.jpg");
 
 const VideoPlayer = ({
   navigation,
   setFullscreen,
   isFullscreen,
-  previewVideoRef,
   currentVideoRef,
   onValueChange,
+  imageURI,
 }: any) => {
   const [status, setStatus] = React.useState<any>({});
   const [isLoaded, setLoaded] = React.useState<any>(true);
@@ -136,7 +173,7 @@ const VideoPlayer = ({
   };
 
   const fadeOut = () => {
-    //  return;
+    return;
     if (isSliding.current) return;
     Animated.timing(IconsOpacity, {
       toValue: 0,
@@ -161,10 +198,13 @@ const VideoPlayer = ({
   };
 
   React.useEffect(() => {
-    fadeOut();
+    //fadeOut();
   }, []);
 
   const Slider_Preview = ({ sliderPercent, sliderPos, isSliding }: any) => {
+    const zoomImageIndex = Math.trunc(sliderPos.current / 1000 / 10);
+    const [getImage, setImage] = React.useState<any>(imageURI);
+
     function pos() {
       const a = WindowSize.Width * sliderPercent - (WindowSize.Width * 0.4) / 2;
       const leftMargin = WindowSize.Width * 0.03;
@@ -178,28 +218,27 @@ const VideoPlayer = ({
       return a;
     }
 
-    //console.log(sliderPos.current);
+    console.log("getImage", getImage);
+    //console.log("zoomImageIndex", zoomImageIndex);
+    //console.log("imageURI", imageURI);
     return (
       <View
+        onLayout={async () => await zoomImage(getImage, setImage, zoomImageIndex)}
         style={{
           //opacity: isSliding.current ? 1 : 0,
-          backgroundColor: "red",
+          //backgroundColor: "red",
           width: WindowSize.Width * 0.4,
           height: WindowSize.Width * 0.25,
           position: "absolute",
           top: WindowSize.Width * 0.15,
           left: pos(),
         }}>
-        <Video
-          //ref={(e)=> e?.loadAsync({uri:videoURL})}
-          // ref={previewVideoRef}
-          source={{ uri: videoURL }}
-          // style={{ width: "100%", height: "100%" }}
-          style={{ ...styles.video, zIndex: 2 }}
-          resizeMode={ResizeMode.STRETCH}
-          positionMillis={sliderPos.current}
-          //rate={32}
-          volume={0}></Video>
+        <Image
+          resizeMode="cover"
+          style={{ flex: 1 }}
+          source={{
+            uri: getImage,
+          }}></Image>
         <Text style={{ color: "white", textAlign: "center" }}>
           {MilisecondsToTimespamp(sliderPos.current)}
         </Text>
@@ -322,11 +361,10 @@ const VideoPlayer = ({
           {isIcons && <Middle_Buttons></Middle_Buttons>}
         </TouchableOpacity>
 
-        {/* <Slider_Preview
+        <Slider_Preview
           isSliding={isSliding}
           sliderPos={slidingPos}
-          sliderPercent={getSliderPercent || 0}
-        ></Slider_Preview> */}
+          sliderPercent={getSliderPercent || 0}></Slider_Preview>
 
         <TouchableOpacity
           onPress={() => (isIcons ? fadeOut() : fadeIn())}
@@ -445,6 +483,9 @@ const VideoPlayer = ({
 
 const MediaScreen = ({ route, navigation }: any) => {
   const [isFullscreen, setFullscreen] = React.useState<any>(false);
+  const [getImage, setImage] = React.useState<any>("");
+  //const [isImageReady, setImageReady] = React.useState(false);
+
   const currentVideo = React.useRef<any>(null);
   const previewVideo = React.useRef<any>(null);
   const ImagesPath: any = [];
@@ -471,36 +512,26 @@ const MediaScreen = ({ route, navigation }: any) => {
 
   React.useEffect(() => {
     (async () => {
-      const ImageSeekGenerator = async () => {
-        const duration = 27;
-        const ImageDivi = 10;
-        const ImagesAfterSeconds = Math.round(duration / ImageDivi);
-        const ImagesAfterMiliseconds = ImagesAfterSeconds * 1000;
-
-        console.log("ImageSeek Generator");
-        for (let index = 0; index < ImageDivi; index++) {
-          let ImageMili = Math.floor(index * ImagesAfterMiliseconds);
-          if (index == ImageDivi - 1) ImageMili -= 1000;
-          console.log(ImageMili);
-
-          ImagesPath[index] = await generateThumbnail(
-            videoURL,
-            1, //Math.floor(index * ImagesAfterMiliseconds),
-            0.1
-          );
-        }
-      };
-
+      async function SliderSeekZoom() {
+        const image = Asset.fromURI(
+          "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=sliderSeek"
+        );
+        console.log("Downloading image...");
+        await image.downloadAsync();
+        setImage(image);
+        //PreviewImage.current = image;
+        //await zoomImage(image.localUri || image.uri, setImage, 0);
+        // console.log("ettettett4654545");
+      }
       const vid = currentVideo?.current?.loadAsync({ uri: videoURL });
-      const preview = previewVideo?.current?.loadAsync({ uri: videoURL, width: 100, height: 100 });
+      const SliderSeek = SliderSeekZoom();
 
-      console.log("Start Loading Video");
-      await Promise.all([vid, preview]).then(async () => {
+      //console.log("Start Loading Video");
+      await Promise.all([vid, SliderSeek]).then(async () => {
         console.log("Video Loaded");
-        // previewVideo?.current?.setStatusAsync({
-        //   pitchCorrectionQuality: PitchCorrectionQuality.Low,
-        // });
-        //console.log("Image:", ImagesPath);
+
+        //console.log(getImage);
+        //setImageReady(true);
       });
     })();
   }, []);
@@ -513,11 +544,11 @@ const MediaScreen = ({ route, navigation }: any) => {
       {isFullscreen && <StatusBar hidden></StatusBar>}
 
       <VideoPlayer
-        previewVideoRef={previewVideo}
         currentVideoRef={currentVideo}
         setFullscreen={setFullscreen}
         isFullscreen={isFullscreen}
-        navigation={navigation}></VideoPlayer>
+        navigation={navigation}
+        imageURI={getImage.localUri || getImage.uri}></VideoPlayer>
 
       <View style={{ flex: 1 }}>
         <View
@@ -552,11 +583,11 @@ const MediaScreen = ({ route, navigation }: any) => {
             color="white"></Octicons>
         </View>
         <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
-        <NextEpisode_Container data={AllData[index + 1]}></NextEpisode_Container>
+        {/* <NextEpisode_Container data={AllData[index + 1]}></NextEpisode_Container>
         <FollowingEpisodes_Container
           ContentID={ContentID}
           index={index}
-          data={AllData}></FollowingEpisodes_Container>
+          data={AllData}></FollowingEpisodes_Container> */}
       </View>
     </ScrollView>
   );
