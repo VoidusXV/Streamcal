@@ -7,58 +7,22 @@ import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
 
 import FadingEdgesView from "../components/Designs/FadingEdgesView";
 import { Asset } from "expo-asset";
+import VideoPlayer from "../components/SubPages/ViewContent/MediaScreen/VideoPlayer";
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 
-const zoomImage = async (image: any, setImage: any) => {
-  const manipResult = await manipulateAsync(
-    image.localUri || image.uri,
-    [
-      {
-        crop: {
-          height: WindowSize.Width * 0.13,
-          width: WindowSize.Width * 0.22,
-          originX: 160,
-          originY: 0,
-        },
-      },
-    ],
-    { compress: 1, format: SaveFormat.PNG }
-  );
-  setImage(manipResult);
-};
 export default function ListScreen() {
-  const [image, setImage] = React.useState<any>(null);
-  const [ready, setReady] = React.useState(false);
+  const VideoRef = React.useRef<any>(null);
+  const videoURL = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
 
   React.useEffect(() => {
     (async () => {
-      const image = Asset.fromURI(
-        "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=sliderSeek"
-      );
-      await image.downloadAsync();
-      setImage(image);
-      setReady(true);
-      await zoomImage(image, setImage);
+      await VideoRef?.current?.loadAsync({ uri: videoURL });
     })();
   }, []);
+
   return (
     <View style={styles.container}>
-      <View style={{ width: 100, height: 100 }}>
-        {ready && (
-          <Image
-            //resizeMethod="resize"
-            //resizeMode="contain"
-            style={{
-              backgroundColor: "white",
-              width: 320,
-              height: 180,
-              //transform: [{ scale: 10 }],
-            }}
-            source={{
-              uri: image.localUri || image.uri, //"http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=sliderSeek",
-            }}></Image>
-        )}
-      </View>
+      <VideoPlayer VideoRef={VideoRef}></VideoPlayer>
       {/* <FadingEdgesView
         style={{ width: "100%", height: "100%", borderWidth: 1, borderColor: "green" }}
         ParentBackgroundColor={"red"}>
@@ -81,7 +45,7 @@ const styles = StyleSheet.create({
     //alignItems: "center",
     //justifyContent: "center",
     width: "100%",
-    height: WindowSize.Height * 0.7,
+    height: "100%", //WindowSize.Height * 0.7,
     backgroundColor: backgroundColor,
     position: "absolute",
   },

@@ -59,6 +59,7 @@ async function changeScreenOrientation() {
   await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
   return true;
 }
+
 const NextEpisode_Container = ({ data }: any) => {
   if (data) {
     return (
@@ -487,11 +488,7 @@ const MediaScreen = ({ route, navigation }: any) => {
   //const [isImageReady, setImageReady] = React.useState(false);
 
   const currentVideo = React.useRef<any>(null);
-  const previewVideo = React.useRef<any>(null);
-  const ImagesPath: any = [];
   const { item, AllData, ContentName, ContentID, index } = route.params;
-  //console.log("index:", index);
-  //console.log(AllData[index + 1]);
 
   React.useEffect(() => {
     const backAction = () => {
