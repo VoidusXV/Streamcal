@@ -304,15 +304,15 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
   };
 
   const fadeOut = () => {
-    //if (isSliding.current) return;
+    if (isSliding.current) return;
 
-    setIcons(false);
+    //setIcons(false);
     Animated.timing(IconsOpacity, {
       toValue: 0,
       duration: 200,
       useNativeDriver: true,
     }).start(() => {
-      //setIcons(false);
+      setIcons(false);
       //isSliding.current = false;
     });
   };
@@ -365,7 +365,8 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
         }}></Video>
 
       <Animated.View
-        onTouchStart={() => (isIcons ? fadeOut() : fadeIn())}
+        //onTouchStart={() => (isIcons ? fadeOut() : fadeIn())}
+        //onTouchStart={() => console.log("Animated.View")}
         style={{
           position: "absolute",
           ...styles.video_container,
@@ -375,31 +376,42 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
           width: Width,
           height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
         }}>
-        <TopButton
-          isFullscreen={isFullScreen}
-          BackButtonOnPress={() => navigation.goBack()}
-          ScreenButtonOnPress={ScreenButtonOnPress}></TopButton>
-        <Middle_Buttons
-          isFullscreen={isFullScreen}
-          status={getStatus}
-          VideoRef={VideoRef}></Middle_Buttons>
-        {/* <Slider_Preview
+        <TouchableOpacity
+          onPress={() => (isIcons ? fadeOut() : fadeIn())}
+          //onPress={() => console.log("TouchableOpacity")}
+          activeOpacity={1}
+          style={{ width: "100%", height: "100%" }}>
+          {isIcons && (
+            <>
+              <TopButton
+                isFullscreen={isFullScreen}
+                BackButtonOnPress={() => navigation.goBack()}
+                ScreenButtonOnPress={ScreenButtonOnPress}></TopButton>
+              <Middle_Buttons
+                isFullscreen={isFullScreen}
+                status={getStatus}
+                VideoRef={VideoRef}></Middle_Buttons>
+              {/* <Slider_Preview
         status={getStatus}
         getSliderValue={getSliderValue}
         imageURI={getCroppedImage}
         CroppedImages={CroppedImages}></Slider_Preview> */}
-        <SliderBar
-          isFullscreen={false}
-          maximumValue={Duration.current}
-          value={getStatus.positionMillis}
-          onValueChange={async (e: any) => {
-            setSliderValue(e);
-          }}
-          onSlidingComplete={async (e: any) => {
-            await VideoRef?.current.setPositionAsync(e);
-            isSliding.current = false;
-          }}
-          onTouchStart={() => (isSliding.current = true)}></SliderBar>
+              <SliderBar
+                isFullscreen={false}
+                maximumValue={Duration.current}
+                value={getStatus.positionMillis}
+                onValueChange={async (e: any) => {
+                  setSliderValue(e);
+                }}
+                onSlidingComplete={async (e: any) => {
+                  await VideoRef?.current.setPositionAsync(e);
+                  isSliding.current = false;
+                  autoFade();
+                }}
+                onTouchStart={() => (isSliding.current = true)}></SliderBar>
+            </>
+          )}
+        </TouchableOpacity>
       </Animated.View>
     </View>
   );
