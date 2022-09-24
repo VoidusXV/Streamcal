@@ -15,6 +15,7 @@ import {
 import React from "react";
 import { Video, AVPlaybackStatus, ResizeMode, PitchCorrectionQuality } from "expo-av";
 import * as ScreenOrientation from "expo-screen-orientation";
+import VideoPlayer from "../components/SubPages/ViewContent/MediaScreen/VideoPlayer";
 
 import Slider from "@react-native-community/slider";
 import Spinner from "react-native-loading-spinner-overlay";
@@ -30,6 +31,7 @@ import { loadAsync } from "expo-font";
 import { FlashList } from "@shopify/flash-list";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { Asset } from "expo-asset";
+import * as NavigationBar from "expo-navigation-bar";
 
 //LogBox.ignoreAllLogs();
 
@@ -51,12 +53,19 @@ function MilisecondsToTimespamp(num: any) {
 
 async function changeScreenOrientation() {
   const Orientation: any = await ScreenOrientation.getOrientationAsync();
+  let ScreenOrientationLock;
+  let NavBar;
 
   if (Orientation != ScreenOrientation.OrientationLock.ALL) {
-    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    ScreenOrientationLock = ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    NavBar = NavigationBar.setVisibilityAsync("visible");
+    await Promise.all([ScreenOrientationLock, NavBar]);
     return false;
   }
-  await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
+  ScreenOrientationLock = NavigationBar.setVisibilityAsync("hidden");
+  NavBar = ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
+  await Promise.all([ScreenOrientationLock, NavBar]);
+
   return true;
 }
 
@@ -104,43 +113,40 @@ const FollowingEpisodes_Container = ({ data, ContentID, index }: any) => {
   }
 };
 
-async function zoomImage(imageURI: any, setImage: any, index: any) {
-  //console.log(WindowSize.Width * 0.14, WindowSize.Width * 0.22);
-  //console.log(sliderPos.current);
-  //const index = 2;
-  if (!imageURI) return;
+async function zoomImage(imageURI: any, index: any) {
+  if (!imageURI) {
+    throw "Invalid imageURI";
+  }
 
-  const originX = index * WindowSize.Width * 0.22;
-  const originY = 0;
+  const ImagesPerRow = 10;
+  const ImageWidth = 80;
+  const ImageHeight = 45;
 
-  //console.log(imageURI);
-  //setImage(imageURI);
+  const originX = (index % 10) * ImageWidth;
+  const originY = Math.trunc(index / ImagesPerRow) * ImageHeight;
 
-  //return;
-  // console.log(originX);
   const manipResult = await manipulateAsync(
-    "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=sliderSeek",
+    imageURI.localUri || imageURI.uri,
     [
       {
         crop: {
-          height: WindowSize.Width * 0.14, //0.13,
-          width: WindowSize.Width * 0.22, // 0.22,
-          originX: originX, // index * 80
+          height: ImageHeight,
+          width: ImageWidth,
+          originX: originX,
           originY: originY,
         },
       },
     ],
-    { compress: 1, format: SaveFormat.PNG }
+    { compress: 1, format: SaveFormat.JPEG }
   );
-  //console.log("manipResult:", manipResult.uri);
-  setImage(manipResult.uri);
+  return manipResult.uri;
 }
 
 let timer: any = null;
 const videoURL = "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=video"; // //"http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"; //http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=video  //"https://eea3-2003-ea-c73b-5f87-41fb-85e8-7931-729f.eu.ngrok.io/v1/test";
 const Cover = require("../assets/covers/One_Piece.jpg");
 
-const VideoPlayer = ({
+const VideoPlayer2 = ({
   navigation,
   setFullscreen,
   isFullscreen,
@@ -224,7 +230,7 @@ const VideoPlayer = ({
     //console.log("imageURI", imageURI);
     return (
       <View
-        onLayout={async () => await zoomImage(getImage, setImage, zoomImageIndex)}
+        //onLayout={async () => await zoomImage(getImage, setImage, zoomImageIndex)}
         style={{
           //opacity: isSliding.current ? 1 : 0,
           //backgroundColor: "red",
@@ -482,22 +488,33 @@ const VideoPlayer = ({
   );
 };
 
-const MediaScreen = ({ route, navigation }: any) => {
-  const [isFullscreen, setFullscreen] = React.useState<any>(false);
-  const [getImage, setImage] = React.useState<any>("");
-  //const [isImageReady, setImageReady] = React.useState(false);
+interface IGeneratedImages {
+  zoomImageIndex: any;
+  zoomImageURI: any;
+}
 
-  const currentVideo = React.useRef<any>(null);
+const MediaScreen = ({ route, navigation }: any) => {
+  const [isFullScreen, setFullScreen] = React.useState<any>(false);
+
+  const [getImage, setImage] = React.useState<any>(null);
+  const [getGeneratedImages, setGeneratedImages] = React.useState<any>([{}]);
+  let generatedImages: IGeneratedImages[] = [];
+
+  const VideoRef = React.useRef<any>(null);
+  const image = Asset.fromURI(
+    "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=sliderSeek"
+  );
+
   const { item, AllData, ContentName, ContentID, index } = route.params;
 
   React.useEffect(() => {
     const backAction = () => {
-      if (!isFullscreen) {
+      if (!isFullScreen) {
         navigation.goBack();
         return true;
       }
       ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
-      setFullscreen(false);
+      setFullScreen(false);
 
       return true;
     };
@@ -505,47 +522,45 @@ const MediaScreen = ({ route, navigation }: any) => {
     return () => {
       backHandler.remove();
     };
-  }, [isFullscreen]);
+  }, [isFullScreen]);
 
   React.useEffect(() => {
     (async () => {
-      async function SliderSeekZoom() {
-        const image = Asset.fromURI(
-          "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=sliderSeek"
-        );
-        console.log("Downloading image...");
-        await image.downloadAsync();
-        setImage(image);
-        //PreviewImage.current = image;
-        //await zoomImage(image.localUri || image.uri, setImage, 0);
-        // console.log("ettettett4654545");
+      // TODO: Running both asyncs at the same time
+      await image.downloadAsync();
+      setImage(image);
+      await VideoRef?.current?.loadAsync({ uri: videoURL });
+
+      console.log("Starting Generate CroppedImages");
+      for (let index = 0; index < 145; index++) {
+        generatedImages.push({
+          zoomImageIndex: index,
+          zoomImageURI: await zoomImage(image, index),
+        });
       }
-      const vid = currentVideo?.current?.loadAsync({ uri: videoURL });
-      const SliderSeek = SliderSeekZoom();
 
-      //console.log("Start Loading Video");
-      await Promise.all([vid, SliderSeek]).then(async () => {
-        console.log("Video Loaded");
-
-        //console.log(getImage);
-        //setImageReady(true);
-      });
+      console.log("Generate CroppedImages Done");
+      setGeneratedImages(generatedImages);
     })();
   }, []);
 
   return (
     <ScrollView
-      scrollEnabled={isFullscreen ? false : true}
-      style={!isFullscreen ? styles.container : { backgroundColor: "black" }}
+      scrollEnabled={isFullScreen ? false : true}
+      style={!isFullScreen ? styles.container : { backgroundColor: "black" }}
       contentContainerStyle={{ paddingBottom: 50 }}>
-      {isFullscreen && <StatusBar hidden></StatusBar>}
+      {isFullScreen && <StatusBar hidden></StatusBar>}
 
-      <VideoPlayer
-        currentVideoRef={currentVideo}
-        setFullscreen={setFullscreen}
-        isFullscreen={isFullscreen}
-        navigation={navigation}
-        imageURI={getImage.localUri || getImage.uri}></VideoPlayer>
+      {getImage && (
+        <VideoPlayer
+          navigation={navigation}
+          VideoRef={VideoRef}
+          CroppedImages={getGeneratedImages}
+          isFullScreen={isFullScreen}
+          ScreenButtonOnPress={async () =>
+            setFullScreen(await changeScreenOrientation())
+          }></VideoPlayer>
+      )}
 
       <View style={{ flex: 1 }}>
         <View

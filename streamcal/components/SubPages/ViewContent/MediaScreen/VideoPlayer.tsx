@@ -29,51 +29,24 @@ function MilisecondsToTimespamp(num: any) {
 
   return result;
 }
-
-async function zoomImage(imageURI: any, index: any) {
-  //console.log(WindowSize.Width * 0.14, WindowSize.Width * 0.22);
-  //console.log(sliderPos.current);
-  //const index = 2;
-  if (!imageURI) return;
-
-  const ImagesPerRow = 10;
-  const ImageWidth = 80;
-  const ImageHeight = 45;
-
-  const originX = (index % 10) * ImageWidth;
-  const originY = Math.trunc(index / ImagesPerRow) * ImageHeight;
-
-  //console.log("localUri: ", imageURI.localUri, "uri", imageURI.uri);
-  //console.log("zoomImage: ", imageURI.localUri || imageURI.uri);
-
-  //console.log("originY", originY);
-  //console.log("originX", originX);
-
-  //setImage(imageURI);
-
-  //return;
-  // console.log(originX);
-  const manipResult = await manipulateAsync(
-    imageURI.localUri || imageURI.uri,
-    [
-      {
-        crop: {
-          height: ImageHeight,
-          width: ImageWidth,
-          originX: originX,
-          originY: originY,
-        },
-      },
-    ],
-    { compress: 1, format: SaveFormat.JPEG }
-  );
-  return manipResult.uri;
-  console.log("manipResult:", manipResult.uri);
-  //setImage(manipResult.uri);
+interface ITopButton {
+  isFullscreen: any;
+  BackButtonOnPress?: any;
+  ScreenButtonOnPress?: any;
 }
 
-const TopButton = ({ isFullscreen, BackButtonOnPress, ScreenButtonOnPress }: any) => (
-  <View style={{ ...styles.TopButtonContainer_Normal, width: isFullscreen ? "90%" : "100%" }}>
+const TopButton: React.FC<ITopButton> = ({
+  isFullscreen,
+  BackButtonOnPress,
+  ScreenButtonOnPress,
+}: any) => (
+  <View
+    style={{
+      ...styles.TopButtonContainer_Normal,
+      zIndex: 1,
+      width: isFullscreen ? WindowSize.Height : "100%",
+      //backgroundColor: "blue",
+    }}>
     <MaterialIcons
       name="arrow-back"
       size={Mini_IconSize}
@@ -97,7 +70,12 @@ const TopButton = ({ isFullscreen, BackButtonOnPress, ScreenButtonOnPress }: any
   </View>
 );
 
-const Middle_Buttons = ({ isFullscreen, status, VideoRef }: any) => {
+interface IMiddle_Buttons {
+  isFullscreen: any;
+  status: any;
+  VideoRef: any;
+}
+const Middle_Buttons: React.FC<IMiddle_Buttons> = ({ isFullscreen, status, VideoRef }: any) => {
   return (
     <View
       style={{
@@ -107,8 +85,9 @@ const Middle_Buttons = ({ isFullscreen, status, VideoRef }: any) => {
         marginRight: isFullscreen ? WindowSize.Width * 0.2 : 0,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "red",
+        //backgroundColor: "red",
         marginTop: WindowSize.Width * 0.1,
+        zIndex: 1,
         //position: "absolute",
         //top: WindowSize.Width * 0.1,
       }}>
@@ -129,10 +108,10 @@ const Middle_Buttons = ({ isFullscreen, status, VideoRef }: any) => {
           }}
           size={IconSize * 1.1}
           style={{
-            //bottom: WindowSize.Width * 0.01,
+            bottom: WindowSize.Width * 0.01,
             minWidth: "20%",
             textAlign: "center",
-            backgroundColor: "blue",
+            //backgroundColor: "blue",
             color: "white",
           }}></MaterialIcons>
         <MaterialIcons
@@ -221,15 +200,27 @@ const SliderBar: React.FC<ISliderBar> = ({
     </TouchableOpacity>
   );
 };
+interface IGeneratedImages {
+  zoomImageIndex: any;
+  zoomImageURI: any;
+}
 
 interface ISlider_Preview {
   getSliderValue: any;
   imageURI: any;
   status: any;
+  CroppedImages: IGeneratedImages[];
 }
-const Slider_Preview: React.FC<ISlider_Preview> = ({ getSliderValue, imageURI, status }: any) => {
+const Slider_Preview: React.FC<ISlider_Preview> = ({
+  getSliderValue,
+  status,
+  CroppedImages,
+}: ISlider_Preview) => {
   const zoomImageIndex = Math.trunc(getSliderValue / 1000 / 10);
   //const [getImage, setImage] = React.useState<any>(imageURI || "");
+  const ImageURI_ByIndex = CroppedImages.find(
+    (e: any) => e.zoomImageIndex === zoomImageIndex
+  )?.zoomImageURI;
 
   function pos() {
     if (!status.durationMillis) return;
@@ -246,10 +237,6 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({ getSliderValue, imageURI, s
     if (leftMargin > a) return leftMargin;
     return a;
   }
-  //console.log(getSliderValue, status?.durationMillis);
-
-  //console.log("zoomImageIndex", zoomImageIndex);
-  //console.log("Slider_Preview", imageURI);
   return (
     <View
       style={{
@@ -263,9 +250,8 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({ getSliderValue, imageURI, s
       }}>
       <Image
         resizeMode="cover"
-        style={{ flex: 1 }}
-        source={{ uri: imageURI }} //getImage
-      ></Image>
+        style={{ flex: 1, borderWidth: 1, borderColor: "white" }}
+        source={{ uri: ImageURI_ByIndex }}></Image>
       <Text style={{ color: "white", textAlign: "center" }}>
         {MilisecondsToTimespamp(getSliderValue)}
       </Text>
@@ -273,31 +259,23 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({ getSliderValue, imageURI, s
   );
 };
 
-async function Download_SeekPreview() {
-  const image = Asset.fromURI(
-    "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=sliderSeek"
-  );
-  return 0; //await image.downloadAsync();
+interface IVideoPlayer {
+  VideoRef: any;
+  CroppedImages: any;
+  isFullScreen?: any;
+  navigation?: any;
+  ScreenButtonOnPress?: any;
 }
 
-function LoadMediaContent() {
-  const [isLoaded, setLoaded] = React.useState(false);
-  React.useEffect(() => {
-    setLoaded(true);
-  }, []);
-  return isLoaded;
-}
+let timer: any = null;
 
-let Generated_PreviewImages: Number[] = [];
-
-function SaveGenerated_PreviewImages(zoomImageIndex: any, onAdd: any) {
-  if (Generated_PreviewImages.includes(zoomImageIndex)) return;
-
-  onAdd();
-  Generated_PreviewImages.push(zoomImageIndex);
-}
-
-const VideoPlayer = ({ VideoRef, imageURI }: any) => {
+const VideoPlayer: React.FC<IVideoPlayer> = ({
+  VideoRef,
+  CroppedImages,
+  isFullScreen,
+  navigation,
+  ScreenButtonOnPress,
+}: any) => {
   // UseStates
   const [getStatus, setStatus] = React.useState<any>({});
   const [isLoaded, setLoaded] = React.useState<any>(true);
@@ -312,11 +290,62 @@ const VideoPlayer = ({ VideoRef, imageURI }: any) => {
 
   const [getSliderValue, setSliderValue] = React.useState<any>(0);
 
-  const zoomImageIndex = Math.trunc(getSliderValue / 1000 / 10);
-  //console.log("zoomImageIndex:", zoomImageIndex);
-  //const isLoaded2 = LoadMediaContent();
+  const fadeIn = () => {
+    // console.log("fadeIN");
+    setIcons(true);
+
+    Animated.timing(IconsOpacity, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {}); // () => setIcons(true)
+
+    autoFade();
+  };
+
+  const fadeOut = () => {
+    //if (isSliding.current) return;
+
+    setIcons(false);
+    Animated.timing(IconsOpacity, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      //setIcons(false);
+      //isSliding.current = false;
+    });
+  };
+
+  const autoFade = () => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout((e) => {
+      fadeOut();
+    }, 2000);
+  };
+
+  React.useEffect(() => {
+    fadeOut();
+  }, []);
+
+  /*
+   !isFullScreen
+          ? { width: WindowSize.Width }
+          : { width: WindowSize.Height, height: WindowSize.Width },
+  */
+  //console.log("isFullscreen:", isFullScreen, WindowSize.Width);
+
+  const Width = isFullScreen ? WindowSize.Height * 0.9 : WindowSize.Width;
   return (
-    <View style={{ ...styles.video_container }}>
+    <View
+      style={{
+        ...styles.video_container,
+        width: Width,
+        height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
+        alignSelf: "center",
+      }}>
       <Video
         ref={VideoRef}
         //source={{ uri: videoURL }}
@@ -336,35 +365,42 @@ const VideoPlayer = ({ VideoRef, imageURI }: any) => {
         }}></Video>
 
       <Animated.View
+        onTouchStart={() => (isIcons ? fadeOut() : fadeIn())}
         style={{
           position: "absolute",
           ...styles.video_container,
           backgroundColor: !getStatus.isPlaying ? "rgba(0,0,0,0.4)" : "",
-        }}></Animated.View>
-
-      {/* <Middle_Buttons status={getStatus} VideoRef={VideoRef}></Middle_Buttons> */}
-      <Slider_Preview
+          //backgroundColor: "red",
+          opacity: IconsOpacity,
+          width: Width,
+          height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
+        }}>
+        <TopButton
+          isFullscreen={isFullScreen}
+          BackButtonOnPress={() => navigation.goBack()}
+          ScreenButtonOnPress={ScreenButtonOnPress}></TopButton>
+        <Middle_Buttons
+          isFullscreen={isFullScreen}
+          status={getStatus}
+          VideoRef={VideoRef}></Middle_Buttons>
+        {/* <Slider_Preview
         status={getStatus}
         getSliderValue={getSliderValue}
-        imageURI={getCroppedImage}></Slider_Preview>
-      <SliderBar
-        isFullscreen={false}
-        maximumValue={Duration.current}
-        value={getStatus.positionMillis}
-        onValueChange={async (e: any) => {
-          setSliderValue(e);
-          //Generated_PreviewImages.push(zoomImageIndex);
-          SaveGenerated_PreviewImages(zoomImageIndex, async () => {
-            //console.log("Add");
-            setCroppedImage(await zoomImage(imageURI, zoomImageIndex));
-          });
-          //setCroppedImage(await zoomImage(imageURI, zoomImageIndex));
-        }}
-        onSlidingComplete={async (e: any) => {
-          await VideoRef?.current.setPositionAsync(e);
-          isSliding.current = false;
-        }}
-        onTouchStart={() => (isSliding.current = true)}></SliderBar>
+        imageURI={getCroppedImage}
+        CroppedImages={CroppedImages}></Slider_Preview> */}
+        <SliderBar
+          isFullscreen={false}
+          maximumValue={Duration.current}
+          value={getStatus.positionMillis}
+          onValueChange={async (e: any) => {
+            setSliderValue(e);
+          }}
+          onSlidingComplete={async (e: any) => {
+            await VideoRef?.current.setPositionAsync(e);
+            isSliding.current = false;
+          }}
+          onTouchStart={() => (isSliding.current = true)}></SliderBar>
+      </Animated.View>
     </View>
   );
 };
@@ -374,8 +410,9 @@ export default VideoPlayer;
 const styles = StyleSheet.create({
   video: { width: "100%", height: "100%", backgroundColor: "black", position: "absolute" },
   video_container: {
-    width: WindowSize.Width,
-    height: WindowSize.Height * 0.3,
+    //width: WindowSize.Width,
+    //height: WindowSize.Width * 0.6,
+
     backgroundColor: "black",
   },
   TopButtonContainer_Normal: {
