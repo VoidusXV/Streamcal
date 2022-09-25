@@ -535,8 +535,13 @@ const MediaScreen = ({ route, navigation }: any) => {
       setImage(image);
       await VideoRef?.current?.loadAsync({ uri: videoURL });
 
-      console.log("Starting Generate CroppedImages");
-      for (let index = 0; index < 145; index++) {
+      const DurationMinutes = item.Duration / 60;
+      const RandomConstant = 0.4;
+      const SecondsPerImage = Math.ceil(DurationMinutes * RandomConstant);
+      const ImageAmount = Math.ceil(item.Duration / SecondsPerImage);
+
+      console.log("Starting Generate CroppedImages:", ImageAmount);
+      for (let index = 0; index < ImageAmount; index++) {
         generatedImages.push({
           zoomImageIndex: index,
           zoomImageURI: await zoomImage(image, index),
@@ -599,11 +604,11 @@ const MediaScreen = ({ route, navigation }: any) => {
             color="white"></Octicons>
         </View>
         <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
-        {/* <NextEpisode_Container data={AllData[index + 1]}></NextEpisode_Container>
+        <NextEpisode_Container data={AllData[index + 1]}></NextEpisode_Container>
         <FollowingEpisodes_Container
           ContentID={ContentID}
           index={index}
-          data={AllData}></FollowingEpisodes_Container> */}
+          data={AllData}></FollowingEpisodes_Container>
       </View>
     </ScrollView>
   );

@@ -320,7 +320,6 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
   };
 
   const fadeOut = () => {
-    return;
     if (isSliding.current) return;
 
     //setIcons(false);

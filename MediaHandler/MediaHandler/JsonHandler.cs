@@ -31,7 +31,18 @@ namespace MediaHandler
                 NewContentSeason_Index++;
             }
 
-            temp.Series.Seasons[NewContentSeason_Index].Episodes.Add(NewEpisode);
+            //temp.Series.Seasons[NewContentSeason_Index].Episodes.Add(NewEpisode); //Old
+
+            // Sort Episode
+            for (int i = 0; i < temp.Series.Seasons[NewContentSeason_Index].Episodes.Count; i++)
+            {
+                if (temp.Series.Seasons[NewContentSeason_Index].Episodes[i].Episode > Episode)
+                {
+                    temp.Series.Seasons[NewContentSeason_Index].Episodes.Insert(i, NewEpisode);
+                    break;
+                }
+            }
+
             File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));
         }
 
@@ -64,7 +75,18 @@ namespace MediaHandler
             else
             {
                 temp = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(File.ReadAllText(jsonPath));
-                temp.Series.Seasons.Add(NewSeason);
+                //temp.Series.Seasons.Add(NewSeason); Old 
+
+                // Sort Season
+
+                for (int i = 0; i < temp.Series.Seasons.Count; i++)
+                {
+                    if (temp.Series.Seasons[i].SeasonNum > NewContentSeason)
+                    {
+                        temp.Series.Seasons.Insert(i, NewSeason);
+                        break;
+                    }
+                }
             }
 
             File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));

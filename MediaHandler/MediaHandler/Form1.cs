@@ -119,12 +119,20 @@ namespace MediaHandler
 
         async Task GeneratePreviewImagesAndThumbnail(string fileName = "all")
         {
-            return;
+            //27s => 27/60 => 0.45
+            //0.45/0.4 => (0.18 < 1) => 1
+
+            int Columns = 10;
+            double RandomConstant = 0.4;
+
+            var Duration = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(File.ReadAllText(NewContentJsonPath)).Duration / 1000; // In Seconds
+            var DurationMinutes = Duration / 60;
+            var SecondsPerImage = Math.Ceiling(DurationMinutes * RandomConstant);
+            var ImageRows = Math.Ceiling(Duration / SecondsPerImage / Columns);
+
             await RunCmd($"ffmpeg -i {fileName}.mp4 -vf fps=1/10 -q:v 50 img/image_%d.jpg", hidden: true, systemArguments: true);// Every 10 seconds one image
-            await RunCmd($"ffmpeg -i img/image_%d.jpg -filter_complex 'scale = 80:-1, tile = 10x15' preview.png", hidden: true, systemArguments: true); // Merge all images to one image
+            await RunCmd($"ffmpeg -i img/image_%d.jpg -filter_complex 'scale = 80:-1, tile = {Columns}x{ImageRows}' preview.png", hidden: true, systemArguments: true); // Merge all images to one image
 
-
-            var Duration = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(File.ReadAllText(NewContentJsonPath)).Duration / 1000;
             int MiddleContentLength = Convert.ToInt32(Duration / 2);
             Directory.CreateDirectory($"{processesPath}/img");
             await RunCmd($"ffmpeg -ss {MiddleContentLength} -i {fileName}.mp4 -qscale:v 1 -frames:v 1 Thumbnail.jpg", hidden: false, systemArguments: true);
@@ -406,7 +414,7 @@ namespace MediaHandler
 
             if (!NewContent)
                 return;
-            
+
             Directory.CreateDirectory($"{serverDataPath}/{ContentID}/Series/Season_{NewContentSeason}");
             //File.Move(processesPath + "/all.mp4", $"{serverDataPath}/{ContentID}/{Path}");
             webClient.DownloadFile(NewContent_JsonObject.CoverURL, $"{serverDataPath}/{ContentID}/Cover.png");
@@ -474,12 +482,45 @@ namespace MediaHandler
 
         private async void button7_Click(object sender, EventArgs e)
         {
+
             await GeneratePreviewImagesAndThumbnail();
         }
 
         private void button8_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            string NewContent_JsonFile = File.ReadAllText(NewContentJsonPath);
+            var NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_JsonFile);
+
+            string LocationFile = File.ReadAllText(@"C:\Coding\Projects\Private Streaming Service\Streamcal\server\Data\0\Locations.json");
+            var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(LocationFile);
+
+            FileHandler.Locations.Episodes NewEpisode = new FileHandler.Locations.Episodes
+            {
+                Episode = 5,
+                Thumbnail = "Thumbnail.jpg",
+                Path = "Path",
+                Title = "Title",
+                Description = "Description",
+                Duration = 1337,
+            };
+
+            for (int i = 0; i < LocationObject.Series.Seasons[0].Episodes.Count; i++)
+            {
+                if (LocationObject.Series.Seasons[0].Episodes[i].Episode > NewContent_JsonObject.Episode)
+                {
+                    LocationObject.Series.Seasons[0].Episodes.Insert(i, NewEpisode);
+                    break;
+                }
+            }
+
+            //LocationObject.Series.Seasons.Add(NewSeason);
+            var LocationObject_Formatted = JsonConvert.SerializeObject(LocationObject, Formatting.Indented);
+            Console.WriteLine(LocationObject_Formatted);
         }
     }
 }
