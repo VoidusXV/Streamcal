@@ -62,8 +62,10 @@ async function changeScreenOrientation() {
     await Promise.all([ScreenOrientationLock, NavBar]);
     return false;
   }
-  ScreenOrientationLock = NavigationBar.setVisibilityAsync("hidden");
-  NavBar = ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
+  ScreenOrientationLock = ScreenOrientation.lockAsync(
+    ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT
+  );
+  NavBar = NavigationBar.setVisibilityAsync("hidden");
   await Promise.all([ScreenOrientationLock, NavBar]);
 
   return true;
@@ -514,6 +516,8 @@ const MediaScreen = ({ route, navigation }: any) => {
         return true;
       }
       ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+      NavigationBar.setVisibilityAsync("visible");
+
       setFullScreen(false);
 
       return true;

@@ -86,14 +86,15 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
     <View
       style={{
         alignSelf: "center",
-        height: IconSize,
+        //height: IconSize,
         width: isFullscreen ? "90%" : "100%",
-        marginRight: isFullscreen ? WindowSize.Width * 0.2 : 0,
+        // marginRight: isFullscreen ? WindowSize.Width * 0.2 : 0,
         justifyContent: "center",
         alignItems: "center",
         //backgroundColor: "red",
-        marginTop: WindowSize.Width * 0.1,
+        marginTop: !isFullscreen ? WindowSize.Width * 0.1 : WindowSize.Width * 0.25,
         zIndex: 1,
+
         //position: "absolute",
         //top: WindowSize.Width * 0.1,
       }}>
@@ -104,7 +105,7 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
             await VideoRef?.current.setPositionAsync(status.positionMillis - 10000);
             onPressAllButtons();
           }}
-          size={IconSize * 0.8}
+          size={IconSize * 0.9}
           style={{ marginRight: "5%", color: "white" }}></MaterialIcons>
         <MaterialIcons
           name={status.isPlaying ? "pause" : "play-arrow"}
@@ -114,9 +115,9 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
               : await VideoRef.current.playAsync();
             onPressAllButtons();
           }}
-          size={IconSize * 1.1}
+          size={IconSize * 1.2}
           style={{
-            bottom: WindowSize.Width * 0.01,
+            //bottom: WindowSize.Width * 0.01,
             minWidth: "20%",
             textAlign: "center",
             //backgroundColor: "blue",
@@ -128,7 +129,7 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
             await VideoRef?.current.setPositionAsync(status.positionMillis + 10000);
             onPressAllButtons();
           }}
-          size={IconSize * 0.8}
+          size={IconSize * 0.9}
           style={{ marginLeft: "5%", color: "white" }}></MaterialIcons>
       </View>
     </View>
@@ -219,11 +220,13 @@ interface ISlider_Preview {
   imageURI: any;
   status: any;
   CroppedImages: IGeneratedImages[];
+  isFullScreen: any;
 }
 const Slider_Preview: React.FC<ISlider_Preview> = ({
   getSliderValue,
   status,
   CroppedImages,
+  isFullScreen,
 }: ISlider_Preview) => {
   const zoomImageIndex = Math.trunc(getSliderValue / 1000 / 10);
   //const [getImage, setImage] = React.useState<any>(imageURI || "");
@@ -235,16 +238,19 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({
     if (!status.durationMillis) return;
 
     const sliderPercent = getSliderValue / status.durationMillis;
-    const a = WindowSize.Width * sliderPercent - (WindowSize.Width * 0.4) / 2;
-    const leftMargin = WindowSize.Width * 0.03;
-    const rightMargin = WindowSize.Width * 0.57;
+    const PreviewBox_Size = (WindowSize.Width * 0.4) / 2;
 
-    if (leftMargin < a) {
-      if (rightMargin < a) return rightMargin;
-      return a;
+    const end =
+      (!isFullScreen ? WindowSize.Width : WindowSize.Height) * sliderPercent - PreviewBox_Size;
+    const leftMargin = !isFullScreen ? WindowSize.Width * 0.03 : WindowSize.Height * 0.03;
+    const rightMargin = !isFullScreen ? WindowSize.Width * 0.57 : WindowSize.Height * 0.67;
+
+    if (leftMargin < end) {
+      if (rightMargin < end) return rightMargin;
+      return end;
     }
-    if (leftMargin > a) return leftMargin;
-    return a;
+    if (leftMargin > end) return leftMargin;
+    return end;
   }
   return (
     <View
@@ -254,7 +260,7 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({
         width: WindowSize.Width * 0.4,
         height: WindowSize.Width * 0.25,
         position: "absolute",
-        top: WindowSize.Width * 0.2,
+        top: !isFullScreen ? WindowSize.Width * 0.2 : WindowSize.Width * 0.55,
         left: pos(),
       }}>
       <Image
@@ -314,6 +320,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
   };
 
   const fadeOut = () => {
+    return;
     if (isSliding.current) return;
 
     //setIcons(false);
@@ -339,13 +346,6 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
   React.useEffect(() => {
     fadeOut();
   }, []);
-
-  /*
-   !isFullScreen
-          ? { width: WindowSize.Width }
-          : { width: WindowSize.Height, height: WindowSize.Width },
-  */
-  //console.log("isFullscreen:", isFullScreen, WindowSize.Width);
 
   const Width = isFullScreen ? WindowSize.Height * 0.9 : WindowSize.Width;
   return (
@@ -375,8 +375,6 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
         }}></Video>
 
       <Animated.View
-        //onTouchStart={() => (isIcons ? fadeOut() : fadeIn())}
-        //onTouchStart={() => console.log("Animated.View")}
         style={{
           position: "absolute",
           ...styles.video_container,
@@ -388,7 +386,6 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
         }}>
         <TouchableOpacity
           onPress={() => (isIcons ? fadeOut() : fadeIn())}
-          //onPress={() => console.log("TouchableOpacity")}
           activeOpacity={1}
           style={{ width: "100%", height: "100%" }}>
           {isIcons && (
@@ -398,7 +395,6 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
                 BackButtonOnPress={() => navigation.goBack()}
                 ScreenButtonOnPress={ScreenButtonOnPress}></TopButton>
 
-              {/* TODO: OnPress  clearTimeout(timer); */}
               <Middle_Buttons
                 isFullscreen={isFullScreen}
                 status={getStatus}
@@ -407,11 +403,14 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
                   clearTimeout(timer);
                   autoFade();
                 }}></Middle_Buttons>
-              {/* <Slider_Preview
-        status={getStatus}
-        getSliderValue={getSliderValue}
-        imageURI={getCroppedImage}
-        CroppedImages={CroppedImages}></Slider_Preview> */}
+              {isSliding.current && (
+                <Slider_Preview
+                  status={getStatus}
+                  getSliderValue={getSliderValue}
+                  imageURI={getCroppedImage}
+                  CroppedImages={CroppedImages}
+                  isFullScreen={isFullScreen}></Slider_Preview>
+              )}
               <SliderBar
                 isFullscreen={false}
                 maximumValue={Duration.current}
