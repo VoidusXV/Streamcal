@@ -74,8 +74,14 @@ interface IMiddle_Buttons {
   isFullscreen: any;
   status: any;
   VideoRef: any;
+  onPressAllButtons: any;
 }
-const Middle_Buttons: React.FC<IMiddle_Buttons> = ({ isFullscreen, status, VideoRef }: any) => {
+const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
+  isFullscreen,
+  status,
+  VideoRef,
+  onPressAllButtons,
+}: any) => {
   return (
     <View
       style={{
@@ -96,6 +102,7 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({ isFullscreen, status, Video
           name="replay-10"
           onPress={async () => {
             await VideoRef?.current.setPositionAsync(status.positionMillis - 10000);
+            onPressAllButtons();
           }}
           size={IconSize * 0.8}
           style={{ marginRight: "5%", color: "white" }}></MaterialIcons>
@@ -105,6 +112,7 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({ isFullscreen, status, Video
             status.isPlaying
               ? await VideoRef.current.pauseAsync()
               : await VideoRef.current.playAsync();
+            onPressAllButtons();
           }}
           size={IconSize * 1.1}
           style={{
@@ -118,6 +126,7 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({ isFullscreen, status, Video
           name="forward-10"
           onPress={async () => {
             await VideoRef?.current.setPositionAsync(status.positionMillis + 10000);
+            onPressAllButtons();
           }}
           size={IconSize * 0.8}
           style={{ marginLeft: "5%", color: "white" }}></MaterialIcons>
@@ -300,6 +309,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
       useNativeDriver: true,
     }).start(() => {}); // () => setIcons(true)
 
+    console.log(timer);
     autoFade();
   };
 
@@ -387,10 +397,16 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
                 isFullscreen={isFullScreen}
                 BackButtonOnPress={() => navigation.goBack()}
                 ScreenButtonOnPress={ScreenButtonOnPress}></TopButton>
+
+              {/* TODO: OnPress  clearTimeout(timer); */}
               <Middle_Buttons
                 isFullscreen={isFullScreen}
                 status={getStatus}
-                VideoRef={VideoRef}></Middle_Buttons>
+                VideoRef={VideoRef}
+                onPressAllButtons={() => {
+                  clearTimeout(timer);
+                  autoFade();
+                }}></Middle_Buttons>
               {/* <Slider_Preview
         status={getStatus}
         getSliderValue={getSliderValue}
