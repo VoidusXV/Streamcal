@@ -84,6 +84,18 @@ namespace Test
 
         }
 
+        static IWebElement ReturnXPath_IfExists(string xPath)
+        {
+            try
+            {
+                return driver.FindElement(By.XPath(xPath));
+            }
+            catch (NoSuchElementException)
+            {
+                return null;
+            }
+        }
+
         static NewContent GetDetails()
         {
             //Cover xPath
@@ -99,15 +111,24 @@ namespace Test
             string ended = "//span[2]/a[1]";
             string CoverURL = "//img[@class='loaded'][1]";
 
-            IWebElement animeTitleElement = driver.FindElement(By.XPath(animeTitle));
-            IWebElement animeDetailsElement = driver.FindElement(By.XPath(animeDetails));
-            IWebElement directorElement = driver.FindElement(By.XPath(director));
-            IWebElement producerElement = driver.FindElement(By.XPath(producer));
-            IWebElement episodeTitleElement = driver.FindElement(By.XPath(episodeTitle));
-            IWebElement startedElement = driver.FindElement(By.XPath(started));
-            IWebElement endedElement = driver.FindElement(By.XPath(ended));
-            IWebElement episodeDescriptionElement = driver.FindElement(By.XPath(episodeDescription));
-            IWebElement CoverURL_Element = driver.FindElement(By.XPath(CoverURL));
+            IWebElement animeTitleElement = ReturnXPath_IfExists(animeTitle);
+
+            IWebElement animeDetailsElement = ReturnXPath_IfExists(animeDetails);
+
+            IWebElement directorElement = ReturnXPath_IfExists(director);
+
+            IWebElement producerElement = ReturnXPath_IfExists(producer);
+
+            IWebElement episodeTitleElement = ReturnXPath_IfExists(episodeTitle);
+
+            IWebElement startedElement = ReturnXPath_IfExists(started);
+
+            IWebElement endedElement = ReturnXPath_IfExists(ended);
+
+            IWebElement episodeDescriptionElement = ReturnXPath_IfExists(episodeDescription);
+
+            IWebElement CoverURL_Element = ReturnXPath_IfExists(CoverURL);
+
 
             int SlashAmount = driver.Url.Split("/").Length - 1;
             string Season = driver.Url.Split("/")[SlashAmount - 1].Split("-")[1];
@@ -115,17 +136,17 @@ namespace Test
 
             return new NewContent
             {
-                Title = animeTitleElement.Text.Replace("’", ""),
-                Description = animeDetailsElement.Text,
-                EpisodeTitle = episodeTitleElement.Text,
-                Episode_Description = episodeDescriptionElement.GetAttribute("textContent"),
+                Title = animeTitleElement?.Text.Replace("’", "") ?? "",
+                Description = animeDetailsElement?.Text ?? "",
+                EpisodeTitle = episodeTitleElement?.Text ?? "",
+                Episode_Description = episodeDescriptionElement?.GetAttribute("textContent") ?? "",
                 Episode = Episode,
                 Season = Season,
-                Started = startedElement.Text,
-                Ended = endedElement.Text,
-                Director = directorElement.Text,
-                Producer = producerElement.Text,
-                CoverURL = CoverURL_Element.GetAttribute("src"),
+                Started = startedElement?.Text ?? "",
+                Ended = endedElement?.Text ?? "",
+                Director = directorElement?.Text ?? "",
+                Producer = producerElement?.Text ?? "",
+                CoverURL = CoverURL_Element?.GetAttribute("src") ?? "",
                 Duration = 0,
             };
         }
@@ -133,6 +154,8 @@ namespace Test
         static void CreateJson()
         {
             var details = GetDetails();
+            Console.WriteLine("Detais gotten");
+
             File.WriteAllText(NewContent_Path, JsonConvert.SerializeObject(details, Formatting.Indented));
         }
         private static void OnNetworkRequestSent(object sender, NetworkRequestSentEventArgs e)
@@ -172,7 +195,9 @@ namespace Test
                     Console.WriteLine($"{currentPath}/video.html");
                     webClient.DownloadFile(e.ResponseUrl, $"{currentPath}/video.html");
                     Console.WriteLine("Download done");
+                    Console.WriteLine("Json creating starting...");
                     CreateJson();
+                    Console.WriteLine("Json Created done");
 
                     driver.Quit();
                     Environment.Exit(-1);

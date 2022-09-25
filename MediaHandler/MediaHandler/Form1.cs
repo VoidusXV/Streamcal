@@ -251,11 +251,10 @@ namespace MediaHandler
         {
             try
             {
-                string[] files = Directory.GetFiles(processesPath);
+                var files = Directory.GetFiles(processesPath).Where(x => Path.GetFileName(x) != "ffmpeg.exe");
                 foreach (var item in files)
                 {
-                    if (item != "ffmpeg.exe")
-                        File.Delete(item);
+                    File.Delete(item);
                 }
 
                 string[] directories = Directory.GetDirectories(processesPath);
@@ -297,7 +296,7 @@ namespace MediaHandler
         async Task ScrappingProcess()
         {
             AddLog("Scrapping started");
-            await RunCmd(textBox1.Text, scrapperPath + "/scrapper.exe", hidden: true);
+            await RunCmd(textBox1.Text, scrapperPath + "/scrapper.exe", hidden: false);
             AddLog("Scrapping successfully ended");
             progressBar1.Value = 10;
 
@@ -341,8 +340,8 @@ namespace MediaHandler
                 string Content_JsonFile = File.ReadAllText(ContentPath);
 
 
-                //await ScrappingProcess();
-                //await GeneratePreviewImagesAndThumbnail();
+                await ScrappingProcess();
+                await GeneratePreviewImagesAndThumbnail();
                 //DeleteFiles();
                 MessageBox.Show("Media successfully downloaded", "Downloaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -521,6 +520,11 @@ namespace MediaHandler
             //LocationObject.Series.Seasons.Add(NewSeason);
             var LocationObject_Formatted = JsonConvert.SerializeObject(LocationObject, Formatting.Indented);
             Console.WriteLine(LocationObject_Formatted);
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            DeleteFiles();
         }
     }
 }
