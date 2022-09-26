@@ -34,12 +34,22 @@ namespace MediaHandler
             //temp.Series.Seasons[NewContentSeason_Index].Episodes.Add(NewEpisode); //Old
 
             // Sort Episode
-            for (int i = 0; i < temp.Series.Seasons[NewContentSeason_Index].Episodes.Count; i++)
+            Console.WriteLine("Sort Episode");
+            int EpisodeCount = temp.Series.Seasons[NewContentSeason_Index].Episodes.Count;
+
+            if (EpisodeCount == 0)
             {
-                if (temp.Series.Seasons[NewContentSeason_Index].Episodes[i].Episode > Episode)
+                temp.Series.Seasons[NewContentSeason_Index].Episodes.Add(NewEpisode);
+            }
+            else
+            {
+                for (int i = 0; i < EpisodeCount; i++)
                 {
-                    temp.Series.Seasons[NewContentSeason_Index].Episodes.Insert(i, NewEpisode);
-                    break;
+                    if (temp.Series.Seasons[NewContentSeason_Index].Episodes[i].Episode > Episode)
+                    {
+                        temp.Series.Seasons[NewContentSeason_Index].Episodes.Insert(i, NewEpisode);
+                        break;
+                    }
                 }
             }
 
@@ -79,6 +89,7 @@ namespace MediaHandler
 
                 // Sort Season
 
+                Console.WriteLine("Sort Season");
                 for (int i = 0; i < temp.Series.Seasons.Count; i++)
                 {
                     if (temp.Series.Seasons[i].SeasonNum > NewContentSeason)

@@ -262,6 +262,7 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({
         position: "absolute",
         top: !isFullScreen ? WindowSize.Width * 0.2 : WindowSize.Width * 0.55,
         left: pos(),
+        zIndex: 2,
       }}>
       <Image
         resizeMode="cover"
