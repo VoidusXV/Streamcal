@@ -124,6 +124,7 @@ namespace MediaHandler
             //0.45/0.4 => (0.18 < 1) => 1
             string Fixed_FileName = fileName.Replace(" ", "_");
 
+            int Scale = 80;
             int Columns = 10;
             double RandomConstant = 0.4;
 
@@ -133,12 +134,10 @@ namespace MediaHandler
             var ImageRows = Math.Ceiling(Duration / SecondsPerImage / Columns);
 
             Directory.CreateDirectory($"{processesPath}/img");
-
             AddLog("Generating Preview Images...");
             await RunCmd($"ffmpeg -i {Fixed_FileName}.mp4 -vf fps=1/10 -q:v 50 img/image_%d.jpg", hidden: true, systemArguments: true);// Every 10 seconds one image
-            await RunCmd($"ffmpeg -i img/image_%d.jpg -filter_complex 'scale = 80:-1, tile = {Columns}x{ImageRows}' preview.png", hidden: true, systemArguments: true); // Merge all images to one image
+            await RunCmd($"ffmpeg -i img/image_%d.jpg -filter_complex \"scale = {Scale}:-1, tile = {Columns}x{ImageRows}\" SeekSliderPreview.png", hidden: true, systemArguments: true); // Merge all images to one image
             AddLog("Preview Images Generated");
-
 
             AddLog("Generating Thumbnail...");
             int MiddleContentLength = Convert.ToInt32(Duration / 2);
@@ -301,7 +300,7 @@ namespace MediaHandler
             //Console.WriteLine(title.Season);
         }
 
-        async Task ScrappingProcess(string Media_FileName)
+        async Task ScrappingProcess()
         {
             try
             {
@@ -324,13 +323,18 @@ namespace MediaHandler
                 Create_TsList($"{processesPath}/TS_Files");
                 progressBar1.Value = 80;
 
-                // string NewContentJsonFile = File.ReadAllText(NewContentJsonPath);
-                //var NewContentJsonObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContentJsonFile);
+
+                string NewContent_Locations = File.ReadAllText(NewContentJsonPath);
+                var NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_Locations);
+                string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.Season}_{NewContent_LocationsObject.Episode}";
 
                 AddLog($"Anime Data: {Media_FileName}");
 
                 await ConvertTsToMp4($"{Media_FileName}");
                 progressBar1.Value = 100;
+
+                await GeneratePreviewImagesAndThumbnail(Media_FileName);
+
             }
             catch (Exception ex)
             {
@@ -356,12 +360,14 @@ namespace MediaHandler
                 string ContentPath = $"{serverDataPath}/Content.json";
                 string Content_JsonFile = File.ReadAllText(ContentPath);
 
-                string NewContent_Locations = File.ReadAllText(NewContentJsonPath);
-                var NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_Locations);
+                //string NewContent_Locations = File.ReadAllText(NewContentJsonPath);
+                //var NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_Locations);
+                //string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.Season}_{NewContent_LocationsObject.Episode}";
 
-                string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.Season}_{NewContent_LocationsObject.Episode}";
-                await ScrappingProcess(Media_FileName);
-                await GeneratePreviewImagesAndThumbnail(Media_FileName);
+
+
+                await ScrappingProcess();
+                MoveFiles();
                 //DeleteFiles();
                 MessageBox.Show("Media successfully downloaded", "Downloaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -412,36 +418,44 @@ namespace MediaHandler
 
         void Move_ExistingContent(int index, FileHandler.NewContent_Locations NewContent_JsonObject, List<FileHandler.Data_Content> Content_JsonObject, bool NewContent = false)
         {
+            try
+            {
+                int NewContentSeason = NewContent_JsonObject.Season;
+                int ContentID = Content_JsonObject[index].ID;
+                string LocationFile_Path = $"{serverDataPath}/{ContentID}/Locations.json";// $"{currentPath}/Locations.json";
+                                                                                          // string LocationFile = File.ReadAllText($"{serverDataPath}/{ContentID}/Locations.json");
+                                                                                          //var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(LocationFile);
 
-            int NewContentSeason = NewContent_JsonObject.Season;
-            int ContentID = Content_JsonObject[index].ID;
-            string LocationFile_Path = $"{serverDataPath}/{ContentID}/Locations.json";// $"{currentPath}/Locations.json";
-            // string LocationFile = File.ReadAllText($"{serverDataPath}/{ContentID}/Locations.json");
-            //var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(LocationFile);
+                int Episode = NewContent_JsonObject.Episode;
+                string Path = $"/Series/Season_{NewContentSeason}/{Episode}/{NewContent_JsonObject.Episode}.mp4";
+                string EpisodeTitle = NewContent_JsonObject.EpisodeTitle;
+                string Description = NewContent_JsonObject.Episode_Description;
+                long Duration = (long)GetContentDuration();// NewContent_JsonObject.Duration;
 
-            int Episode = NewContent_JsonObject.Episode;
-            string Path = $"/Series/Season_{NewContentSeason}/{Episode}/{NewContent_JsonObject.Episode}.mp4";
-            string EpisodeTitle = NewContent_JsonObject.EpisodeTitle;
-            string Description = NewContent_JsonObject.Episode_Description;
-            long Duration = (long)GetContentDuration();// NewContent_JsonObject.Duration;
+                string EpisodePath = $"{serverDataPath}/{ContentID}/Series/Season_{NewContentSeason}/{Episode}";
+                string VideoFileName = $"{NewContent_JsonObject.Title}_{NewContent_JsonObject.Season}_{Episode}".Replace(" ", "_");
+                if (!JsonHandler.SeasonExists(LocationFile_Path, NewContentSeason))
+                    JsonHandler.Add_NewSeason(LocationFile_Path, NewContentSeason);
 
-            string VideoFileName = $"{NewContent_JsonObject.Title}_{NewContent_JsonObject.Season}_{Episode}".Replace(" ", "_");
+                JsonHandler.Add_NewEpisode(Episode, Path, EpisodeTitle, Description, Duration, NewContentSeason, LocationFile_Path);
 
-            if (!JsonHandler.SeasonExists(LocationFile_Path, NewContentSeason))
-                JsonHandler.Add_NewSeason(LocationFile_Path, NewContentSeason);
+                Console.WriteLine($"{serverDataPath}/{ContentID}/Series/Season_{NewContentSeason}/{Episode}");
+                Console.WriteLine(NewContent);
 
-            JsonHandler.Add_NewEpisode(Episode, Path, EpisodeTitle, Description, Duration, NewContentSeason, LocationFile_Path);
+                Directory.CreateDirectory($"{serverDataPath}/{ContentID}/Series/Season_{NewContentSeason}");
+                Directory.CreateDirectory(EpisodePath);
 
-            if (!NewContent)
-                return;
+                File.Move(processesPath + $"/{VideoFileName}.mp4", $"{serverDataPath}/{ContentID}/{Path}");
+                File.Move(processesPath + $"/Thumbnail.jpg", $"{EpisodePath}/Thumbnail.jpg");
+                File.Move(processesPath + $"/SeekSliderPreview.png", $"{EpisodePath}/SeekSliderPreview.png");
 
-            Directory.CreateDirectory($"{serverDataPath}/{ContentID}/Series/Season_{NewContentSeason}");
-            Directory.CreateDirectory($"{serverDataPath}/{ContentID}/Series/Season_{NewContentSeason}/{Episode}");
-
-            File.Move(processesPath + $"/{VideoFileName}.mp4", $"{serverDataPath}/{ContentID}/{Path}");
-
-            if (!File.Exists($"{serverDataPath}/{ContentID}/Cover.png"))
-                webClient.DownloadFile(NewContent_JsonObject.CoverURL, $"{serverDataPath}/{ContentID}/Cover.png");
+                if (NewContent)
+                    webClient.DownloadFile(NewContent_JsonObject.CoverURL, $"{serverDataPath}/{ContentID}/Cover.png");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Move_ExistingContent Error");
+            }
         }
 
         void MoveFiles()
@@ -457,6 +471,7 @@ namespace MediaHandler
             {
                 if (Content_JsonObject[i].Title == NewContent_JsonObject.Title)
                 {
+                    Console.WriteLine("Series Exists");
                     Move_ExistingContent(i, NewContent_JsonObject, Content_JsonObject);
                     return;
                 }

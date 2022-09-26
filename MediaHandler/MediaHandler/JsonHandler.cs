@@ -34,26 +34,26 @@ namespace MediaHandler
             //temp.Series.Seasons[NewContentSeason_Index].Episodes.Add(NewEpisode); //Old
 
             // Sort Episode
+
             Console.WriteLine("Sort Episode");
             int EpisodeCount = temp.Series.Seasons[NewContentSeason_Index].Episodes.Count;
 
-            if (EpisodeCount == 0)
+
+            for (int i = 0; i < EpisodeCount; i++)
             {
-                temp.Series.Seasons[NewContentSeason_Index].Episodes.Add(NewEpisode);
-            }
-            else
-            {
-                for (int i = 0; i < EpisodeCount; i++)
+                if (temp.Series.Seasons[NewContentSeason_Index].Episodes[i].Episode > Episode)
                 {
-                    if (temp.Series.Seasons[NewContentSeason_Index].Episodes[i].Episode > Episode)
-                    {
-                        temp.Series.Seasons[NewContentSeason_Index].Episodes.Insert(i, NewEpisode);
-                        break;
-                    }
+                    Console.WriteLine($"Episode Insert at {i}");
+                    temp.Series.Seasons[NewContentSeason_Index].Episodes.Insert(i, NewEpisode);
+                    File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));
+
+                    return;
                 }
             }
 
+            temp.Series.Seasons[NewContentSeason_Index].Episodes.Add(NewEpisode);
             File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));
+
         }
 
 
@@ -95,11 +95,13 @@ namespace MediaHandler
                     if (temp.Series.Seasons[i].SeasonNum > NewContentSeason)
                     {
                         temp.Series.Seasons.Insert(i, NewSeason);
-                        break;
+                        File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));
+                        return;
                     }
                 }
             }
 
+            temp.Series.Seasons.Add(NewSeason);
             File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));
         }
 

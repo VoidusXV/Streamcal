@@ -5,8 +5,17 @@
         "SeasonNum": 1,
         "Episodes": [
           {
+            "Episode": 2,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/2/2.mp4",
+            "Title": "Ich meine es ernst",
+            "Description": "Um ein vollwertiges Mitglied des Basketballteams zu werden, müssen Kagami, Kuroko und die anderen Erstklässler einen Schwur vor der ganzen Schule ablegen. Im Zuge dessen bereitet die Mannschaft das erste Probespiel vor. Ausgerechnet gegen das Team eines \"Generation der Wunder\"-Mitgliedes...",
+            "Duration": 1461600
+          },
+          {
             "Episode": 7,
             "Thumbnail": "Thumbnail.jpg",
+            "Path": null,
             "Title": "Du wirst etwas einmaliges sehen7",
             "Description": "Serien Beschreibung Hier",
             "Duration": 1450000
