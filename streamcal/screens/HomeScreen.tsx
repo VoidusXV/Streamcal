@@ -92,7 +92,6 @@ const RenderItem = ({ onPress, TitleText, CoverURL, Availability }: any) => {
 };
 
 const ContentContainer = ({ navigation, data }: any) => {
-  const [getMediaData, setMediaData] = React.useState([]);
   return (
     <FlashList
       numColumns={2}

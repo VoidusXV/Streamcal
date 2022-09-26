@@ -368,7 +368,7 @@ namespace MediaHandler
 
                 await ScrappingProcess();
                 MoveFiles();
-                //DeleteFiles();
+                DeleteFiles();
                 MessageBox.Show("Media successfully downloaded", "Downloaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -450,7 +450,7 @@ namespace MediaHandler
                 File.Move(processesPath + $"/SeekSliderPreview.png", $"{EpisodePath}/SeekSliderPreview.png");
 
                 if (NewContent)
-                    webClient.DownloadFile(NewContent_JsonObject.CoverURL, $"{serverDataPath}/{ContentID}/Cover.png");
+                    webClient.DownloadFile(NewContent_JsonObject.CoverURL, $"{serverDataPath}/{ContentID}/Cover.jpg");
             }
             catch (Exception ex)
             {
@@ -583,6 +583,12 @@ namespace MediaHandler
 
             AddLog($"Anime Data: {JsonObject.Title}_{JsonObject.Season}_{JsonObject.Episode}");
             await ConvertTsToMp4($"{JsonObject.Title}_{JsonObject.Season}_{JsonObject.Episode}");
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            APIKEY_Generator APIKEY_Generator = new APIKEY_Generator();
+            APIKEY_Generator.Show();
         }
     }
 }

@@ -370,7 +370,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
         style={{ ...styles.video }}
         resizeMode={ResizeMode.COVER}
         onPlaybackStatusUpdate={(status: any) => {
-          setSliderValue(status.positionMillis);
+          !isSliding.current && setSliderValue(status.positionMillis);
           !isSliding.current && setStatus(status);
         }}></Video>
 

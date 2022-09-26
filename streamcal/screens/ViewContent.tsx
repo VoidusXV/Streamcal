@@ -23,9 +23,6 @@ import {
   getThumbnailURL,
 } from "../backend/serverConnection";
 import { generateThumbnail } from "../components/media/Functions";
-import Slider from "@react-native-community/slider";
-
-const Cover2 = require("../assets/covers/One_Piece.jpg");
 
 const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
   const [getTextHeight, setTextHeight] = React.useState<any>(0);

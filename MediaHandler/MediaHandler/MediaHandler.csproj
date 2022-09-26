@@ -73,6 +73,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APIKEY_Generator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="APIKEY_Generator.Designer.cs">
+      <DependentUpon>APIKEY_Generator.cs</DependentUpon>
+    </Compile>
     <Compile Include="FileHandler.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -83,6 +89,9 @@
     <Compile Include="JsonHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="APIKEY_Generator.resx">
+      <DependentUpon>APIKEY_Generator.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
