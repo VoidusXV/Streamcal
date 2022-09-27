@@ -240,9 +240,9 @@ app.get("/v1/check-apikey", (req, res) => {
 
 app.get("*", (req, res) => {
   //res.send(mediaData);
+  //res.send("kok").status(200).end();
 
-  res.status(403);
-  res.end();
+  res.status(403).end();
 });
 app.listen(port, () => console.log("Server listening at Port:", port));
 

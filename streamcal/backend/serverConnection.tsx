@@ -64,6 +64,21 @@ function getVideoURL(ContentID: any, SeasonID: any, EpisodeID: any) {
   return URL;
 }
 
+function IsServerReachable() {
+  const timeout = new Promise((resolve, reject) => {
+    setTimeout(reject, 3000, "Request timed out");
+  });
+
+  const req = fetch(baseIPURL);
+  return Promise.race([timeout, req])
+    .then(() => {
+      return true;
+    })
+    .catch(() => {
+      return false;
+    });
+}
+
 export {
   getAllContent,
   getCoverURL,
@@ -73,4 +88,5 @@ export {
   getThumbnailURL,
   getVideoURL,
   getPreviewImageURL,
+  IsServerReachable,
 };

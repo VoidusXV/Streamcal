@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -65,16 +66,54 @@ namespace MediaHandler
             //https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=Example
         }
 
+        class QRCode_Json
+        {
+            public string APIKEY { get; set; }
+            public string Server { get; set; }
+
+        }
+
         private void button6_Click(object sender, EventArgs e)
         {
+
+            if (string.IsNullOrEmpty(textBox1.Text) || string.IsNullOrWhiteSpace(textBox1.Text))
+            {
+                MessageBox.Show("Server Domain is empty, please write a Server Domain", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (string.IsNullOrEmpty(textBox3.Text) || string.IsNullOrWhiteSpace(textBox3.Text))
+            {
+                MessageBox.Show("Port is empty, please write a Port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             string APIKEY = GenerateAPIKEY();
             textBox2.Text = APIKEY;
 
+            QRCode_Json QRCode_Json = new QRCode_Json
+            {
+                APIKEY = APIKEY,
+                Server = $"{textBox1.Text}:{textBox3.Text}",
+            };
+            var QRCode_JsonObject = JsonConvert.SerializeObject(QRCode_Json);
+
             WebClient webClient = new WebClient();
-            byte[] QR_Data = webClient.DownloadData($"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={APIKEY}");
+            byte[] QR_Data = webClient.DownloadData($"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={QRCode_JsonObject}");
             Stream stream = new MemoryStream(QR_Data);
             pictureBox1.Image = Image.FromStream(stream);
 
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            WebClient webClient = new WebClient();
+            string IP = webClient.DownloadString("https://api.ipify.org");
+            textBox1.Text = IP;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            textBox3.Text = "3005";
         }
     }
 }

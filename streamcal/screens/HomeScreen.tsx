@@ -4,7 +4,7 @@ import { backgroundColor, selectionColor } from "../components/constants/Colors"
 import { WindowSize } from "../components/constants/Layout";
 import { Foundation } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import { getAllContent, getCoverURL } from "../backend/serverConnection";
+import { getAllContent, getCoverURL, IsServerReachable } from "../backend/serverConnection";
 
 const Cover = require("../assets/covers/kurokos-basketball-stream-cover-DCQ2LYPVqVRk0cyMCmDlMQPzkRHLtyqZ_220x330.jpeg");
 const Cover2 = require("../assets/covers/One_Piece.jpg");
@@ -112,29 +112,76 @@ const ContentContainer = ({ navigation, data }: any) => {
 };
 export default function HomeScreen({ navigation }: any) {
   const [getContent, setContent] = React.useState({});
+  const [isServerOnline, setServerOnline] = React.useState(false);
 
   React.useEffect(() => {
     (async () => {
-      const data = await getAllContent();
-      setContent(data);
+      const data = getAllContent();
+      const serverStatus = IsServerReachable();
+
+      Promise.all([serverStatus, data])
+        .then((e) => {
+          setServerOnline(e[0]);
+          setContent(e[1]);
+        })
+        .catch((e) => {
+          console.log("Error: HomeScreen 125");
+        });
     })();
   }, []);
 
-  return (
-    <View style={styles.container}>
-      <TilteContainer></TilteContainer>
-      <View style={styles.separator}></View>
-      <View style={{ flex: 1 }}>
-        <ContentContainer data={getContent} navigation={navigation}></ContentContainer>
+  if (isServerOnline || !getContent) {
+    return (
+      <View style={styles.container}>
+        <TilteContainer></TilteContainer>
+        <View style={styles.separator}></View>
+        <View style={{ flex: 1 }}>
+          <ContentContainer data={getContent} navigation={navigation}></ContentContainer>
+        </View>
       </View>
-    </View>
-  );
+    );
+  } else {
+    return (
+      <View style={{ ...styles.container, ...styles.CenterChildren }}>
+        <Text
+          style={{
+            fontSize: WindowSize.Width * 0.08,
+            color: "rgba(255,255,255,0.8)",
+            marginBottom: "10%",
+          }}>
+          Server is Offline
+        </Text>
+        <TouchableHighlight
+          onPress={async () => setServerOnline(await IsServerReachable())}
+          style={{
+            width: "70%",
+            height: "8%",
+            backgroundColor: selectionColor,
+            ...styles.CenterChildren,
+            marginBottom: "10%",
+            borderRadius: WindowSize.Width * 0.03,
+          }}>
+          <Text
+            style={{
+              fontSize: WindowSize.Width * 0.05,
+              color: "white",
+            }}>
+            Re-Connect To Server
+          </Text>
+        </TouchableHighlight>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   FillContainer: {
     width: "100%",
     height: "100%",
+  },
+  CenterChildren: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   container: {
     flex: 1,
