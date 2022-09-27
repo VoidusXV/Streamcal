@@ -4,6 +4,10 @@ const app = express();
 const fs = require("fs");
 const port = 3005;
 
+const Mongo = require("mongodb");
+const MongoURL = `mongodb://localhost:${port}/`;
+const MongoClient = new Mongo.MongoClient(MongoURL);
+
 app.use(cors());
 app.use(express.json());
 
@@ -18,6 +22,43 @@ function contentExists(ID) {
   const data = require(`./Data/Content.json`);
   return data.length > ID && ID >= 0;
 }
+
+function Generate_APIKEY() {
+  const Numbers = "0123456789";
+  const UpperAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  let apikey = "";
+  let randomNum = 0;
+
+  for (let i = 0; i < 25; i++) {
+    if (i % 5 == 0 && i > 1) apikey += "-";
+
+    randomNum = Math.floor(Math.random() * 1);
+    if (randomNum == 0) {
+      //Numbers
+      randomNum = Math.floor(Math.random() * Numbers.length);
+      apikey += Numbers[randomNum];
+    } //UpperAlphabet
+    else {
+      randomNum = Math.floor(Math.random() * UpperAlphabet.length);
+      apikey += UpperAlphabet[randomNum];
+    }
+  }
+  return apikey;
+}
+
+function APIKEY_Exists(API_KEYS_Data, APIKEY) {
+  let exists = false;
+  API_KEYS_Data.forEach((e) => {
+    if (e.APIKEY == APIKEY) {
+      exists = true;
+      return;
+    }
+  });
+
+  return exists;
+}
+
 //const image = require(__dirname + "/public/Cover.jpg"); //`./Data/${ID}/Cover.jpg`);
 
 app.get("/v1/test", (req, res) => {
@@ -32,6 +73,7 @@ app.get("/v1/test2", (req, res) => {
     const SeasonID = new URLSearchParams(req.url).get("season");
     const EpisodeID = new URLSearchParams(req.url).get("episode");
     const dataRequest = new URLSearchParams(req.url).get("dr");
+    const apikey = new URLSearchParams(req.url).get("apikey");
 
     if (!ContentID || !SeasonID || !EpisodeID || !dataRequest) return res.status(403).end();
     //if (!contentExists(ContentID)) return res.status(403).end();
@@ -83,6 +125,66 @@ app.get("/v1/Media/Cover", (req, res) => {
     const url = __dirname + `/Data/${ContentID}/Cover.jpg`;
     res.sendFile(url);
   } catch (e) {
+    res.status(403).end();
+  }
+});
+
+app.get("/v1/create-apikey", (req, res) => {
+  try {
+    (async () => {
+      const API_AdminKey = new URLSearchParams(req.url).get("/v1/create-apikey?adminKey");
+
+      await MongoClient.connect();
+      //await MongoClient.db("admin").command({ ping: 1 });
+      const database = MongoClient.db("Streamcal");
+      const AdminColl = database.collection("Admin");
+      const Admin_Data = await AdminColl.findOne({});
+
+      const API_KEYS_Coll = database.collection("API_KEYS");
+      const API_KEYS_Data = await API_KEYS_Coll.find({});
+
+      if (API_AdminKey != Admin_Data.AdminKey) {
+        res.status(403).end();
+        return;
+      }
+
+      let APIKEY = Generate_APIKEY();
+      if (APIKEY_Exists(API_KEYS_Data, APIKEY)) APIKEY = Generate_APIKEY();
+
+      const New_APIKEY_Doc = {
+        APIKEY: APIKEY,
+        Enabled: false,
+        FirstLogin: new Date().toUTCString(),
+        LastLogin: new Date().toUTCString(),
+        History: [{}],
+        DeviceID: "DeviceID",
+      };
+
+      await API_KEYS_Coll.insertOne(New_APIKEY_Doc);
+      res.send("API-KEY successfully created").status(200).end();
+
+      //TODO: Finally => Connection close
+    })();
+  } catch (e) {
+    console.log("Watch_Error:", e);
+    res.status(403).end();
+  }
+});
+
+app.get("/v1/check-apikey", (req, res) => {
+  try {
+    (async () => {
+      await MongoClient.connect();
+      const database = MongoClient.db("Streamcal");
+      const API_KEYS_Coll = database.collection("API_KEYS");
+      const API_KEYS_Data = await API_KEYS_Coll.find({});
+
+      let APIKEY = Generate_APIKEY();
+      if (APIKEY_Exists(API_KEYS_Data, APIKEY)) APIKEY = Generate_APIKEY();
+      else console.log("Yeeet", APIKEY);
+    })();
+  } catch (e) {
+    console.log("Watch_Error:", e);
     res.status(403).end();
   }
 });
