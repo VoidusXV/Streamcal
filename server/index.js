@@ -142,7 +142,6 @@ app.get("/v1/create-apikey", (req, res) => {
 
       const API_KEYS_Coll = database.collection("API_KEYS");
       const API_KEYS_Data = await API_KEYS_Coll.find({});
-
       if (API_AdminKey != Admin_Data.AdminKey) {
         res.status(403).end();
         return;
@@ -189,6 +188,26 @@ app.get("/v1/check-apikey", (req, res) => {
   }
 });
 
+app.get("/v1/check-adminkey", (req, res) => {
+  try {
+    (async () => {
+      const API_AdminKey = new URLSearchParams(req.url).get("/v1/check-adminkey?adminKey");
+
+      await MongoClient.connect();
+      const database = MongoClient.db("Streamcal");
+      const AdminColl = database.collection("Admin");
+      const Admin_Data = await AdminColl.findOne({});
+      if (!API_AdminKey) {
+        res.status(403).end();
+        return;
+      }
+      res.send(API_AdminKey == Admin_Data.AdminKey).end();
+    })();
+  } catch (e) {
+    console.log("check-adminkey:", e);
+    res.status(403).end();
+  }
+});
 // app.get("/v1/watch", (req, res) => {
 //   try {
 //     res.sendFile(__dirname + "/index.html");

@@ -2,11 +2,12 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Local_IP from "./Local_IP";
 
-const APIKEY = "";
-const port = 3005;
+let Port = 3005;
+let APIKEY = "";
+let isAdmin = false;
 
-const baseURL = `http://localhost:` + port;
-const baseIPURL = `http://${Local_IP}:` + port;
+const baseURL = `http://localhost:` + Port;
+let baseIPURL = `http://${Local_IP}:` + Port;
 const baseAPIURL = baseIPURL + "/v1";
 
 const AllContentURL = baseIPURL + "/v1/Content";
@@ -79,6 +80,11 @@ function IsServerReachable() {
     });
 }
 
+async function checkAdminKey(AdminKey: any) {
+  const rep = await getServerData(`${baseAPIURL}/check-adminkey?adminKey=${AdminKey}`);
+  return rep;
+}
+
 export {
   getAllContent,
   getCoverURL,
@@ -89,4 +95,5 @@ export {
   getVideoURL,
   getPreviewImageURL,
   IsServerReachable,
+  checkAdminKey,
 };

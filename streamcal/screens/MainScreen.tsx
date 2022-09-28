@@ -7,7 +7,7 @@ import useCachedResources from "../hooks/useCachedResources";
 //Screens
 import HomeScreen from "./HomeScreen";
 import ListScreen from "./ListScreen";
-import AccountPage from "./AccountScreen";
+import SettingsScreen from "./SettingsScreen";
 
 import { Ionicons, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -21,7 +21,6 @@ const isFocused = (focused: any) => {
 
 export default function MainScreen() {
   const isLoadingComplete = useCachedResources();
-
   if (!isLoadingComplete) {
     return null;
   } else {
@@ -31,8 +30,7 @@ export default function MainScreen() {
           screenOptions={{
             tabBarStyle: { backgroundColor: backgroundColor },
             tabBarLabelStyle: { color: "white" },
-          }}
-        >
+          }}>
           <Tab.Screen
             name="Home"
             component={HomeScreen}
@@ -41,8 +39,7 @@ export default function MainScreen() {
               tabBarIcon: ({ focused }) => (
                 <Ionicons name="ios-home-outline" size={24} color={isFocused(focused)}></Ionicons>
               ),
-            }}
-          ></Tab.Screen>
+            }}></Tab.Screen>
           <Tab.Screen
             name="Liste"
             component={ListScreen}
@@ -51,22 +48,19 @@ export default function MainScreen() {
               tabBarIcon: ({ focused }) => (
                 <FontAwesome name="bookmark-o" size={24} color={isFocused(focused)}></FontAwesome>
               ),
-            }}
-          ></Tab.Screen>
+            }}></Tab.Screen>
           <Tab.Screen
-            name="Konto"
-            component={AccountPage}
+            name="Einstellungen"
+            component={SettingsScreen}
             options={{
               headerShown: false,
               tabBarIcon: ({ focused }) => (
                 <MaterialCommunityIcons
                   name="account-circle-outline"
                   size={24}
-                  color={isFocused(focused)}
-                ></MaterialCommunityIcons>
+                  color={isFocused(focused)}></MaterialCommunityIcons>
               ),
-            }}
-          ></Tab.Screen>
+            }}></Tab.Screen>
         </Tab.Navigator>
       </>
     );

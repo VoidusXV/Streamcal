@@ -15,6 +15,8 @@ namespace MediaHandler
 {
     public partial class APIKEY_Generator : Form
     {
+        Random random = new Random();
+
         public APIKEY_Generator()
         {
             InitializeComponent();
@@ -30,7 +32,7 @@ namespace MediaHandler
             string apikey = "";
             int randomNum = 0;
 
-            Random random = new Random();
+            // Random random = new Random();
             for (int i = 0; i < 25; i++)
             {
                 if (i % 5 == 0 && i > 1)
@@ -70,12 +72,14 @@ namespace MediaHandler
         {
             public string APIKEY { get; set; }
             public string Server { get; set; }
+            public string Port { get; set; }
+            public string AdminKey { get; set; }
+
 
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        void Gen(bool isAdminKey = false)
         {
-
             if (string.IsNullOrEmpty(textBox1.Text) || string.IsNullOrWhiteSpace(textBox1.Text))
             {
                 MessageBox.Show("Server Domain is empty, please write a Server Domain", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -88,19 +92,37 @@ namespace MediaHandler
             }
 
             string APIKEY = GenerateAPIKEY();
+            string AdminKey = "";
+
+
+
             textBox2.Text = APIKEY;
+
+            if (isAdminKey)
+            {
+                AdminKey = GenerateAPIKEY();
+                textBox4.Text = AdminKey;
+            }
 
             QRCode_Json QRCode_Json = new QRCode_Json
             {
                 APIKEY = APIKEY,
-                Server = $"{textBox1.Text}:{textBox3.Text}",
+                Server = textBox1.Text,
+                Port = textBox3.Text,
+                AdminKey = !isAdminKey ? "" : AdminKey,
             };
+
             var QRCode_JsonObject = JsonConvert.SerializeObject(QRCode_Json);
 
             WebClient webClient = new WebClient();
             byte[] QR_Data = webClient.DownloadData($"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={QRCode_JsonObject}");
             Stream stream = new MemoryStream(QR_Data);
             pictureBox1.Image = Image.FromStream(stream);
+        }
+        private void button6_Click(object sender, EventArgs e)
+        {
+
+            Gen();
 
         }
 
@@ -114,6 +136,16 @@ namespace MediaHandler
         private void button3_Click(object sender, EventArgs e)
         {
             textBox3.Text = "3005";
+        }
+
+        private void APIKEY_Generator_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Gen(true);
         }
     }
 }

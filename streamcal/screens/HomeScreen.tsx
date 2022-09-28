@@ -5,6 +5,7 @@ import { WindowSize } from "../components/constants/Layout";
 import { Foundation } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { getAllContent, getCoverURL, IsServerReachable } from "../backend/serverConnection";
+import { GetData_AsyncStorage } from "../components/DataHandling";
 
 const Cover = require("../assets/covers/kurokos-basketball-stream-cover-DCQ2LYPVqVRk0cyMCmDlMQPzkRHLtyqZ_220x330.jpeg");
 const Cover2 = require("../assets/covers/One_Piece.jpg");
@@ -113,24 +114,41 @@ const ContentContainer = ({ navigation, data }: any) => {
 export default function HomeScreen({ navigation }: any) {
   const [getContent, setContent] = React.useState({});
   const [isServerOnline, setServerOnline] = React.useState(false);
+  const [getCurrentConnection, setCurrentConnection] = React.useState({});
 
   React.useEffect(() => {
     (async () => {
       const data = getAllContent();
       const serverStatus = IsServerReachable();
+      const currentConnection = GetData_AsyncStorage("currentConnection");
 
-      Promise.all([serverStatus, data])
+      Promise.all([serverStatus, data, currentConnection])
         .then((e) => {
           setServerOnline(e[0]);
           setContent(e[1]);
+          setCurrentConnection(e[2] || {});
         })
         .catch((e) => {
-          console.log("Error: HomeScreen 125");
+          console.log("Error: HomeScreen Z.125");
         });
     })();
   }, []);
 
-  if (isServerOnline || !getContent) {
+  if (!getCurrentConnection)
+    return (
+      <View style={{ ...styles.container, ...styles.CenterChildren }}>
+        <Text
+          style={{
+            fontSize: WindowSize.Width * 0.07,
+            color: "rgba(255,255,255,0.8)",
+            marginBottom: "10%",
+            maxWidth: "90%",
+          }}>
+          Set up a server connection
+        </Text>
+      </View>
+    );
+  else if (isServerOnline) {
     return (
       <View style={styles.container}>
         <TilteContainer></TilteContainer>
@@ -145,9 +163,10 @@ export default function HomeScreen({ navigation }: any) {
       <View style={{ ...styles.container, ...styles.CenterChildren }}>
         <Text
           style={{
-            fontSize: WindowSize.Width * 0.08,
+            fontSize: WindowSize.Width * 0.07,
             color: "rgba(255,255,255,0.8)",
             marginBottom: "10%",
+            maxWidth: "90%",
           }}>
           Server is Offline
         </Text>
@@ -156,10 +175,10 @@ export default function HomeScreen({ navigation }: any) {
           style={{
             width: "70%",
             height: "8%",
-            backgroundColor: selectionColor,
+            backgroundColor: "#253959",
             ...styles.CenterChildren,
             marginBottom: "10%",
-            borderRadius: WindowSize.Width * 0.03,
+            borderRadius: WindowSize.Width * 0.01,
           }}>
           <Text
             style={{
