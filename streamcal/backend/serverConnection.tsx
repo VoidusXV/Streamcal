@@ -110,7 +110,7 @@ function SetGlobalConnection(data: any) {
   currentConnectionInfo.Server = data?.Server;
   currentConnectionInfo.Port = data?.Port;
   currentConnectionInfo.APIKEY = data?.APIKEY;
-  currentConnectionInfo.AdminKey = data?.AdminKey;
+  //currentConnectionInfo.AdminKey = data?.AdminKey;
 }
 
 export {

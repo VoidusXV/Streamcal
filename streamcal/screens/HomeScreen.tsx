@@ -128,7 +128,9 @@ export default function HomeScreen({ navigation }: any) {
     (async () => {
       const currentConnection: IServerInfo = await GetData_AsyncStorage("currentConnection");
       SetGlobalConnection(currentConnection);
-      //currentConnectionInfo.isAdmin = await checkAdminKey(currentConnection.AdminKey);
+      const isAdmin = await checkAdminKey(currentConnection.AdminKey);
+      currentConnectionInfo.isAdmin = isAdmin;
+      // console.log(isAdmin);
 
       const data = getAllContent();
       const serverStatus = IsServerReachable();
