@@ -59,7 +59,17 @@ function APIKEY_Exists(API_KEYS_Data, APIKEY) {
   return exists;
 }
 
-//const image = require(__dirname + "/public/Cover.jpg"); //`./Data/${ID}/Cover.jpg`);
+async function isAdmin(database, API_AdminKey) {
+  if (!database || !API_AdminKey) throw "Parameter is missing";
+
+  const AdminColl = database.collection("Admin");
+  const Admin_Data = await AdminColl.findOne({});
+  if (!API_AdminKey || API_AdminKey != Admin_Data.AdminKey) {
+    return false;
+  }
+
+  return true;
+}
 
 app.get("/v1/test", (req, res) => {
   const testVid = __dirname + "/Data/0/Series/Season_1/7/7.mp4";
@@ -142,7 +152,7 @@ app.get("/v1/create-apikey", (req, res) => {
 
       const API_KEYS_Coll = database.collection("API_KEYS");
       const API_KEYS_Data = await API_KEYS_Coll.find({});
-      if (API_AdminKey != Admin_Data.AdminKey) {
+      if (!API_AdminKey || API_AdminKey != Admin_Data.AdminKey) {
         res.status(403).end();
         return;
       }
@@ -208,54 +218,32 @@ app.get("/v1/check-adminkey", (req, res) => {
     res.status(403).end();
   }
 });
-// app.get("/v1/watch", (req, res) => {
-//   try {
-//     res.sendFile(__dirname + "/index.html");
-//   } catch (e) {
-//     console.log("Watch_Error:", e);
-//     res.status(403).end();
-//   }
-// });
+app.get("/v1/get-users", (req, res) => {
+  try {
+    (async () => {
+      const API_AdminKey = new URLSearchParams(req.url).get("/v1/get-users?adminKey");
 
-// app.get("/v1/video", (req, res) => {
-//   try {
-//     const range = req.headers.range;
+      await MongoClient.connect();
+      const database = MongoClient.db("Streamcal");
+      const isAdmin = await isAdmin(database, API_AdminKey);
+      if (!isAdmin) {
+        res.status(403).end();
+        return;
+      }
 
-//     if (!range) {
-//       res.status(400).send("Requires Range header");
-//     }
+      const API_KEYS_Coll = database.collection("API_KEYS");
+      let Users = [];
 
-//     // get video stats (about 61MB)
-//     const videoPath = __dirname + "/Data/big_buck_bunny.mp4";
-//     const videoSize = fs.statSync(videoPath).size;
-//     // Parse Range
-//     // Example: "bytes=32324-"
-//     const CHUNK_SIZE = 10 ** 6; // byte to 1MB
-//     const start = Number(range.replace(/\D/g, ""));
-//     const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
-
-//     // Create headers
-//     const contentLength = end - start + 1;
-//     const headers = {
-//       "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-//       "Accept-Ranges": "bytes",
-//       "Content-Length": contentLength,
-//       "Content-Type": "video/mp4",
-//     };
-
-//     // HTTP Status 206 for Partial Content
-//     res.writeHead(206, headers);
-
-//     // create video read stream for this particular chunk
-//     const videoStream = fs.createReadStream(videoPath, { start, end });
-
-//     // Stream the video chunk to the client
-//     videoStream.pipe(res);
-//   } catch (e) {
-//     // console.log("Watch_Error:", e);
-//     res.status(403).end();
-//   }
-// });
+      await API_KEYS_Coll.find().forEach((e) => {
+        Users.push(e);
+      });
+      res.send(Users).end();
+    })();
+  } catch (e) {
+    console.log("check-adminkey:", e);
+    res.status(403).end();
+  }
+});
 
 app.get("*", (req, res) => {
   //res.send(mediaData);

@@ -4,7 +4,16 @@ import Local_IP from "./Local_IP";
 
 let Port = 3005;
 let APIKEY = "";
-let isAdmin = false;
+let isAdmin: String = "";
+
+interface IServerInfo {
+  APIKEY?: any;
+  Server?: any;
+  Port?: any;
+  AdminKey?: any;
+  isAdmin?: any;
+}
+let currentConnectionInfo: IServerInfo = {};
 
 const baseURL = `http://localhost:` + Port;
 let baseIPURL = `http://${Local_IP}:` + Port;
@@ -13,8 +22,6 @@ const baseAPIURL = baseIPURL + "/v1";
 const AllContentURL = baseIPURL + "/v1/Content";
 const mediaURL = baseIPURL + "/v1/Media";
 const coverURL = mediaURL + "/Cover";
-
-const serverConnection = () => {};
 
 async function getServerData(URL: any) {
   try {
@@ -96,4 +103,6 @@ export {
   getPreviewImageURL,
   IsServerReachable,
   checkAdminKey,
+  currentConnectionInfo,
+  IServerInfo,
 };

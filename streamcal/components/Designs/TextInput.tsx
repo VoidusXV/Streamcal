@@ -23,6 +23,7 @@ interface ITextInput {
   isSecure?: boolean;
   maxLength?: number;
   defaultValue?: string;
+  onChangeText?: any;
 }
 const NormalTextInput: React.FC<ITextInput> = ({
   PlaceholderText,
@@ -34,7 +35,6 @@ const NormalTextInput: React.FC<ITextInput> = ({
 }: any) => {
   const [getDefaultValue, setDefaultValue] = React.useState(defaultValue);
 
-  console.log("first");
   React.useEffect(() => {
     setDefaultValue(defaultValue);
     ClearButtonVisibility(defaultValue);

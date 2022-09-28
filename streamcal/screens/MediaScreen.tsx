@@ -97,7 +97,7 @@ const NextEpisode_Container = ({
             item,
             ContentName: contentData?.Title,
             ContentID: contentData?.ID,
-            AllData: getMediaLocation.Series.Seasons[getSeason].Episodes,
+            AllData: getMediaLocation?.Series.Seasons[getSeason].Episodes,
             index: index,
           }}
           Source={{ uri: getThumbnailURL(ContentID, getSeason + 1, data.Episode) }}></MediaItemCard>

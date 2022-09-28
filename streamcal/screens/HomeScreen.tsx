@@ -4,7 +4,14 @@ import { backgroundColor, selectionColor } from "../components/constants/Colors"
 import { WindowSize } from "../components/constants/Layout";
 import { Foundation } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import { getAllContent, getCoverURL, IsServerReachable } from "../backend/serverConnection";
+import {
+  getAllContent,
+  getCoverURL,
+  currentConnectionInfo,
+  IsServerReachable,
+  IServerInfo,
+  checkAdminKey,
+} from "../backend/serverConnection";
 import { GetData_AsyncStorage } from "../components/DataHandling";
 
 const Cover = require("../assets/covers/kurokos-basketball-stream-cover-DCQ2LYPVqVRk0cyMCmDlMQPzkRHLtyqZ_220x330.jpeg");
@@ -120,13 +127,21 @@ export default function HomeScreen({ navigation }: any) {
     (async () => {
       const data = getAllContent();
       const serverStatus = IsServerReachable();
-      const currentConnection = GetData_AsyncStorage("currentConnection");
+      const currentConnection: Promise<IServerInfo> = GetData_AsyncStorage("currentConnection");
 
       Promise.all([serverStatus, data, currentConnection])
-        .then((e) => {
-          setServerOnline(e[0]);
-          setContent(e[1]);
-          setCurrentConnection(e[2] || {});
+        .then(async (data) => {
+          setServerOnline(data[0]);
+          setContent(data[1]);
+          setCurrentConnection(data[2] || {});
+          //console.log(data[2]);
+          if (data[2]) {
+            currentConnectionInfo.Server = data[2].Server;
+            currentConnectionInfo.Port = data[2].Port;
+            currentConnectionInfo.APIKEY = data[2].APIKEY;
+            currentConnectionInfo.AdminKey = data[2].AdminKey;
+            currentConnectionInfo.isAdmin = await checkAdminKey(data[2].AdminKey);
+          }
         })
         .catch((e) => {
           console.log("Error: HomeScreen Z.125");
