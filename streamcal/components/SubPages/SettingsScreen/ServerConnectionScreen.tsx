@@ -17,6 +17,9 @@ import LoadingIndicator from "../../Designs/LoadingIndicator";
 async function ConnectToServer(getServerInfo: any, onLoadStarted?: any, onLoadEnded?: any) {
   if (!getServerInfo) return;
   let currentConnection: IServerInfo = getServerInfo;
+  currentConnectionInfo.Server = currentConnection.Server;
+  currentConnectionInfo.Port = currentConnection.Port;
+  //console.log(currentConnectionInfo);
 
   onLoadStarted && onLoadStarted();
   await StoreData_AsyncStorage("currentConnection", currentConnection);
@@ -30,7 +33,6 @@ async function ConnectToServer(getServerInfo: any, onLoadStarted?: any, onLoadEn
 
   if (currentConnection.AdminKey) {
     const isAdmin = await checkAdminKey(currentConnection.AdminKey);
-    console.log(isAdmin);
     currentConnectionInfo.isAdmin = isAdmin;
   }
 

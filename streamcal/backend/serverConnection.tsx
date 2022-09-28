@@ -2,10 +2,6 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Local_IP from "./Local_IP";
 
-let Port = 3005;
-let APIKEY = "";
-let isAdmin: String = "";
-
 interface IServerInfo {
   APIKEY?: any;
   Server?: any;
@@ -14,14 +10,33 @@ interface IServerInfo {
   isAdmin?: any;
 }
 let currentConnectionInfo: IServerInfo = {};
+//let Port = 3005;
+//let APIKEY = "";
+//let isAdmin: String = "";
 
-const baseURL = `http://localhost:` + Port;
-let baseIPURL = `http://${Local_IP}:` + Port;
-const baseAPIURL = baseIPURL + "/v1";
+//const baseURL = `http://localhost:` + Port;
+//let baseIPURL = `http://${Local_IP}:` + Port;
 
-const AllContentURL = baseIPURL + "/v1/Content";
-const mediaURL = baseIPURL + "/v1/Media";
-const coverURL = mediaURL + "/Cover";
+//let baseIPURL = `http://${currentConnectionInfo.Server}:` + currentConnectionInfo.Port;
+
+function baseIPURL() {
+  return `http://${currentConnectionInfo.Server}:` + currentConnectionInfo.Port;
+}
+function baseAPIURL() {
+  return baseIPURL() + "/v1";
+}
+
+function AllContentURL() {
+  return baseAPIURL() + "/Content";
+}
+function mediaURL() {
+  return baseAPIURL() + "/Media";
+}
+function coverURL() {
+  return mediaURL() + "/Cover";
+}
+//const mediaURL = baseIPURL() + "/v1/Media";
+//const coverURL = mediaURL + "/Cover";
 
 async function getServerData(URL: any) {
   try {
@@ -34,15 +49,15 @@ async function getServerData(URL: any) {
 }
 
 async function getAllContent() {
-  return getServerData(AllContentURL);
+  return getServerData(AllContentURL());
 }
 
 function getCoverURL(ID: any) {
-  return `${coverURL}?id=${ID}`;
+  return `${coverURL()}?id=${ID}`;
 }
 
 async function getMediaLocations(ID: any) {
-  return getServerData(mediaURL + "?id=" + ID);
+  return getServerData(mediaURL() + "?id=" + ID);
 }
 
 function getSeasonAmount(data: any) {
@@ -59,16 +74,16 @@ function getEpisodeAmount(data: any) {
 }
 
 function getThumbnailURL(ContentID: any, SeasonID: any, EpisodeID: any) {
-  const URL = `${baseAPIURL}/test2?id=${ContentID}&season=${SeasonID}&episode=${EpisodeID}&dr=thumb`;
+  const URL = `${baseAPIURL()}/test2?id=${ContentID}&season=${SeasonID}&episode=${EpisodeID}&dr=thumb`;
   return URL;
 }
 
 function getPreviewImageURL(ContentID: any, SeasonID: any, EpisodeID: any) {
-  const URL = `${baseAPIURL}/test2?id=${ContentID}&season=${SeasonID}&episode=${EpisodeID}&dr=sliderSeek`;
+  const URL = `${baseAPIURL()}/test2?id=${ContentID}&season=${SeasonID}&episode=${EpisodeID}&dr=sliderSeek`;
   return URL;
 }
 function getVideoURL(ContentID: any, SeasonID: any, EpisodeID: any) {
-  const URL = `${baseAPIURL}/test2?id=${ContentID}&season=${SeasonID}&episode=${EpisodeID}&dr=video`;
+  const URL = `${baseAPIURL()}/test2?id=${ContentID}&season=${SeasonID}&episode=${EpisodeID}&dr=video`;
   return URL;
 }
 
@@ -76,8 +91,7 @@ function IsServerReachable() {
   const timeout = new Promise((resolve, reject) => {
     setTimeout(reject, 3000, "Request timed out");
   });
-
-  const req = fetch(baseIPURL);
+  const req = fetch(baseIPURL());
   return Promise.race([timeout, req])
     .then(() => {
       return true;
@@ -88,8 +102,15 @@ function IsServerReachable() {
 }
 
 async function checkAdminKey(AdminKey: any) {
-  const rep = await getServerData(`${baseAPIURL}/check-adminkey?adminKey=${AdminKey}`);
+  const rep = await getServerData(`${baseAPIURL()}/check-adminkey?adminKey=${AdminKey}`);
   return rep;
+}
+
+function SetGlobalConnection(data: any) {
+  currentConnectionInfo.Server = data?.Server;
+  currentConnectionInfo.Port = data?.Port;
+  currentConnectionInfo.APIKEY = data?.APIKEY;
+  currentConnectionInfo.AdminKey = data?.AdminKey;
 }
 
 export {
@@ -105,4 +126,5 @@ export {
   checkAdminKey,
   currentConnectionInfo,
   IServerInfo,
+  SetGlobalConnection,
 };
