@@ -113,6 +113,8 @@ function SetGlobalConnection(data: any) {
   //currentConnectionInfo.AdminKey = data?.AdminKey;
 }
 
+function ServerAuthentication() {}
+
 export {
   getAllContent,
   getCoverURL,

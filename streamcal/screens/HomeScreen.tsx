@@ -122,6 +122,9 @@ const ContentContainer = ({ navigation, data }: any) => {
 export default function HomeScreen({ navigation }: any) {
   const [getContent, setContent] = React.useState({});
   const [isServerOnline, setServerOnline] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  //const [isLogged, setLogged] = React.useState(false);
+
   const [getCurrentConnection, setCurrentConnection] = React.useState({});
 
   React.useEffect(() => {

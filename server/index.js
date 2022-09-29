@@ -58,13 +58,41 @@ function APIKEY_Exists(API_KEYS_Data, APIKEY) {
 
   return exists;
 }
+async function GetUsers(_isAdmin, API_KEYS_Coll, adminAccess = true) {
+  if (adminAccess) {
+    if (!_isAdmin) {
+      res.status(403).end();
+      return;
+    }
+  }
+
+  let Users = [];
+
+  await API_KEYS_Coll.find().forEach((e) => {
+    Users.push(e);
+  });
+
+  return Users;
+}
+async function GetUserByAPIKEY(API_KEYS_Coll, API_APIKey) {
+  const Users = await GetUsers(null, API_KEYS_Coll, false);
+  let User = [];
+  Users.forEach((UserData) => {
+    if (UserData.APIKEY == API_APIKey) {
+      User = UserData;
+      return;
+    }
+  });
+
+  return User;
+}
 
 async function isAdmin(database, API_AdminKey) {
-  if (!database || !API_AdminKey) throw "Parameter is missing";
+  if (!database || !API_AdminKey) return false;
 
   const AdminColl = database.collection("Admin");
   const Admin_Data = await AdminColl.findOne({});
-  if (!API_AdminKey || API_AdminKey != Admin_Data.AdminKey) {
+  if (API_AdminKey != Admin_Data.AdminKey) {
     return false;
   }
 
@@ -166,7 +194,7 @@ app.get("/v1/create-apikey", (req, res) => {
         FirstLogin: new Date().toUTCString(),
         LastLogin: new Date().toUTCString(),
         History: [{}],
-        DeviceID: "DeviceID",
+        DeviceID: "",
       };
 
       await API_KEYS_Coll.insertOne(New_APIKEY_Doc);
@@ -205,19 +233,15 @@ app.get("/v1/check-adminkey", (req, res) => {
 
       await MongoClient.connect();
       const database = MongoClient.db("Streamcal");
-      const AdminColl = database.collection("Admin");
-      const Admin_Data = await AdminColl.findOne({});
-      if (!API_AdminKey) {
-        res.status(403).end();
-        return;
-      }
-      res.send(API_AdminKey == Admin_Data.AdminKey).end();
+      const isAdmin = await isAdmin(database, API_AdminKey);
+      res.send(isAdmin).end();
     })();
   } catch (e) {
     console.log("check-adminkey:", e);
     res.status(403).end();
   }
 });
+
 app.get("/v1/get-users", (req, res) => {
   try {
     (async () => {
@@ -225,12 +249,11 @@ app.get("/v1/get-users", (req, res) => {
 
       await MongoClient.connect();
       const database = MongoClient.db("Streamcal");
-      const isAdmin = await isAdmin(database, API_AdminKey);
-      if (!isAdmin) {
+      const _isAdmin = await isAdmin(database, API_AdminKey);
+      if (!_isAdmin) {
         res.status(403).end();
         return;
       }
-
       const API_KEYS_Coll = database.collection("API_KEYS");
       let Users = [];
 
@@ -241,6 +264,28 @@ app.get("/v1/get-users", (req, res) => {
     })();
   } catch (e) {
     console.log("check-adminkey:", e);
+    res.status(403).end();
+  }
+});
+
+app.get("/v1/authenticate-user", (req, res) => {
+  try {
+    (async () => {
+      await MongoClient.connect();
+      const database = MongoClient.db("Streamcal");
+      const API_KEYS_Coll = database.collection("API_KEYS");
+      const API_APIKey = new URLSearchParams(req.url).get("/v1/authenticate-user?apikey");
+      const API_DeviceID = new URLSearchParams(req.url).get("deviceId");
+
+      if (!API_APIKey || !API_DeviceID) {
+        console.log("authenticate-user: missing params");
+        res.status(403).end();
+        return;
+      }
+      const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
+      res.send(User).end();
+    })();
+  } catch (e) {
     res.status(403).end();
   }
 });
