@@ -15,7 +15,7 @@ const TitleContainer = () => (
       height: WindowSize.Width * 0.15,
       width: "100%",
     }}>
-    <Text style={{ color: "white", fontSize: WindowSize.Width * 0.07 }}>Einstellungen</Text>
+    <Text style={{ color: "white", fontSize: WindowSize.Width * 0.07 }}>Settings</Text>
   </View>
 );
 

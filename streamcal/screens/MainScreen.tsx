@@ -50,7 +50,7 @@ export default function MainScreen() {
               ),
             }}></Tab.Screen>
           <Tab.Screen
-            name="Einstellungen"
+            name="Settings"
             component={SettingsScreen}
             options={{
               headerShown: false,

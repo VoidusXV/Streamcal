@@ -47,6 +47,17 @@ function Generate_APIKEY() {
   return apikey;
 }
 
+async function checkIsAdmin(database, API_AdminKey) {
+  if (!database || !API_AdminKey) return false;
+
+  const AdminColl = database.collection("Admin");
+  const Admin_Data = await AdminColl.findOne({});
+  if (API_AdminKey != Admin_Data.AdminKey) {
+    return false;
+  }
+
+  return true;
+}
 function APIKEY_Exists(API_KEYS_Data, APIKEY) {
   let exists = false;
   API_KEYS_Data.forEach((e) => {
@@ -76,7 +87,7 @@ async function GetUsers(_isAdmin, API_KEYS_Coll, adminAccess = true) {
 }
 async function GetUserByAPIKEY(API_KEYS_Coll, API_APIKey) {
   const Users = await GetUsers(null, API_KEYS_Coll, false);
-  let User = [];
+  let User = null;
   Users.forEach((UserData) => {
     if (UserData.APIKEY == API_APIKey) {
       User = UserData;
@@ -87,16 +98,12 @@ async function GetUserByAPIKEY(API_KEYS_Coll, API_APIKey) {
   return User;
 }
 
-async function isAdmin(database, API_AdminKey) {
-  if (!database || !API_AdminKey) return false;
+async function UpdateDocument(Collection, filter, updateObject) {
+  const updateDoc = {
+    $set: updateObject,
+  };
 
-  const AdminColl = database.collection("Admin");
-  const Admin_Data = await AdminColl.findOne({});
-  if (API_AdminKey != Admin_Data.AdminKey) {
-    return false;
-  }
-
-  return true;
+  await Collection.updateOne(filter, updateDoc).catch((e) => console.log(e));
 }
 
 app.get("/v1/test", (req, res) => {
@@ -190,7 +197,7 @@ app.get("/v1/create-apikey", (req, res) => {
 
       const New_APIKEY_Doc = {
         APIKEY: APIKEY,
-        Enabled: false,
+        Enabled: true,
         FirstLogin: new Date().toUTCString(),
         LastLogin: new Date().toUTCString(),
         History: [{}],
@@ -233,8 +240,8 @@ app.get("/v1/check-adminkey", (req, res) => {
 
       await MongoClient.connect();
       const database = MongoClient.db("Streamcal");
-      const isAdmin = await isAdmin(database, API_AdminKey);
-      res.send(isAdmin).end();
+      const _isAdmin = await checkIsAdmin(database, API_AdminKey);
+      res.send(_isAdmin).end();
     })();
   } catch (e) {
     console.log("check-adminkey:", e);
@@ -249,7 +256,7 @@ app.get("/v1/get-users", (req, res) => {
 
       await MongoClient.connect();
       const database = MongoClient.db("Streamcal");
-      const _isAdmin = await isAdmin(database, API_AdminKey);
+      const _isAdmin = await checkIsAdmin(database, API_AdminKey);
       if (!_isAdmin) {
         res.status(403).end();
         return;
@@ -268,6 +275,15 @@ app.get("/v1/get-users", (req, res) => {
   }
 });
 
+const LoginStatus = {
+  UserNotExist: "-1",
+  New_User: "0",
+  Account_Disabled: "1",
+  Wrong_Device: "2",
+  Login_Succeed: "3",
+  Unkown_Issue: "4",
+};
+
 app.get("/v1/authenticate-user", (req, res) => {
   try {
     (async () => {
@@ -283,7 +299,42 @@ app.get("/v1/authenticate-user", (req, res) => {
         return;
       }
       const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
-      res.send(User).end();
+      //console.log(User.length === 0, User);
+
+      if (!User) {
+        res.send(LoginStatus.UserNotExist).end();
+        console.log("UserNotExist");
+        return;
+      }
+
+      let updateObject = {}; //{ DeviceID: "Testus" };
+
+      if (!User.Enabled) {
+        res.send(LoginStatus.Account_Disabled).end();
+        console.log("Account Disabled");
+        return;
+      }
+      if (!User.DeviceID) {
+        // New User
+        updateObject = { FirstLogin: new Date().toUTCString(), DeviceID: API_DeviceID };
+        console.log("New User");
+        res.send(LoginStatus.New_User).end();
+      } else if (User.DeviceID != API_DeviceID) {
+        // Authentication Failed => Wrong DeviceID
+        console.log("Authentication Failed => Wrong DeviceID");
+        res.send(LoginStatus.Wrong_Device).end();
+      } else if (User.DeviceID == API_DeviceID) {
+        // Login succeed
+        updateObject = { LastLogin: new Date().toUTCString() };
+        console.log("Login succeed");
+        res.send(LoginStatus.Login_Succeed).end();
+      } else {
+        console.log("Unkown: Login Failed");
+        res.status(403).end();
+      }
+
+      if (!updateObject) return;
+      await UpdateDocument(API_KEYS_Coll, User, updateObject);
     })();
   } catch (e) {
     res.status(403).end();

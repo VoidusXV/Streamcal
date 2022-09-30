@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Local_IP from "./Local_IP";
+import * as Device from "expo-device";
+import * as Crypto from "expo-crypto";
 
 interface IServerInfo {
   APIKEY?: any;
@@ -44,7 +46,7 @@ async function getServerData(URL: any) {
     const data = request.json();
     return data;
   } catch (e: any) {
-    console.log("getServerData_Error:", e.message);
+    console.log("getServerData_Error:", e.message, URL);
   }
 }
 
@@ -110,10 +112,31 @@ function SetGlobalConnection(data: any) {
   currentConnectionInfo.Server = data?.Server;
   currentConnectionInfo.Port = data?.Port;
   currentConnectionInfo.APIKEY = data?.APIKEY;
-  //currentConnectionInfo.AdminKey = data?.AdminKey;
+  currentConnectionInfo.AdminKey = data?.AdminKey;
 }
 
-function ServerAuthentication() {}
+async function Generate_DeviceID() {
+  let Val =
+    (Device?.modelName || "modelName") +
+    (Device.osName || "osName") +
+    (Device.deviceYearClass || "deviceYearClass");
+
+  const EncryptedDeviceID = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA512,
+    Val
+  );
+  return EncryptedDeviceID;
+}
+
+async function ServerAuthentication() {
+  const DeviceID = await Generate_DeviceID();
+  const URL = `${baseAPIURL()}/authenticate-user?apikey=${
+    currentConnectionInfo.APIKEY
+  }&deviceId=${DeviceID}`;
+
+  const rep = await getServerData(URL);
+  return rep;
+}
 
 export {
   getAllContent,
@@ -129,4 +152,5 @@ export {
   currentConnectionInfo,
   IServerInfo,
   SetGlobalConnection,
+  ServerAuthentication,
 };
