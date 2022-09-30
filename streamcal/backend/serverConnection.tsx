@@ -127,12 +127,22 @@ async function Generate_DeviceID() {
   );
   return EncryptedDeviceID;
 }
+enum AuthResponse {
+  UserNotExist = -1,
+  New_User = 0,
+  Account_Disabled = 1,
+  Wrong_Device = 2,
+  Login_Succeed = 3,
+  Unkown_Issue = 4,
+}
 
-async function ServerAuthentication() {
+async function ServerAuthentication(APIKEY = null) {
   const DeviceID = await Generate_DeviceID();
-  const URL = `${baseAPIURL()}/authenticate-user?apikey=${
+  let URL = `${baseAPIURL()}/authenticate-user?apikey=${
     currentConnectionInfo.APIKEY
   }&deviceId=${DeviceID}`;
+
+  if (APIKEY) URL = `${baseAPIURL()}/authenticate-user?apikey=${APIKEY}&deviceId=${DeviceID}`;
 
   const rep = await getServerData(URL);
   return rep;
@@ -153,4 +163,5 @@ export {
   IServerInfo,
   SetGlobalConnection,
   ServerAuthentication,
+  AuthResponse,
 };

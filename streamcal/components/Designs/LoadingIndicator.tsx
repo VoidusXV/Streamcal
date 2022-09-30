@@ -7,12 +7,13 @@ interface ILoadingIndicator {
   style?: ViewStyle | ViewStyle[];
 }
 const LoadingIndicator: React.FC<ILoadingIndicator> = ({ style }: any) => {
+  const LoadingIndicatorSize = WindowSize.Width * 0.2;
   return (
     <View style={{ ...styles.container, ...style }}>
       <ActivityIndicator
-        size={WindowSize.Width * 0.2}
+        size={LoadingIndicatorSize}
         color={selectionColor}
-        style={{ marginBottom: WindowSize.Width * 0.5 }}></ActivityIndicator>
+        style={{ marginBottom: LoadingIndicatorSize }}></ActivityIndicator>
     </View>
   );
 };

@@ -11,6 +11,7 @@ import {
   currentConnectionInfo,
   IServerInfo,
   IsServerReachable,
+  ServerAuthentication,
 } from "../../../backend/serverConnection";
 import LoadingIndicator from "../../Designs/LoadingIndicator";
 
@@ -35,7 +36,8 @@ async function ConnectToServer(getServerInfo: any, onLoadStarted?: any, onLoadEn
     const isAdmin = await checkAdminKey(currentConnection.AdminKey);
     currentConnectionInfo.isAdmin = isAdmin;
   }
-
+  const authResponse = await ServerAuthentication(currentConnection.APIKEY);
+  console.log("ServerConnection AuthResponse:", authResponse);
   onLoadEnded && onLoadEnded();
 }
 
@@ -71,7 +73,7 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
             PlaceholderText={"Port"}></NormalTextInput>
           <NormalTextInput
             defaultValue={getServerInfo?.APIKEY}
-            onChangeText={(e: any) => setServerInfo({ ...getServerInfo, AdminKey: e })}
+            onChangeText={(e: any) => setServerInfo({ ...getServerInfo, APIKEY: e })}
             bodyStyle={{ ...styles.NormalTextInputStyle }}
             PlaceholderText={"API-KEY"}></NormalTextInput>
           <SettingsButton
@@ -108,7 +110,10 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
               await ConnectToServer(
                 getServerInfo,
                 () => setIsLoading(true),
-                () => setIsLoading(false)
+                () => {
+                  setIsLoading(false);
+                  navigation.navigate("Home", {});
+                }
               )
             }
             style={{

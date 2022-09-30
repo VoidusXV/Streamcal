@@ -13,6 +13,7 @@ import {
   checkAdminKey,
   SetGlobalConnection,
   ServerAuthentication,
+  AuthResponse,
 } from "../backend/serverConnection";
 import { GetData_AsyncStorage } from "../components/DataHandling";
 import SettingsButton from "../components/Designs/SettingsButton";
@@ -125,7 +126,6 @@ const ContentContainer = ({ navigation, data }: any) => {
 
 const ErrorContainer = ({ setServerOnline, isServerOnline, getAuthResponse }: any) => {
   //async () => setServerOnline(await IsServerReachable())
-  console.log("TTT", getAuthResponse, isServerOnline);
   //Re-Connect To Server
   function ErrorText() {
     if (!isServerOnline) return "Server is Offline";
@@ -161,14 +161,6 @@ const ErrorContainer = ({ setServerOnline, isServerOnline, getAuthResponse }: an
   );
 };
 
-enum AuthResponse {
-  UserNotExist = -1,
-  New_User = 0,
-  Account_Disabled = 1,
-  Wrong_Device = 2,
-  Login_Succeed = 3,
-  Unkown_Issue = 4,
-}
 interface IGetServerContentAndStatus {
   serverStatus: Boolean;
   content: {};
@@ -190,9 +182,8 @@ export default function HomeScreen({ navigation }: any) {
   const [getCurrentConnection, setCurrentConnection] = React.useState({});
 
   React.useEffect(() => {
-    (async () => {
-      //setIsLoading(true);
-
+    async function Listener() {
+      setIsLoading(true);
       const currentConnection: IServerInfo = await GetData_AsyncStorage("currentConnection");
       setCurrentConnection(currentConnection);
       SetGlobalConnection(currentConnection);
@@ -202,12 +193,24 @@ export default function HomeScreen({ navigation }: any) {
       setServerOnline(ContentAndStatus.serverStatus);
       setContent(ContentAndStatus.content);
       setIsLoading(false);
+    }
+
+    (async () => {
+      console.log("Start First.");
+      await Listener();
     })();
+
+    const unsubscribe = navigation.addListener("focus", async () => {
+      console.log("Start Secodns.");
+
+      await Listener();
+    });
+    return unsubscribe;
   }, []);
 
   if (isLoading) {
     return (
-      <View style={{ ...styles.container, ...styles.CenterChildren }}>
+      <View style={{ ...styles.container }}>
         <LoadingIndicator></LoadingIndicator>
       </View>
     );
