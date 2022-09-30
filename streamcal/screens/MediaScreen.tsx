@@ -224,7 +224,10 @@ const MediaScreen = ({ route, navigation }: any) => {
       // TODO: Running both asyncs at the same time
       await image.downloadAsync();
       setImage(image);
+
       await VideoRef?.current?.loadAsync({ uri: videoURL });
+      await VideoRef.current.playAsync();
+      setIsLoading(false);
 
       const DurationMinutes = item.Duration / 60;
       const RandomConstant = 0.4;
@@ -242,7 +245,6 @@ const MediaScreen = ({ route, navigation }: any) => {
       console.log("Generate CroppedImages Done");
       setGeneratedImages(generatedImages);
       console.log("Loading Should be done");
-      setIsLoading(false);
     })();
   }, []);
   //        <LoadingIndicator style={{ backgroundColor: "red" }}></LoadingIndicator>
