@@ -33,6 +33,7 @@ import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { Asset } from "expo-asset";
 import * as NavigationBar from "expo-navigation-bar";
 import { getPreviewImageURL, getThumbnailURL, getVideoURL } from "../backend/serverConnection";
+import LoadingIndicator from "../components/Designs/LoadingIndicator";
 
 //LogBox.ignoreAllLogs();
 
@@ -71,36 +72,46 @@ async function changeScreenOrientation() {
 
   return true;
 }
-
+interface INextEpisode_Container {
+  AllData: any;
+  ContentID: any;
+  ContentTitle: any;
+  getSeason: any;
+  navigation: any;
+  index: any;
+}
 const NextEpisode_Container = ({
-  data,
+  AllData,
   ContentID,
+  ContentTitle,
   getSeason,
   navigation,
-  item,
-  contentData,
-  getMediaLocation,
   index,
-}: any) => {
-  if (data) {
+}: INextEpisode_Container) => {
+  const EpisodeData = AllData[index];
+
+  if (EpisodeData) {
     return (
       <View style={{ marginTop: "5%" }}>
         <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
           Nächste Folge
         </Text>
         <MediaItemCard
-          ID_Path={data.Episode}
-          Duration={data.Duration}
-          Title={data.Title}
+          ID_Path={EpisodeData.Episode}
+          Duration={EpisodeData.Duration}
+          Title={EpisodeData.Title}
           navigation={navigation}
+          isMediaScreen={true}
           routeParams={{
-            item,
-            ContentName: contentData?.Title,
-            ContentID: contentData?.ID,
-            AllData: getMediaLocation?.Series.Seasons[getSeason].Episodes,
+            item: EpisodeData,
+            ContentName: ContentTitle,
+            ContentID: ContentID,
+            AllData: AllData,
             index: index,
           }}
-          Source={{ uri: getThumbnailURL(ContentID, getSeason + 1, data.Episode) }}></MediaItemCard>
+          Source={{
+            uri: getThumbnailURL(ContentID, getSeason + 1, EpisodeData.Episode),
+          }}></MediaItemCard>
       </View>
     );
   } else return <></>;
@@ -176,10 +187,10 @@ interface IGeneratedImages {
 }
 
 const MediaScreen = ({ route, navigation }: any) => {
-  const { item, AllData, ContentName, ContentID, index } = route.params;
+  const { item, AllData, ContentTitle, ContentID, index } = route.params;
 
+  const [isLoading, setIsLoading] = React.useState(false);
   const [isFullScreen, setFullScreen] = React.useState<any>(false);
-
   const [getImage, setImage] = React.useState<any>(null);
   const [getGeneratedImages, setGeneratedImages] = React.useState<any>([{}]);
   let generatedImages: IGeneratedImages[] = [];
@@ -209,6 +220,7 @@ const MediaScreen = ({ route, navigation }: any) => {
 
   React.useEffect(() => {
     (async () => {
+      setIsLoading(true);
       // TODO: Running both asyncs at the same time
       await image.downloadAsync();
       setImage(image);
@@ -229,8 +241,11 @@ const MediaScreen = ({ route, navigation }: any) => {
 
       console.log("Generate CroppedImages Done");
       setGeneratedImages(generatedImages);
+      console.log("Loading Should be done");
+      setIsLoading(false);
     })();
   }, []);
+  //        <LoadingIndicator style={{ backgroundColor: "red" }}></LoadingIndicator>
 
   return (
     <ScrollView
@@ -240,14 +255,30 @@ const MediaScreen = ({ route, navigation }: any) => {
       {isFullScreen && <StatusBar hidden></StatusBar>}
 
       {getImage && (
-        <VideoPlayer
-          navigation={navigation}
-          VideoRef={VideoRef}
-          CroppedImages={getGeneratedImages}
-          isFullScreen={isFullScreen}
-          ScreenButtonOnPress={async () =>
-            setFullScreen(await changeScreenOrientation())
-          }></VideoPlayer>
+        <View
+          style={{
+            height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
+            backgroundColor: "black",
+          }}>
+          {isLoading && (
+            <LoadingIndicator
+              style={{
+                position: "absolute",
+                //backgroundColor: "red",
+                height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
+                zIndex: 1,
+              }}></LoadingIndicator>
+          )}
+          <VideoPlayer
+            // style={{ opacity: 0 }}
+            navigation={navigation}
+            VideoRef={VideoRef}
+            CroppedImages={getGeneratedImages}
+            isFullScreen={isFullScreen}
+            ScreenButtonOnPress={async () =>
+              setFullScreen(await changeScreenOrientation())
+            }></VideoPlayer>
+        </View>
       )}
 
       <View style={{ flex: 1 }}>
@@ -268,7 +299,7 @@ const MediaScreen = ({ route, navigation }: any) => {
               color: "#95b9fc",
               //textDecorationLine: "underline",
             }}>
-            {ContentName}
+            {ContentTitle}
           </Text>
 
           <Text
@@ -284,14 +315,16 @@ const MediaScreen = ({ route, navigation }: any) => {
         </View>
         <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
         <NextEpisode_Container
-          data={AllData[index + 1]}
+          AllData={AllData}
           getSeason={0}
           ContentID={ContentID}
-          navigation={navigation}></NextEpisode_Container>
-        <FollowingEpisodes_Container
+          ContentTitle={ContentTitle}
+          navigation={navigation}
+          index={index + 1}></NextEpisode_Container>
+        {/* <FollowingEpisodes_Container
           ContentID={ContentID}
           index={index}
-          data={AllData}></FollowingEpisodes_Container>
+          data={AllData}></FollowingEpisodes_Container> */}
       </View>
     </ScrollView>
   );

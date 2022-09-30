@@ -19,17 +19,6 @@ import { GetData_AsyncStorage } from "../components/DataHandling";
 import SettingsButton from "../components/Designs/SettingsButton";
 import LoadingIndicator from "../components/Designs/LoadingIndicator";
 
-const Cover = require("../assets/covers/kurokos-basketball-stream-cover-DCQ2LYPVqVRk0cyMCmDlMQPzkRHLtyqZ_220x330.jpeg");
-const Cover2 = require("../assets/covers/One_Piece.jpg");
-//<FontAwesome5 name="list-ul" size={24} color="black" />
-//<MaterialIcons name="grid-view" size={24} color="black" />
-// const data = [
-//   { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
-//   { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
-//   { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
-//   { ID: 7, Path: "/Series/Season_1/7.mp4", Title: "Du wirst etwas einmaliges sehen" },
-// ];
-
 const TilteContainer = () => {
   return (
     <View style={styles.TitleContainer}>

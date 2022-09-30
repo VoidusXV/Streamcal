@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Animated, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, Text, View, Animated, TouchableOpacity, Image, ViewStyle } from "react-native";
 import { Video, AVPlaybackStatus, ResizeMode, PitchCorrectionQuality } from "expo-av";
 
 import React from "react";
@@ -281,6 +281,7 @@ interface IVideoPlayer {
   isFullScreen?: any;
   navigation?: any;
   ScreenButtonOnPress?: any;
+  style?: ViewStyle | ViewStyle[];
 }
 
 let timer: any = null;
@@ -291,6 +292,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
   isFullScreen,
   navigation,
   ScreenButtonOnPress,
+  style,
 }: any) => {
   // UseStates
   const [getStatus, setStatus] = React.useState<any>({});
@@ -312,11 +314,10 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
 
     Animated.timing(IconsOpacity, {
       toValue: 1,
-      duration: 200,
+      duration: 300,
       useNativeDriver: true,
     }).start(() => {}); // () => setIcons(true)
 
-    console.log(timer);
     autoFade();
   };
 
@@ -326,7 +327,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
     //setIcons(false);
     Animated.timing(IconsOpacity, {
       toValue: 0,
-      duration: 200,
+      duration: 300,
       useNativeDriver: true,
     }).start(() => {
       setIcons(false);
@@ -340,7 +341,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
     }
     timer = setTimeout((e) => {
       fadeOut();
-    }, 2000);
+    }, 3000);
   };
 
   React.useEffect(() => {
@@ -355,6 +356,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
         width: Width,
         height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
         alignSelf: "center",
+        ...style,
       }}>
       <Video
         ref={VideoRef}

@@ -19,6 +19,7 @@ interface IMediaItemCard {
   Duration?: number;
   Description?: any;
   routeParams?: any;
+  isMediaScreen?: any;
 }
 
 function MilisecondsToMinutes(num: any) {
@@ -34,13 +35,18 @@ const MediaItemCard: React.FC<IMediaItemCard> = ({
   onPress,
   navigation,
   Source,
+  isMediaScreen = false,
 }: any) => {
   return (
     <TouchableHighlight
       activeOpacity={0.6}
       underlayColor="#385180"
       style={{ ...styles.MediaItemCard_Container }}
-      onPress={() => navigation.navigate("MediaScreen", routeParams)}>
+      onPress={() =>
+        !isMediaScreen
+          ? navigation.navigate("MediaScreen", routeParams)
+          : navigation.replace("MediaScreen", routeParams)
+      }>
       <>
         <View style={{ backgroundColor: "green", width: "45%", ...styles.ContainerMiddle }}>
           <Image

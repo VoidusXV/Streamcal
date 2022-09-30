@@ -219,7 +219,7 @@ const ViewContent = ({ route, navigation }: any) => {
                     navigation={navigation}
                     routeParams={{
                       item,
-                      ContentName: contentData?.Title,
+                      ContentTitle: contentData?.Title,
                       ContentID: contentData?.ID,
                       AllData: getMediaLocation.Series.Seasons[getSeason].Episodes,
                       index: index,
