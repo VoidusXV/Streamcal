@@ -16,6 +16,7 @@ import {
 } from "../backend/serverConnection";
 import { GetData_AsyncStorage } from "../components/DataHandling";
 import SettingsButton from "../components/Designs/SettingsButton";
+import LoadingIndicator from "../components/Designs/LoadingIndicator";
 
 const Cover = require("../assets/covers/kurokos-basketball-stream-cover-DCQ2LYPVqVRk0cyMCmDlMQPzkRHLtyqZ_220x330.jpeg");
 const Cover2 = require("../assets/covers/One_Piece.jpg");
@@ -124,7 +125,7 @@ const ContentContainer = ({ navigation, data }: any) => {
 
 const ErrorContainer = ({ setServerOnline, isServerOnline, getAuthResponse }: any) => {
   //async () => setServerOnline(await IsServerReachable())
-  console.log(getAuthResponse, isServerOnline);
+  console.log("TTT", getAuthResponse, isServerOnline);
   //Re-Connect To Server
   function ErrorText() {
     if (!isServerOnline) return "Server is Offline";
@@ -168,48 +169,49 @@ enum AuthResponse {
   Login_Succeed = 3,
   Unkown_Issue = 4,
 }
-
-async function GetServerContentAndStatus() {
+interface IGetServerContentAndStatus {
+  serverStatus: Boolean;
+  content: {};
+}
+async function GetServerContentAndStatus(): Promise<IGetServerContentAndStatus> {
   const serverStatus = await IsServerReachable();
-  if (!serverStatus) return [serverStatus, []];
+  if (!serverStatus) return { serverStatus: serverStatus, content: {} };
+
   const data = await getAllContent();
-  return [serverStatus, data];
+  return { serverStatus: serverStatus, content: data };
 }
 
 export default function HomeScreen({ navigation }: any) {
   const [getContent, setContent] = React.useState({});
-  const [isServerOnline, setServerOnline] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isServerOnline, setServerOnline] = React.useState<any>(false);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [getAuthResponse, setAuthResponse] = React.useState(null);
 
   const [getCurrentConnection, setCurrentConnection] = React.useState({});
 
   React.useEffect(() => {
     (async () => {
+      //setIsLoading(true);
+
       const currentConnection: IServerInfo = await GetData_AsyncStorage("currentConnection");
-      //console.log(currentConnection);
-      //const isAdmin = await checkAdminKey(currentConnection.AdminKey);
-      //currentConnection.isAdmin = isAdmin;
+      setCurrentConnection(currentConnection);
       SetGlobalConnection(currentConnection);
 
       setAuthResponse(await ServerAuthentication());
-      //console.log("ServerAuthentication:", await ServerAuthentication());
-
-      const data = getAllContent();
-      const serverStatus = IsServerReachable();
-
-      Promise.all([serverStatus, data])
-        .then(async (data) => {
-          setServerOnline(data[0]);
-          setContent(data[1]);
-        })
-        .catch((e) => {
-          console.log("Error: HomeScreen Z.125");
-        });
+      const ContentAndStatus = await GetServerContentAndStatus();
+      setServerOnline(ContentAndStatus.serverStatus);
+      setContent(ContentAndStatus.content);
+      setIsLoading(false);
     })();
   }, []);
 
-  if (!getCurrentConnection)
+  if (isLoading) {
+    return (
+      <View style={{ ...styles.container, ...styles.CenterChildren }}>
+        <LoadingIndicator></LoadingIndicator>
+      </View>
+    );
+  } else if (!getCurrentConnection)
     return (
       <View style={{ ...styles.container, ...styles.CenterChildren }}>
         <Text

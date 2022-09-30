@@ -33,7 +33,7 @@ function Generate_APIKEY() {
   for (let i = 0; i < 25; i++) {
     if (i % 5 == 0 && i > 1) apikey += "-";
 
-    randomNum = Math.floor(Math.random() * 1);
+    randomNum = Math.floor(Math.random() * 2);
     if (randomNum == 0) {
       //Numbers
       randomNum = Math.floor(Math.random() * Numbers.length);
