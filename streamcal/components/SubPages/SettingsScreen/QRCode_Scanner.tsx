@@ -16,13 +16,15 @@ const QRCode_Scanner = ({ navigation }: any) => {
   }, []);
 
   const handleBarCodeScanned = ({ type, data }: any) => {
-    setScanned(true);
-    console.log("data", data);
-    const JsonData = JSON.parse(data);
-    navigation.navigate("ServerConnectionScreen", JsonData);
+    try {
+      setScanned(true);
+      console.log("data", data);
+      const JsonData = JSON.parse(data);
+      navigation.navigate("ServerConnectionScreen", JsonData);
 
-    //navigation.goBack();
-    Vibration.vibrate();
+      //navigation.goBack();
+      Vibration.vibrate();
+    } catch {}
   };
   //   if (hasPermission === null) {
   //     return Alert.alert(" Requesting for camera permission");
@@ -34,7 +36,8 @@ const QRCode_Scanner = ({ navigation }: any) => {
     <View style={{ backgroundColor: "black" }}>
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={{ height: "100%", width: "100%" }}></BarCodeScanner>
+        style={{ height: "100%", width: "100%" }}
+      ></BarCodeScanner>
     </View>
   );
 };

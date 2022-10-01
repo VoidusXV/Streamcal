@@ -3,10 +3,10 @@ import React from "react";
 import { WindowSize } from "../../constants/Layout";
 import { selectionColor } from "../../constants/Colors";
 import { FlashList } from "@shopify/flash-list";
-import { GetData_AsyncStorage } from "../../DataHandling";
+import { GetData_AsyncStorage, StoreData_AsyncStorage } from "../../DataHandling";
 import { IServerInfo } from "../../../backend/serverConnection";
 
-const HistoryCard = ({ item }: { item: IServerInfo }) => {
+const HistoryCard = ({ item, navigation }: { item: IServerInfo; navigation: any }) => {
   const animation = new Animated.Value(0);
   const inputRange = [0, 1];
   const outputRange = [1, 0.985];
@@ -26,6 +26,10 @@ const HistoryCard = ({ item }: { item: IServerInfo }) => {
       speed: 500,
     }).start();
   };
+  const onPress = () => {
+    console.log("first2");
+    navigation.navigate("ServerConnectionScreen", item);
+  };
   return (
     <Animated.View
       style={{
@@ -36,7 +40,12 @@ const HistoryCard = ({ item }: { item: IServerInfo }) => {
         transform: [{ scale }],
       }}
     >
-      <TouchableOpacity activeOpacity={0.8} onPressIn={onPressIn} onPressOut={onPressOut}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={onPress}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+      >
         <Text
           style={{
             color: "white",
@@ -70,24 +79,43 @@ const HistoryCard = ({ item }: { item: IServerInfo }) => {
   );
 };
 
-const ServerHistoryScreen = () => {
+async function ClearHistory(setHistory: any) {
+  console.log("first");
+  await StoreData_AsyncStorage("ServerConnection_History", null);
+  setHistory(null);
+}
+const ServerHistoryScreen = ({ navigation }: any) => {
   const [getHistory, setHistory] = React.useState([]);
 
   React.useEffect(() => {
     (async () => {
       const a = await GetData_AsyncStorage("ServerConnection_History");
       setHistory(a);
-      //console.log(a);
     })();
   }, []);
 
   return (
     <View style={{ flex: 1 }}>
-      {getHistory.length > 0 && (
+      <Text
+        onPress={async () => await ClearHistory(setHistory)}
+        style={{
+          color: "white",
+          fontSize: WindowSize.Width * 0.04,
+          textAlign: "right",
+          marginRight: "7%",
+          marginTop: "5%",
+          fontWeight: "500",
+        }}
+      >
+        CLEAR HISTORY
+      </Text>
+      {getHistory && getHistory.length > 0 && (
         <FlashList
           estimatedItemSize={10}
           data={getHistory}
-          renderItem={({ item }: { item: IServerInfo }) => <HistoryCard item={item}></HistoryCard>}
+          renderItem={({ item }: { item: IServerInfo }) => (
+            <HistoryCard navigation={navigation} item={item}></HistoryCard>
+          )}
         ></FlashList>
       )}
     </View>
