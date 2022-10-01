@@ -14,6 +14,7 @@ import {
   ServerAuthentication,
 } from "../../../backend/serverConnection";
 import LoadingIndicator from "../../Designs/LoadingIndicator";
+import { Animation_Main } from "../../Designs/NotifyBox";
 
 async function ConnectToServer(getServerInfo: any, onLoadStarted?: any, onLoadEnded?: any) {
   if (!getServerInfo) return;
@@ -124,7 +125,7 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
             IconFamily={MaterialCommunityIcons}
             IconName={"history"}
             ButtonText="History"
-            onPress={async () => console.log(currentConnectionInfo.isAdmin)}
+            onPress={() => Animation_Main()}
             style={{
               marginLeft: WindowSize.Width * 0.05,
               marginTop: WindowSize.Width * 0.05,

@@ -1,13 +1,15 @@
 import React from "react";
 
-import { View, StyleSheet, Image } from "react-native";
-import { backgroundColor } from "../components/constants/Colors";
+import { View, StyleSheet, Image, Text } from "react-native";
+import { backgroundColor, selectionColor } from "../components/constants/Colors";
 import { WindowSize } from "../components/constants/Layout";
 import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
 
 import FadingEdgesView from "../components/Designs/FadingEdgesView";
 import { Asset } from "expo-asset";
 import VideoPlayer from "../components/SubPages/ViewContent/MediaScreen/VideoPlayer";
+import NotifyBox, { Animation_Main } from "../components/Designs/NotifyBox";
+import SettingsButton from "../components/Designs/SettingsButton";
 const Cover2 = require("../assets/covers/One_Piece.jpg");
 
 async function zoomImage(imageURI: any, index: any) {
@@ -55,43 +57,34 @@ interface IGeneratedImages {
   zoomImageURI: any;
 }
 
-export default function ListScreen() {
-  const VideoRef = React.useRef<any>(null);
-
-  const [getImage, setImage] = React.useState<any>(null);
-  let generatedImages: IGeneratedImages[] = [];
-  const [getGeneratedImages, setGeneratedImages] = React.useState<any>([{}]);
-
-  const videoURL = "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=video "; //"http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
-  const image = Asset.fromURI(
-    "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=sliderSeek"
+const DescriptionContainer = ({ DescriptionText }: any) => {
+  return (
+    <View
+      style={{
+        width: "100%",
+        //backgroundColor: "red",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingTop: "3%",
+        paddingBottom: "3%",
+      }}>
+      <Text
+        numberOfLines={2}
+        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
+        {DescriptionText}
+      </Text>
+    </View>
   );
+};
 
-  React.useEffect(() => {
-    return;
-    (async () => {
-      // TODO: Running both asyncs at the same time
-      await image.downloadAsync();
-      setImage(image);
-      await VideoRef?.current?.loadAsync({ uri: videoURL });
-
-      console.log("Starting Generate CroppedImages");
-      for (let index = 0; index < 145; index++) {
-        generatedImages.push({
-          zoomImageIndex: index,
-          zoomImageURI: await zoomImage(image, index),
-        });
-      }
-
-      console.log("Generate CroppedImages Done");
-      setGeneratedImages(generatedImages);
-    })();
-  }, []);
-
+export default function ListScreen() {
+  const t =
+    "Dank einer geheimen Organisation namens Lycoris, die nur aus Mädchen besteht, herrscht Frieden. Die elitäre, freigeistige Chisato ist die stärkste Agentin aller Zeiten und bildet zusammen mit der kühlen, talentierten, aber geheimnisvollen Takina ein nahezu perfektes Duo";
   return (
     <View style={styles.container}>
-      <VideoPlayer VideoRef={VideoRef} CroppedImages={getGeneratedImages}></VideoPlayer>
-
+      <NotifyBox></NotifyBox>
+      <SettingsButton onPress={() => Animation_Main("Kopfus")}></SettingsButton>
+      {/* <DescriptionContainer DescriptionText={t}></DescriptionContainer> */}
       {/* <FadingEdgesView
         style={{ width: "100%", height: "100%", borderWidth: 1, borderColor: "green" }}
         ParentBackgroundColor={"red"}>

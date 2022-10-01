@@ -10,6 +10,7 @@ import MainScreen from "./screens/MainScreen";
 import ViewContent from "./screens/ViewContent";
 import MediaScreen from "./screens/MediaScreen";
 
+import NotifyBox from "./components/Designs/NotifyBox";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
