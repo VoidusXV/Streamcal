@@ -17,17 +17,12 @@ import { Video, AVPlaybackStatus, ResizeMode, PitchCorrectionQuality } from "exp
 import * as ScreenOrientation from "expo-screen-orientation";
 import VideoPlayer from "../components/SubPages/ViewContent/MediaScreen/VideoPlayer";
 
-import Slider from "@react-native-community/slider";
-import Spinner from "react-native-loading-spinner-overlay";
-
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
 import { backgroundColor, selectionColor } from "../components/constants/Colors";
 import { WindowSize } from "../components/constants/Layout";
 import Seperator from "../components/Designs/Seperator";
 import MediaItemCard from "../components/Designs/MediaItemCard";
 import { StatusBar } from "expo-status-bar";
-import { generateThumbnail } from "../components/media/Functions";
-import { loadAsync } from "expo-font";
 import { FlashList } from "@shopify/flash-list";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { Asset } from "expo-asset";
@@ -111,7 +106,8 @@ const NextEpisode_Container = ({
           }}
           Source={{
             uri: getThumbnailURL(ContentID, getSeason + 1, EpisodeData.Episode),
-          }}></MediaItemCard>
+          }}
+        ></MediaItemCard>
       </View>
     );
   } else return <></>;
@@ -139,8 +135,10 @@ const FollowingEpisodes_Container = ({ data, ContentID, index }: any) => {
               Description={item.Description}
               Source={{
                 uri: `http://192.168.2.121:3005/v1/test2?id=${ContentID}&season=1&episode=${item.Episode}&dr=thumb`,
-              }}></MediaItemCard>
-          )}></FlashList>
+              }}
+            ></MediaItemCard>
+          )}
+        ></FlashList>
       </View>
     );
   } else {
@@ -253,7 +251,8 @@ const MediaScreen = ({ route, navigation }: any) => {
     <ScrollView
       scrollEnabled={isFullScreen ? false : true}
       style={!isFullScreen ? styles.container : { backgroundColor: "black" }}
-      contentContainerStyle={{ paddingBottom: 50 }}>
+      contentContainerStyle={{ paddingBottom: 50 }}
+    >
       {isFullScreen && <StatusBar hidden></StatusBar>}
 
       {getImage && (
@@ -261,7 +260,8 @@ const MediaScreen = ({ route, navigation }: any) => {
           style={{
             height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
             backgroundColor: "black",
-          }}>
+          }}
+        >
           {isLoading && (
             <LoadingIndicator
               style={{
@@ -269,7 +269,8 @@ const MediaScreen = ({ route, navigation }: any) => {
                 //backgroundColor: "red",
                 height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
                 zIndex: 1,
-              }}></LoadingIndicator>
+              }}
+            ></LoadingIndicator>
           )}
           <VideoPlayer
             // style={{ opacity: 0 }}
@@ -277,9 +278,8 @@ const MediaScreen = ({ route, navigation }: any) => {
             VideoRef={VideoRef}
             CroppedImages={getGeneratedImages}
             isFullScreen={isFullScreen}
-            ScreenButtonOnPress={async () =>
-              setFullScreen(await changeScreenOrientation())
-            }></VideoPlayer>
+            ScreenButtonOnPress={async () => setFullScreen(await changeScreenOrientation())}
+          ></VideoPlayer>
         </View>
       )}
 
@@ -291,7 +291,8 @@ const MediaScreen = ({ route, navigation }: any) => {
             //backgroundColor: "red",
             flexDirection: "column",
             justifyContent: "center",
-          }}>
+          }}
+        >
           <Text
             style={{
               ...styles.EpisodeText,
@@ -300,12 +301,14 @@ const MediaScreen = ({ route, navigation }: any) => {
               marginTop: "4%",
               color: "#95b9fc",
               //textDecorationLine: "underline",
-            }}>
+            }}
+          >
             {ContentTitle}
           </Text>
 
           <Text
-            style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
+            style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
+          >
             Folge {item.Episode}: {item.Title}
           </Text>
           <Octicons
@@ -313,7 +316,8 @@ const MediaScreen = ({ route, navigation }: any) => {
             name="download"
             size={WindowSize.Width * 0.07}
             style={{ marginLeft: "auto", marginRight: "7%" }}
-            color="white"></Octicons>
+            color="white"
+          ></Octicons>
         </View>
         <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
         <NextEpisode_Container
@@ -322,7 +326,8 @@ const MediaScreen = ({ route, navigation }: any) => {
           ContentID={ContentID}
           ContentTitle={ContentTitle}
           navigation={navigation}
-          index={index + 1}></NextEpisode_Container>
+          index={index + 1}
+        ></NextEpisode_Container>
         {/* <FollowingEpisodes_Container
           ContentID={ContentID}
           index={index}

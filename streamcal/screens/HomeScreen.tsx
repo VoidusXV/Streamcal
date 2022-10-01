@@ -26,7 +26,8 @@ const TilteContainer = () => {
         name="play-video"
         style={{ marginLeft: "5%" }}
         size={WindowSize.Width * 0.1}
-        color={selectionColor}></Foundation>
+        color={selectionColor}
+      ></Foundation>
       <Text style={styles.title}>Streamcal</Text>
     </View>
   );
@@ -64,20 +65,23 @@ const RenderItem = ({ onPress, TitleText, CoverURL, Availability }: any) => {
         marginLeft: "5%",
         marginTop: "10%",
         transform: [{ scale }],
-      }}>
+      }}
+    >
       <TouchableHighlight
         style={{ flex: 1, borderRadius: 5 }}
         underlayColor="#2c4063"
         onPressIn={onPressIn}
         onPressOut={onPressOut}
-        onPress={onPress}>
+        onPress={onPress}
+      >
         <>
           <View style={{ height: "80%", width: "100%" }}>
             <Image
               borderRadius={5}
               source={{ uri: CoverURL }}
               style={{ width: "100%", height: "100%" }}
-              resizeMode="contain"></Image>
+              resizeMode="contain"
+            ></Image>
           </View>
           <View style={{ flex: 1 }}>
             <Text numberOfLines={2} style={{ ...styles.ContentText, marginTop: "4%" }}>
@@ -113,8 +117,10 @@ const ContentContainer = ({ navigation, data }: any) => {
                 Description: item.Description,
               },
             })
-          }></RenderItem>
-      )}></FlashList>
+          }
+        ></RenderItem>
+      )}
+    ></FlashList>
   );
 };
 
@@ -141,7 +147,8 @@ const ErrorContainer = ({ setServerOnline, isServerOnline, getAuthResponse }: an
           color: "rgba(255,255,255,0.8)",
           marginBottom: "10%",
           maxWidth: "90%",
-        }}>
+        }}
+      >
         {ErrorText()}
       </Text>
       {(!isServerOnline || getAuthResponse == AuthResponse.UserNotExist) && (
@@ -149,7 +156,8 @@ const ErrorContainer = ({ setServerOnline, isServerOnline, getAuthResponse }: an
           style={{ justifyContent: "center" }}
           textStyle={{ maxWidth: "90%" }}
           ButtonText={!isServerOnline ? "Re-Connect To Server" : "Go To The Settings"}
-          onPress={() => console.log("first")}></SettingsButton>
+          onPress={() => console.log("first")}
+        ></SettingsButton>
       )}
     </View>
   );
@@ -217,8 +225,9 @@ export default function HomeScreen({ navigation }: any) {
             color: "rgba(255,255,255,0.8)",
             marginBottom: "10%",
             maxWidth: "90%",
-          }}>
-          Set up a server connection
+          }}
+        >
+          Set up a Server-Connection
         </Text>
       </View>
     );
@@ -239,7 +248,8 @@ export default function HomeScreen({ navigation }: any) {
     return (
       <ErrorContainer
         getAuthResponse={getAuthResponse}
-        isServerOnline={isServerOnline}></ErrorContainer>
+        isServerOnline={isServerOnline}
+      ></ErrorContainer>
     );
   }
 }

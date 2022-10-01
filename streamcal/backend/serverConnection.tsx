@@ -5,6 +5,7 @@ import * as Device from "expo-device";
 import * as Crypto from "expo-crypto";
 
 interface IServerInfo {
+  Description?: any;
   APIKEY?: any;
   Server?: any;
   Port?: any;
