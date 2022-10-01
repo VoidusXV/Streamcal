@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { WindowSize } from "../../constants/Layout";
 import { selectionColor } from "../../constants/Colors";
@@ -7,43 +7,66 @@ import { GetData_AsyncStorage } from "../../DataHandling";
 import { IServerInfo } from "../../../backend/serverConnection";
 
 const HistoryCard = ({ item }: { item: IServerInfo }) => {
+  const animation = new Animated.Value(0);
+  const inputRange = [0, 1];
+  const outputRange = [1, 0.985];
+  const scale = animation.interpolate({ inputRange, outputRange });
+
+  const onPressIn = () => {
+    Animated.spring(animation, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 500,
+    }).start();
+  };
+  const onPressOut = () => {
+    Animated.spring(animation, {
+      toValue: 0,
+      useNativeDriver: true,
+      speed: 500,
+    }).start();
+  };
   return (
-    <View
+    <Animated.View
       style={{
         ...styles.HistoryCard_Container,
         paddingTop: "2%",
         paddingBottom: "2%",
         paddingLeft: "5%",
+        transform: [{ scale }],
       }}
     >
-      <Text
-        style={{
-          color: "white",
-          fontSize: WindowSize.Width * 0.045,
-          maxWidth: "90%",
-        }}
-      >
-        {item.Description}
-      </Text>
-      <Text
-        style={{
-          color: "white",
-          fontSize: WindowSize.Width * 0.045,
-          maxWidth: "90%",
-        }}
-      >
-        {item.Server}:{item.Port}
-      </Text>
-      <Text
-        style={{
-          color: "white",
-          fontSize: WindowSize.Width * 0.045,
-          maxWidth: "90%",
-        }}
-      >
-        {item.APIKEY}
-      </Text>
-    </View>
+      <TouchableOpacity activeOpacity={0.8} onPressIn={onPressIn} onPressOut={onPressOut}>
+        <Text
+          style={{
+            color: "white",
+            fontSize: WindowSize.Width * 0.045,
+            maxWidth: "90%",
+            textDecorationLine: "underline",
+          }}
+        >
+          {item.Description}
+        </Text>
+        <Text
+          style={{
+            color: "white",
+            fontSize: WindowSize.Width * 0.045,
+            maxWidth: "90%",
+          }}
+        >
+          {item.Server}:{item.Port}
+        </Text>
+        <Text
+          style={{
+            color: "white",
+            fontSize: WindowSize.Width * 0.045,
+            maxWidth: "90%",
+          }}
+        >
+          {item.APIKEY}
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
