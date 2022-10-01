@@ -125,7 +125,7 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
             IconFamily={MaterialCommunityIcons}
             IconName={"history"}
             ButtonText="History"
-            onPress={() => Animation_Main()}
+            onPress={() => console.log("first")}
             style={{
               marginLeft: WindowSize.Width * 0.05,
               marginTop: WindowSize.Width * 0.05,

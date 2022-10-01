@@ -82,8 +82,8 @@ export default function ListScreen() {
     "Dank einer geheimen Organisation namens Lycoris, die nur aus Mädchen besteht, herrscht Frieden. Die elitäre, freigeistige Chisato ist die stärkste Agentin aller Zeiten und bildet zusammen mit der kühlen, talentierten, aber geheimnisvollen Takina ein nahezu perfektes Duo";
   return (
     <View style={styles.container}>
-      <NotifyBox></NotifyBox>
-      <SettingsButton onPress={() => Animation_Main("Kopfus")}></SettingsButton>
+      <NotifyBox visible={true} MessageText={"Kof3535ij"}></NotifyBox>
+      {/* <SettingsButton onPress={() => Animation_Main("Kopfus")}></SettingsButton> */}
       {/* <DescriptionContainer DescriptionText={t}></DescriptionContainer> */}
       {/* <FadingEdgesView
         style={{ width: "100%", height: "100%", borderWidth: 1, borderColor: "green" }}

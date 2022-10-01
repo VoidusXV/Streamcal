@@ -3,14 +3,16 @@ import React from "react";
 import { WindowSize } from "../constants/Layout";
 import { selectionColor } from "../constants/Colors";
 
-const StartValue = WindowSize.Height * -0.15;
-const EndValue = 30;
-let Animated_Height = new Animated.Value(StartValue);
-let MessageText = "";
-function getMessageText() {
-  return MessageText;
-}
-function ShowHide_Animation(show = true) {
+//const StartValue = WindowSize.Height * -0.15;
+//const EndValue = 30;
+//let Animated_Height = new Animated.Value(StartValue);
+
+function ShowHide_Animation(
+  show = true,
+  Animated_Height: any,
+  StartValue = WindowSize.Height * -0.15,
+  EndValue = 30
+) {
   Animated.timing(Animated_Height, {
     toValue: show ? EndValue : StartValue,
     duration: 120,
@@ -18,24 +20,31 @@ function ShowHide_Animation(show = true) {
   }).start();
 }
 
-function Animation_Main(text?: any) {
-  console.log("Tett3");
-  MessageText = text;
-  ShowHide_Animation(true);
+function Animation_Main(Animated_Height: any) {
+  ShowHide_Animation(true, Animated_Height);
   setTimeout(() => {
-    ShowHide_Animation(false);
+    ShowHide_Animation(false, Animated_Height);
   }, 3000);
 }
+interface INotifyBox {
+  visible?: any;
+  MessageText?: any;
+}
+const NotifyBox: React.FC<INotifyBox> = ({ visible, MessageText }: any) => {
+  const StartValue = WindowSize.Height * -0.15;
+  //const EndValue = 30;
+  let Animated_Height = new Animated.Value(StartValue);
 
-const NotifyBox = () => {
-  //   React.useEffect(() => {
-  //     Animation_Main();
-  //   }, []);
+  React.useEffect(() => {
+    Animation_Main(Animated_Height);
+  }, [visible]);
 
   // transform: [{ translateY: WindowSize.Width * 0.05 }] }
   return (
-    <Animated.View style={{ ...styles.container, marginTop: Animated_Height }}>
-      <Text style={styles.MessageStyle}>{getMessageText()}</Text>
+    <Animated.View
+      onTouchEnd={() => ShowHide_Animation(false, Animated_Height)}
+      style={{ ...styles.container, marginTop: Animated_Height }}>
+      <Text style={styles.MessageStyle}>{MessageText}</Text>
     </Animated.View>
   );
 };
