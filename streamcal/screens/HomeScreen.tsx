@@ -106,7 +106,12 @@ const ContentContainer = ({ navigation, data }: any) => {
           CoverURL={getCoverURL(item.ID)}
           onPress={() =>
             navigation.navigate("ViewContent", {
-              contentData: { ID: item.ID, Title: item.Title, Cover: getCoverURL(item.ID) },
+              contentData: {
+                ID: item.ID,
+                Title: item.Title,
+                Cover: getCoverURL(item.ID),
+                Description: item.Description,
+              },
             })
           }></RenderItem>
       )}></FlashList>
@@ -171,13 +176,14 @@ export default function HomeScreen({ navigation }: any) {
   const [getCurrentConnection, setCurrentConnection] = React.useState({});
 
   React.useEffect(() => {
-    async function Listener() {
+    async function Listener(auth = true) {
       setIsLoading(true);
-      const currentConnection: IServerInfo = await GetData_AsyncStorage("currentConnection");
-      setCurrentConnection(currentConnection);
-      SetGlobalConnection(currentConnection);
-
-      setAuthResponse(await ServerAuthentication());
+      if (auth) {
+        const currentConnection: IServerInfo = await GetData_AsyncStorage("currentConnection");
+        setCurrentConnection(currentConnection);
+        SetGlobalConnection(currentConnection);
+        setAuthResponse(await ServerAuthentication());
+      }
       const ContentAndStatus = await GetServerContentAndStatus();
       setServerOnline(ContentAndStatus.serverStatus);
       setContent(ContentAndStatus.content);
@@ -191,8 +197,7 @@ export default function HomeScreen({ navigation }: any) {
 
     const unsubscribe = navigation.addListener("focus", async () => {
       console.log("Start Secodns.");
-
-      await Listener();
+      await Listener(false);
     });
     return unsubscribe;
   }, []);

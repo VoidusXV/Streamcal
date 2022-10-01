@@ -49,6 +49,8 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
         <Image
           source={{ uri: CoverURL }}
           resizeMethod="scale"
+          resizeMode="cover"
+          //blurRadius={0}
           style={{
             width: "100%",
             height: "100%",
@@ -73,13 +75,43 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
     </View>
   );
 };
-
-const ContentInfo = ({ SeasonNum, EpisodeNum }: any) => (
-  <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-    <Text style={styles.InfoText}>&#9679; Serie</Text>
-    <Text style={styles.InfoText}>&#9679; {SeasonNum} Staffel</Text>
-    <Text style={styles.InfoText}>&#9679; {EpisodeNum} Folgen</Text>
-  </View>
+const DescriptionContainer = ({ DescriptionText }: any) => {
+  return (
+    <View
+      style={{
+        width: "100%",
+        //backgroundColor: "red",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingTop: "3%",
+        paddingBottom: "3%",
+      }}>
+      <Text
+        numberOfLines={2}
+        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
+        {DescriptionText}
+      </Text>
+    </View>
+  );
+};
+const ContentInfo = ({ SeasonNum, EpisodeNum, DescriptionText }: any) => (
+  <>
+    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+      <Text style={styles.InfoText}>&#9679; Series</Text>
+      <Text style={styles.InfoText}>
+        &#9679; {SeasonNum} {SeasonNum == 1 ? "Season" : "Seasons"}
+      </Text>
+      <Text style={styles.InfoText}>
+        &#9679; {EpisodeNum} {EpisodeNum == 1 ? "Episode" : "Episodes"}
+      </Text>
+    </View>
+    <DescriptionContainer DescriptionText={DescriptionText}></DescriptionContainer>
+    <Text
+      onPress={() => console.log("Show More Details")}
+      style={{ ...styles.InfoText, textDecorationLine: "underline", textAlign: "center" }}>
+      Show More Details
+    </Text>
+  </>
 );
 
 const SelectionBox = () => (
@@ -200,6 +232,7 @@ const ViewContent = ({ route, navigation }: any) => {
               ContentTitle={contentData?.Title}></ImageContainer>
             <View style={styles.ContentContainer}>
               <ContentInfo
+                DescriptionText={contentData.Description}
                 SeasonNum={getSeasonAmount(getMediaLocation)}
                 EpisodeNum={getEpisodeAmount(getMediaLocation)}></ContentInfo>
               <SelectionBox></SelectionBox>
