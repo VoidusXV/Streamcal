@@ -19,14 +19,15 @@ async function AdminAuth() {
   return isAdmin;
 }
 
-interface IManagerUsersScreen {
+interface IManageUsersScreen {
   navigation?: any; //NativeStackScreenProps<any,any>;
   MessageText?: any;
 }
-const ManagerUsersScreen = ({ navigation, MessageText }: IManagerUsersScreen) => {
+const ManageUsersScreen = ({ navigation, MessageText }: IManageUsersScreen) => {
   const [getUserData, setUserData] = React.useState([]);
 
   React.useEffect(() => {
+    return;
     (async () => {
       const isAdmin = await AdminAuth();
       if (!isAdmin) {
@@ -37,14 +38,9 @@ const ManagerUsersScreen = ({ navigation, MessageText }: IManagerUsersScreen) =>
       }
     })();
   }, []);
-  return (
-    <View>
-      <Text>ManagerUsersScreen</Text>
-      <SettingsButton onPress={() => {}}></SettingsButton>
-    </View>
-  );
+  return <View></View>;
 };
 
-export default ManagerUsersScreen;
+export default ManageUsersScreen;
 
 const styles = StyleSheet.create({});

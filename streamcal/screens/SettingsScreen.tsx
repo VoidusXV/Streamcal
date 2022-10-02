@@ -18,7 +18,7 @@ import ServerConnectionScreen from "../components/SubPages/SettingsScreen/Server
 import Settings_DefaultScreen from "../components/SubPages/SettingsScreen/Settings_DefaultScreen";
 import QRCode_Scanner from "../components/SubPages/SettingsScreen/QRCode_Scanner";
 import ServerHistoryScreen from "../components/SubPages/SettingsScreen/ServerHistoryScreen";
-import ManagerUsersScreen from "../components/SubPages/SettingsScreen/ManagerUsersScreen";
+import ManagerUsersScreen from "../components/SubPages/SettingsScreen/ManageUsersScreen";
 import NotifyBox from "../components/Designs/NotifyBox";
 
 const IconSize = WindowSize.Width * 0.07;
@@ -106,9 +106,6 @@ const SettingsScreen = ({ navigation }: any) => {
     }
   };
 
-  React.useEffect(() => {
-    console.log("et4tt3t444444");
-  }, []);
   return (
     <>
       <Stack.Navigator
