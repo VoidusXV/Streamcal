@@ -1,6 +1,17 @@
 import React from "react";
 
-import { View, StyleSheet, Image, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  Animated,
+  TouchableOpacity,
+  StyleProp,
+  ViewStyle,
+  Easing,
+  LayoutChangeEvent,
+} from "react-native";
 import { backgroundColor, selectionColor } from "../components/constants/Colors";
 import { WindowSize } from "../components/constants/Layout";
 import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
@@ -10,7 +21,9 @@ import { Asset } from "expo-asset";
 import VideoPlayer from "../components/SubPages/ViewContent/MediaScreen/VideoPlayer";
 import NotifyBox, { Animation_Main } from "../components/Designs/NotifyBox";
 import SettingsButton from "../components/Designs/SettingsButton";
-const Cover2 = require("../assets/covers/One_Piece.jpg");
+
+import { MaterialIcons } from "@expo/vector-icons";
+import DropDownMenu from "../components/Designs/DropDownMenu";
 
 async function zoomImage(imageURI: any, index: any) {
   if (!imageURI) {
@@ -67,10 +80,12 @@ const DescriptionContainer = ({ DescriptionText }: any) => {
         justifyContent: "center",
         paddingTop: "3%",
         paddingBottom: "3%",
-      }}>
+      }}
+    >
       <Text
         numberOfLines={2}
-        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
+        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
+      >
         {DescriptionText}
       </Text>
     </View>
@@ -78,12 +93,23 @@ const DescriptionContainer = ({ DescriptionText }: any) => {
 };
 
 export default function ListScreen() {
+  const [a, b] = React.useState<any>("");
+
   const t =
     "Dank einer geheimen Organisation namens Lycoris, die nur aus Mädchen besteht, herrscht Frieden. Die elitäre, freigeistige Chisato ist die stärkste Agentin aller Zeiten und bildet zusammen mit der kühlen, talentierten, aber geheimnisvollen Takina ein nahezu perfektes Duo";
   return (
     <View style={styles.container}>
-      <NotifyBox visible={true} MessageText={"Kof3535ij"}></NotifyBox>
-      {/* <SettingsButton onPress={() => Animation_Main("Kopfus")}></SettingsButton> */}
+      {/* <DropDownMenu endHeight={300}></DropDownMenu> */}
+
+      <NotifyBox MessageText={a}></NotifyBox>
+
+      <SettingsButton
+        onPress={() => {
+          b(new Date().getMilliseconds());
+          Animation_Main();
+        }}
+      ></SettingsButton>
+
       {/* <DescriptionContainer DescriptionText={t}></DescriptionContainer> */}
       {/* <FadingEdgesView
         style={{ width: "100%", height: "100%", borderWidth: 1, borderColor: "green" }}
@@ -119,5 +145,14 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: "80%",
+  },
+  DropDownMenuContainer: {
+    backgroundColor: "#253959",
+    width: "90%",
+    minHeight: WindowSize.Width * 0.13,
+    //height: WindowSize.Width * 0.13,
+    alignSelf: "center",
+    padding: "3%",
+    borderRadius: WindowSize.Width * 0.02,
   },
 });
