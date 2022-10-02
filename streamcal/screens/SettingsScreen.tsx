@@ -20,6 +20,8 @@ import QRCode_Scanner from "../components/SubPages/SettingsScreen/QRCode_Scanner
 import ServerHistoryScreen from "../components/SubPages/SettingsScreen/ServerHistoryScreen";
 import ManagerUsersScreen from "../components/SubPages/SettingsScreen/ManageUsersScreen";
 import NotifyBox from "../components/Designs/NotifyBox";
+import EditUserScreen from "../components/SubPages/SettingsScreen/EditUserScreen";
+import AddUserScreen from "../components/SubPages/SettingsScreen/AddUserScreen";
 
 const IconSize = WindowSize.Width * 0.07;
 const fontSize = WindowSize.Width * 0.055;
@@ -35,8 +37,7 @@ const TitleContainer = () => (
       borderBottomWidth: 1,
       borderBottomColor: "rgba(255,255,255,0.6)",
       height: WindowSize.Width * 0.15,
-    }}
-  >
+    }}>
     <Text style={{ color: "white", fontSize: WindowSize.Width * 0.07 }}>Einstellungen</Text>
   </View>
 );
@@ -54,15 +55,13 @@ const SettingButton = ({ onPress, style, ButtonText, IconFamily, IconName }: any
       backgroundColor: "#253959",
       borderRadius: WindowSize.Width * 0.01,
       ...style,
-    }}
-  >
+    }}>
     <>
       <IconFamily
         name={IconName}
         size={IconSize}
         style={{ marginLeft: "5%" }}
-        color="white"
-      ></IconFamily>
+        color="white"></IconFamily>
       <Text style={{ color: "white", fontSize: fontSize, marginLeft: "5%" }}>{ButtonText}</Text>
     </>
   </TouchableHighlight>
@@ -77,8 +76,7 @@ const ServerConnection_Modal = ({ visible, onRequestClose }: any) => {
       visible={visible}
       transparent
       style={{ backgroundColor: "red" }}
-      onRequestClose={onRequestClose}
-    >
+      onRequestClose={onRequestClose}>
       <View style={{ width: "100%", height: "100%", backgroundColor: backgroundColor }}>
         <MaterialCommunityIcons name="history" size={24} color="white" />
         {/* <SettingButton onPress={() => console.log("teteitj485t9")}></SettingButton> */}
@@ -119,12 +117,10 @@ const SettingsScreen = ({ navigation }: any) => {
           presentation: "fullScreenModal",
           //animationDuration: 1,
           //animation: "slide_from_right",
-        }}
-      >
+        }}>
         <Stack.Screen
           name="Settings_DefaultScreen"
-          component={Settings_DefaultScreen}
-        ></Stack.Screen>
+          component={Settings_DefaultScreen}></Stack.Screen>
         <Stack.Screen
           options={{
             headerShown: true,
@@ -133,8 +129,7 @@ const SettingsScreen = ({ navigation }: any) => {
             headerTitle: "Server Connection",
           }}
           name="ServerConnectionScreen"
-          component={ServerConnectionScreen}
-        ></Stack.Screen>
+          component={ServerConnectionScreen}></Stack.Screen>
         <Stack.Screen
           options={{
             headerShown: true,
@@ -143,8 +138,7 @@ const SettingsScreen = ({ navigation }: any) => {
             headerTitle: "Server Connection History",
           }}
           name="ServerHistoryScreen"
-          component={ServerHistoryScreen}
-        ></Stack.Screen>
+          component={ServerHistoryScreen}></Stack.Screen>
         <Stack.Screen
           options={{
             headerShown: true,
@@ -158,10 +152,20 @@ const SettingsScreen = ({ navigation }: any) => {
           {() => (
             <ManagerUsersScreen
               navigation={navigation}
-              MessageText={setMessageText}
-            ></ManagerUsersScreen>
+              MessageText={setMessageText}></ManagerUsersScreen>
           )}
         </Stack.Screen>
+        <Stack.Screen
+          name="EditUserScreen"
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: backgroundColor },
+            headerTintColor: "white",
+            headerTitle: "User",
+          }}
+          component={EditUserScreen}></Stack.Screen>
+        <Stack.Screen name="AddUserScreen" component={AddUserScreen}></Stack.Screen>
+
         <Stack.Screen name="QRCode_ScannerScreen" component={QRCode_Scanner}></Stack.Screen>
       </Stack.Navigator>
       <NotifyBox MessageText={getMessageText}></NotifyBox>

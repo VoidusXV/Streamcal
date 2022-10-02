@@ -262,11 +262,8 @@ app.get("/v1/get-users", (req, res) => {
         return;
       }
       const API_KEYS_Coll = database.collection("API_KEYS");
-      let Users = [];
+      let Users = await GetUsers(_isAdmin, API_KEYS_Coll);
 
-      await API_KEYS_Coll.find().forEach((e) => {
-        Users.push(e);
-      });
       res.send(Users).end();
     })();
   } catch (e) {

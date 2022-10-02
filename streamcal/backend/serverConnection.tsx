@@ -94,6 +94,7 @@ function IsServerReachable() {
   const timeout = new Promise((resolve, reject) => {
     setTimeout(reject, 3000, "Request timed out");
   });
+  console.log(baseIPURL());
   const req = fetch(baseIPURL());
   return Promise.race([timeout, req])
     .then(() => {
@@ -109,6 +110,10 @@ async function checkAdminKey(AdminKey: any) {
   return rep;
 }
 
+async function getAllUsers(AdminKey: any) {
+  const rep = await getServerData(`${baseAPIURL()}/get-users?adminKey=${AdminKey}`);
+  return rep;
+}
 function SetGlobalConnection(data: any) {
   currentConnectionInfo.Server = data?.Server;
   currentConnectionInfo.Port = data?.Port;
@@ -158,6 +163,7 @@ export {
   getThumbnailURL,
   getVideoURL,
   getPreviewImageURL,
+  getAllUsers,
   IsServerReachable,
   checkAdminKey,
   currentConnectionInfo,
