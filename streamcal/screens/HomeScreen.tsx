@@ -185,23 +185,26 @@ export default function HomeScreen({ navigation }: any) {
 
   React.useEffect(() => {
     async function Listener(auth = true) {
-      setIsLoading(true);
-      const ContentAndStatus = await GetServerContentAndStatus();
-      if (!ContentAndStatus.serverStatus) {
+      try {
+        setIsLoading(true);
+        const ContentAndStatus = await GetServerContentAndStatus();
+        if (!ContentAndStatus.serverStatus) {
+          return;
+        }
+
+        if (auth) {
+          const currentConnection: IServerInfo = await GetData_AsyncStorage("currentConnection");
+          setCurrentConnection(currentConnection);
+          SetGlobalConnection(currentConnection);
+          setAuthResponse(await ServerAuthentication());
+        }
+        setServerOnline(ContentAndStatus.serverStatus);
+        setContent(ContentAndStatus.content);
+      } catch (e: any) {
+        console.log("Listener Error", e.message);
+      } finally {
         setIsLoading(false);
-
-        return;
       }
-
-      if (auth) {
-        const currentConnection: IServerInfo = await GetData_AsyncStorage("currentConnection");
-        setCurrentConnection(currentConnection);
-        SetGlobalConnection(currentConnection);
-        setAuthResponse(await ServerAuthentication());
-      }
-      setServerOnline(ContentAndStatus.serverStatus);
-      setContent(ContentAndStatus.content);
-      setIsLoading(false);
     }
 
     (async () => {

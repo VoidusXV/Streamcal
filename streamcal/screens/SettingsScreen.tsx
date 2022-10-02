@@ -18,6 +18,8 @@ import ServerConnectionScreen from "../components/SubPages/SettingsScreen/Server
 import Settings_DefaultScreen from "../components/SubPages/SettingsScreen/Settings_DefaultScreen";
 import QRCode_Scanner from "../components/SubPages/SettingsScreen/QRCode_Scanner";
 import ServerHistoryScreen from "../components/SubPages/SettingsScreen/ServerHistoryScreen";
+import ManagerUsersScreen from "../components/SubPages/SettingsScreen/ManagerUsersScreen";
+import NotifyBox from "../components/Designs/NotifyBox";
 
 const IconSize = WindowSize.Width * 0.07;
 const fontSize = WindowSize.Width * 0.055;
@@ -88,6 +90,7 @@ const ServerConnection_Modal = ({ visible, onRequestClose }: any) => {
 const SettingsScreen = ({ navigation }: any) => {
   // const [getNavigationStateIndex, setNavigationStateIndex] = React.useState(0);
 
+  const [getMessageText, setMessageText] = React.useState("");
   const NavigatorListener = (state: any) => {
     //setNavigationStateIndex(state.data.state.index);
     if (state.data.state.index == 0) {
@@ -103,43 +106,69 @@ const SettingsScreen = ({ navigation }: any) => {
     }
   };
 
+  React.useEffect(() => {
+    console.log("et4tt3t444444");
+  }, []);
   return (
-    <Stack.Navigator
-      screenListeners={{
-        state: NavigatorListener,
-      }}
-      screenOptions={{
-        contentStyle: { backgroundColor: backgroundColor },
-        headerShown: false,
-        //headerMode: "none",
-        presentation: "fullScreenModal",
-        //animationDuration: 1,
-        //animation: "slide_from_right",
-      }}
-    >
-      <Stack.Screen name="Settings_DefaultScreen" component={Settings_DefaultScreen}></Stack.Screen>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerStyle: { backgroundColor: backgroundColor },
-          headerTintColor: "white",
-          headerTitle: "Server Connection",
+    <>
+      <Stack.Navigator
+        screenListeners={{
+          state: NavigatorListener,
         }}
-        name="ServerConnectionScreen"
-        component={ServerConnectionScreen}
-      ></Stack.Screen>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerStyle: { backgroundColor: backgroundColor },
-          headerTintColor: "white",
-          headerTitle: "Server Connection History",
+        screenOptions={{
+          contentStyle: { backgroundColor: backgroundColor },
+          headerShown: false,
+          //headerMode: "none",
+          presentation: "fullScreenModal",
+          //animationDuration: 1,
+          //animation: "slide_from_right",
         }}
-        name="ServerHistoryScreen"
-        component={ServerHistoryScreen}
-      ></Stack.Screen>
-      <Stack.Screen name="QRCode_ScannerScreen" component={QRCode_Scanner}></Stack.Screen>
-    </Stack.Navigator>
+      >
+        <Stack.Screen
+          name="Settings_DefaultScreen"
+          component={Settings_DefaultScreen}
+        ></Stack.Screen>
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: backgroundColor },
+            headerTintColor: "white",
+            headerTitle: "Server Connection",
+          }}
+          name="ServerConnectionScreen"
+          component={ServerConnectionScreen}
+        ></Stack.Screen>
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: backgroundColor },
+            headerTintColor: "white",
+            headerTitle: "Server Connection History",
+          }}
+          name="ServerHistoryScreen"
+          component={ServerHistoryScreen}
+        ></Stack.Screen>
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: backgroundColor },
+            headerTintColor: "white",
+            headerTitle: "Manage Users",
+          }}
+          name="ManageUsersScreen"
+          // component={ManagerUsersScreen}
+        >
+          {() => (
+            <ManagerUsersScreen
+              navigation={navigation}
+              MessageText={setMessageText}
+            ></ManagerUsersScreen>
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="QRCode_ScannerScreen" component={QRCode_Scanner}></Stack.Screen>
+      </Stack.Navigator>
+      <NotifyBox MessageText={getMessageText}></NotifyBox>
+    </>
   );
 };
 

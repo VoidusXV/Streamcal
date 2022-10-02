@@ -14,7 +14,8 @@ const TitleContainer = () => (
       borderBottomColor: "rgba(255,255,255,0.6)",
       height: WindowSize.Width * 0.15,
       width: "100%",
-    }}>
+    }}
+  >
     <Text style={{ color: "white", fontSize: WindowSize.Width * 0.07 }}>Settings</Text>
   </View>
 );
@@ -29,13 +30,15 @@ const Settings_DefaultScreen = ({ navigation }: any) => {
         IconFamily={MaterialCommunityIcons}
         IconName={"connection"}
         style={styles.SettingsButtonStyle}
-        ButtonText={"Server Connection"}></SettingsButton>
+        ButtonText={"Server Connection"}
+      ></SettingsButton>
       <SettingsButton
-        onPress={() => console.log("first")}
+        onPress={() => navigation.navigate("ManageUsersScreen")}
         IconFamily={MaterialCommunityIcons}
         IconName={"account-edit"}
         style={styles.SettingsButtonStyle}
-        ButtonText={"Manage Users"}></SettingsButton>
+        ButtonText={"Manage Users"}
+      ></SettingsButton>
     </View>
   );
 };

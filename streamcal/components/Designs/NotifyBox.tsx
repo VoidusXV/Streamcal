@@ -17,7 +17,7 @@ function ShowHide_Animation(
 ) {
   Animated.timing(Animated_Height, {
     toValue: show ? EndValue : StartValue,
-    duration: 120,
+    duration: 300,
     useNativeDriver: false,
   }).start();
 }
