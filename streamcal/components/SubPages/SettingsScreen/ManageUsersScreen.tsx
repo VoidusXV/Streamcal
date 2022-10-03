@@ -15,7 +15,8 @@ import { FlashList } from "@shopify/flash-list";
 
 interface IManageUsersScreen {
   navigation?: any; //NativeStackScreenProps<any,any>;
-  MessageText?: any;
+  setMessageText?: any;
+  route?: any;
 }
 interface IUserInfo {
   APIKEY: any;
@@ -83,11 +84,10 @@ const UserCard = ({
       data = [...getUserSelections];
       data[index] = !data[index];
       setUserSelections(data);
-    }
 
-    //console.log("User:", index);
-    //navigation?.navigate("EditUserScreen");
-    //navigation?.canGoBack();
+      return;
+    }
+    navigation?.navigate("EditUserScreen", { item: item });
   };
 
   //console.log("isManaging:", isManaging);
@@ -163,19 +163,18 @@ const EditingButtons = ({
   function RightButtons() {
     setManaging(!isManaging);
     if (!isManaging) onManage && onManage();
-    if (isManaging) onCancel && onCancel();
+    if (isManaging) onCancel && onCancel(setAllSected(true));
   }
   function LeftButtons() {
     if (isManaging) onSelectAll && onSelectAll(setAllSected(!isAllSelected));
-    if (isAllSelected) onUnSelectAll && onUnSelectAll(setAllSected(!isAllSelected));
+    if (!isAllSelected) onUnSelectAll && onUnSelectAll(setAllSected(!isAllSelected));
   }
 
-  console.log(isAllSelected);
   return (
     <View style={{ flexDirection: "row", height: "5%", justifyContent: "space-between" }}>
       <TouchableOpacity style={{ width: "40%" }} onPress={LeftButtons} activeOpacity={0.6}>
         <Text style={{ ...styles.ManageTextStyle, marginLeft: "15%" }}>
-          {!isManaging ? "ADD USER" : !isAllSelected ? "SELECT ALL" : "UNSELECT ALL"}
+          {!isManaging ? "ADD USER" : !isAllSelected ? "UNSELECT ALL" : "SELECT ALL"}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -210,10 +209,11 @@ interface IFlashlist {
   target?: any;
   extraData?: any;
 }
-const ManageUsersScreen = ({ navigation, MessageText }: IManageUsersScreen) => {
+const ManageUsersScreen = ({ navigation }: IManageUsersScreen) => {
   const [getUserData, setUserData] = React.useState<any>([]);
   const [isManaging, setManaging] = React.useState(false);
   const [getUserSelections, setUserSelections] = React.useState([false, false]);
+  //route.params?.setMessageText("");
 
   //console.log("first");
   React.useEffect(() => {

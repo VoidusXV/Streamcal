@@ -106,6 +106,7 @@ async function UpdateDocument(Collection, filter, updateObject) {
   await Collection.updateOne(filter, updateDoc).catch((e) => console.log(e));
 }
 
+// Media API
 app.get("/v1/test", (req, res) => {
   const testVid = __dirname + "/Data/0/Series/Season_1/7/7.mp4";
   console.log(testVid);
@@ -174,6 +175,7 @@ app.get("/v1/Media/Cover", (req, res) => {
   }
 });
 
+// Database API
 app.get("/v1/create-apikey", (req, res) => {
   try {
     (async () => {
@@ -272,6 +274,26 @@ app.get("/v1/get-users", (req, res) => {
   }
 });
 
+app.get("/v1/set-users", (req, res) => {
+  try {
+    (async () => {
+      const API_AdminKey = new URLSearchParams(req.url).get("/v1/set-users?adminKey");
+
+      await MongoClient.connect();
+      const database = MongoClient.db("Streamcal");
+      const _isAdmin = await checkIsAdmin(database, API_AdminKey);
+      if (!_isAdmin) {
+        res.status(403).end();
+        return;
+      }
+
+      res.send("Set Users").end();
+    })();
+  } catch (e) {
+    console.log("check-adminkey:", e);
+    res.status(403).end();
+  }
+});
 const LoginStatus = {
   UserNotExist: "-1",
   New_User: "0",

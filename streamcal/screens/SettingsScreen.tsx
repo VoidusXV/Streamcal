@@ -140,6 +140,7 @@ const SettingsScreen = ({ navigation }: any) => {
           name="ServerHistoryScreen"
           component={ServerHistoryScreen}></Stack.Screen>
         <Stack.Screen
+          // initialParams={{ setMessageText: setMessageText }}
           options={{
             headerShown: true,
             headerStyle: { backgroundColor: backgroundColor },
@@ -147,14 +148,7 @@ const SettingsScreen = ({ navigation }: any) => {
             headerTitle: "Manage Users",
           }}
           name="ManageUsersScreen"
-          // component={ManagerUsersScreen}
-        >
-          {() => (
-            <ManagerUsersScreen
-              navigation={navigation}
-              MessageText={setMessageText}></ManagerUsersScreen>
-          )}
-        </Stack.Screen>
+          component={ManagerUsersScreen}></Stack.Screen>
         <Stack.Screen
           name="EditUserScreen"
           options={{
