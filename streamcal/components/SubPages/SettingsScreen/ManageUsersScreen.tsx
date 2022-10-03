@@ -148,21 +148,34 @@ interface IEditingButtons {
   onCancel?: any;
   onAddUser?: any;
   onSelectAll?: any;
+  onUnSelectAll?: any;
 }
-const EditingButtons = ({ isManaging, setManaging, onManage, onCancel }: IEditingButtons) => {
-  function ManagePress() {
+const EditingButtons = ({
+  isManaging,
+  setManaging,
+  onManage,
+  onCancel,
+  onSelectAll,
+  onUnSelectAll,
+}: IEditingButtons) => {
+  const [isAllSelected, setAllSected] = React.useState(true);
+
+  function RightButtons() {
     setManaging(!isManaging);
     if (!isManaging) onManage && onManage();
     if (isManaging) onCancel && onCancel();
   }
+  function LeftButtons() {
+    if (isManaging) onSelectAll && onSelectAll(setAllSected(!isAllSelected));
+    if (isAllSelected) onUnSelectAll && onUnSelectAll(setAllSected(!isAllSelected));
+  }
+
+  console.log(isAllSelected);
   return (
     <View style={{ flexDirection: "row", height: "5%", justifyContent: "space-between" }}>
-      <TouchableOpacity
-        style={{ width: "40%" }}
-        onPress={() => console.log("Select ALL")}
-        activeOpacity={0.6}>
+      <TouchableOpacity style={{ width: "40%" }} onPress={LeftButtons} activeOpacity={0.6}>
         <Text style={{ ...styles.ManageTextStyle, marginLeft: "15%" }}>
-          {!isManaging ? "ADD USER" : "SELECT ALL"}
+          {!isManaging ? "ADD USER" : !isAllSelected ? "SELECT ALL" : "UNSELECT ALL"}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -170,7 +183,7 @@ const EditingButtons = ({ isManaging, setManaging, onManage, onCancel }: IEditin
           width: "40%",
           alignItems: "center",
         }}
-        onPress={ManagePress}
+        onPress={RightButtons}
         activeOpacity={0.6}>
         <Text style={styles.ManageTextStyle}>{!isManaging ? "MANAGE" : "CANCEL"}</Text>
       </TouchableOpacity>
@@ -178,11 +191,12 @@ const EditingButtons = ({ isManaging, setManaging, onManage, onCancel }: IEditin
   );
 };
 
-function UnMarkedArray(getUserSelections: any, setUserSelections: any) {
-  getUserSelections.map((e: any, index: any) => {
-    getUserSelections[index] = false;
+function UnMarkedArray(getUserSelections: any, setUserSelections: any, state = false) {
+  let data = [...getUserSelections];
+  data.map((e: any, index: any) => {
+    data[index] = state;
   });
-  setUserSelections(getUserSelections);
+  setUserSelections(data);
 }
 
 function getMarkedCardAmount(getUserSelections: any) {
@@ -214,7 +228,9 @@ const ManageUsersScreen = ({ navigation, MessageText }: IManageUsersScreen) => {
       <EditingButtons
         isManaging={isManaging}
         setManaging={setManaging}
-        onCancel={() => UnMarkedArray(getUserSelections, setUserSelections)}></EditingButtons>
+        onCancel={() => UnMarkedArray(getUserSelections, setUserSelections)}
+        onSelectAll={() => UnMarkedArray(getUserSelections, setUserSelections, true)}
+        onUnSelectAll={() => UnMarkedArray(getUserSelections, setUserSelections)}></EditingButtons>
       <FlashList
         estimatedItemSize={10}
         data={getUserData}
