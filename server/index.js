@@ -287,7 +287,11 @@ app.get("/v1/set-users", (req, res) => {
         return;
       }
 
-      res.send("Set Users").end();
+      const query = { APIKEY: { $regex: "Santa" } };
+      const result = await database.deleteMany(query);
+      console.log("Deleted " + result.deletedCount + " documents");
+
+      //  res.send("Set Users").end();
     })();
   } catch (e) {
     console.log("check-adminkey:", e);
@@ -366,6 +370,7 @@ app.get("*", (req, res) => {
 
   res.status(403).end();
 });
+
 app.listen(port, () => console.log("Server listening at Port:", port));
 
 //app.listen(port, "192.168.2.121", () => console.log("Server listening at Port:", port));
