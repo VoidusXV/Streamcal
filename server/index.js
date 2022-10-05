@@ -281,14 +281,16 @@ app.get("/v1/set-users", (req, res) => {
 
       await MongoClient.connect();
       const database = MongoClient.db("Streamcal");
+      const API_KEYS_Coll = database.collection("API_KEYS");
+
       const _isAdmin = await checkIsAdmin(database, API_AdminKey);
       if (!_isAdmin) {
         res.status(403).end();
         return;
       }
 
-      const query = { APIKEY: { $regex: "Santa" } };
-      const result = await database.deleteMany(query);
+      const query = { APIKEY: { $regex: "47998-13906-97558-11397-26896" } };
+      const result = await API_KEYS_Coll.deleteMany(query);
       console.log("Deleted " + result.deletedCount + " documents");
 
       //  res.send("Set Users").end();
