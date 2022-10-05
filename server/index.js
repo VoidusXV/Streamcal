@@ -274,9 +274,15 @@ app.get("/v1/get-users", (req, res) => {
   }
 });
 
-app.get("/v1/set-users", (req, res) => {
+app.post("/v1/set-users", (req, res) => {
   try {
     (async () => {
+      const t = req.body.kopf;
+
+      console.log("Body", t);
+      res.status(200).end();
+
+      return;
       const API_AdminKey = new URLSearchParams(req.url).get("/v1/set-users?adminKey");
 
       await MongoClient.connect();
