@@ -14,11 +14,12 @@ import { WindowSize } from "../../constants/Layout";
 import { selectionColor } from "../../constants/Colors";
 import { FlashList } from "@shopify/flash-list";
 import { IUserInfo } from "../../constants/interfaces";
+import { RouteProp } from "@react-navigation/native";
 
 interface IManageUsersScreen {
   navigation?: any; //NativeStackScreenProps<any,any>;
   setMessageText?: any;
-  route?: any;
+  route?: RouteProp<any>;
 }
 
 async function AdminAuth() {
@@ -94,15 +95,13 @@ const UserCard = ({
         paddingBottom: "2%",
         paddingLeft: "5%",
         transform: [{ scale }],
-      }}
-    >
+      }}>
       <TouchableOpacity
         //style={{ transform: [{ rotateY: "180deg" }, { translateX: 20 }] }}
         activeOpacity={0.8}
         onPress={onPress}
         onPressIn={onPressIn}
-        onPressOut={onPressOut}
-      >
+        onPressOut={onPressOut}>
         <Text
           style={{
             color: "white",
@@ -111,8 +110,7 @@ const UserCard = ({
             maxWidth: "90%",
 
             //textDecorationLine: "underline",
-          }}
-        >
+          }}>
           {item?.Description}
         </Text>
         <Text
@@ -120,8 +118,7 @@ const UserCard = ({
             color: "white",
             fontSize: WindowSize.Width * 0.045,
             maxWidth: "90%",
-          }}
-        >
+          }}>
           {item?.APIKEY}
         </Text>
         <Text
@@ -129,8 +126,7 @@ const UserCard = ({
             color: "white",
             fontSize: WindowSize.Width * 0.045,
             maxWidth: "90%",
-          }}
-        >
+          }}>
           {item?.LastLogin}
         </Text>
       </TouchableOpacity>
@@ -182,8 +178,7 @@ const EditingButtons = ({
           alignItems: "center",
         }}
         onPress={RightButtons}
-        activeOpacity={0.6}
-      >
+        activeOpacity={0.6}>
         <Text style={styles.ManageTextStyle}>{!isManaging ? "MANAGE" : "CANCEL"}</Text>
       </TouchableOpacity>
     </View>
@@ -215,9 +210,9 @@ function getSelectedAPIKEYS(getUserSelections: any, getUserData: Array<IUserInfo
 
 function removeAdminFromArray(UserData: Array<IUserInfo>) {
   UserData?.map((e, index) => {
-    if (e.APIKEY == currentConnectionInfo.APIKEY)
+    if (e?.APIKEY == currentConnectionInfo?.APIKEY)
       // && currentConnectionInfo.isAdmin
-      UserData.splice(index, 1);
+      UserData?.splice(index, 1);
   });
 }
 
@@ -251,7 +246,7 @@ interface IFlashlist {
   target?: any;
   extraData?: any;
 }
-const ManageUsersScreen = ({ navigation }: IManageUsersScreen) => {
+const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
   const [getUserData, setUserData] = React.useState<Array<IUserInfo>>([]);
   const [isManaging, setManaging] = React.useState(false);
   const [getUserSelections, setUserSelections] = React.useState([]);
@@ -259,8 +254,19 @@ const ManageUsersScreen = ({ navigation }: IManageUsersScreen) => {
   //route.params?.setMessageText("");
 
   //console.log("first");
+
+  // console.log("isAdmin:", currentConnectionInfo.isAdmin);
+  // if (!currentConnectionInfo.isAdmin) {
+  //   navigation?.goBack();
+  // }
   React.useEffect(() => {
     (async () => {
+      if (!currentConnectionInfo.isAdmin) {
+        //route?.params?.setMessageText("You're not Admin");
+        //Animation_Main();
+        navigation?.goBack();
+        return;
+      }
       await getAllUsers(currentConnectionInfo.AdminKey)
         .then((UserData: Array<IUserInfo>) => {
           removeAdminFromArray(UserData);
@@ -282,8 +288,7 @@ const ManageUsersScreen = ({ navigation }: IManageUsersScreen) => {
         onCancel={() => UnMarkedArray(getUserSelections, setUserSelections)}
         onSelectAll={() => UnMarkedArray(getUserSelections, setUserSelections, true)}
         onUnSelectAll={() => UnMarkedArray(getUserSelections, setUserSelections)}
-        onAddUser={() => navigation.navigate("AddUserScreen")}
-      ></EditingButtons>
+        onAddUser={() => navigation.navigate("AddUserScreen")}></EditingButtons>
       <FlashList
         estimatedItemSize={10}
         data={getUserData}
@@ -296,10 +301,8 @@ const ManageUsersScreen = ({ navigation }: IManageUsersScreen) => {
             navigation={navigation}
             isManaging={extraData.isManaging}
             getUserSelections={extraData.getUserSelections}
-            setUserSelections={extraData.setUserSelections}
-          ></UserCard>
-        )}
-      ></FlashList>
+            setUserSelections={extraData.setUserSelections}></UserCard>
+        )}></FlashList>
 
       {isManaging && (
         <View
@@ -313,14 +316,12 @@ const ManageUsersScreen = ({ navigation }: IManageUsersScreen) => {
             flexDirection: "row",
             alignItems: "center",
             padding: "5%",
-          }}
-        >
+          }}>
           <Text
             style={{
               ...styles.ManageTextStyle,
               fontSize: WindowSize.Width * 0.045,
-            }}
-          >
+            }}>
             {getSelectedUsersAmount(getUserSelections)} Selected Users
           </Text>
           <TouchableOpacity
@@ -333,16 +334,14 @@ const ManageUsersScreen = ({ navigation }: IManageUsersScreen) => {
                 getUserSelections,
                 setManaging
               )
-            }
-          >
+            }>
             <Text
               style={{
                 ...styles.ManageTextStyle,
                 fontSize: WindowSize.Width * 0.045,
                 marginLeft: "5%",
                 color: "red",
-              }}
-            >
+              }}>
               Remove
             </Text>
           </TouchableOpacity>

@@ -89,6 +89,8 @@ const SettingsScreen = ({ navigation }: any) => {
   // const [getNavigationStateIndex, setNavigationStateIndex] = React.useState(0);
 
   const [getMessageText, setMessageText] = React.useState("");
+  console.log(getMessageText);
+
   const NavigatorListener = (state: any) => {
     //setNavigationStateIndex(state.data.state.index);
     if (state.data.state.index == 0) {
@@ -140,7 +142,7 @@ const SettingsScreen = ({ navigation }: any) => {
           name="ServerHistoryScreen"
           component={ServerHistoryScreen}></Stack.Screen>
         <Stack.Screen
-          // initialParams={{ setMessageText: setMessageText }}
+          initialParams={{ setMessageText }}
           options={{
             headerShown: true,
             headerStyle: { backgroundColor: backgroundColor },

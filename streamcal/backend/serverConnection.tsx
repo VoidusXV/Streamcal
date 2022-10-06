@@ -105,8 +105,15 @@ function IsServerReachable() {
     });
 }
 
-async function checkAdminKey(AdminKey: any) {
-  const rep = await getServerData(`${baseAPIURL()}/check-adminkey?adminKey=${AdminKey}`);
+async function checkAdminKey(AdminKey: any, IP?: any, Port?: any) {
+  let rep; // await getServerData(`${baseAPIURL()}/check-adminkey?adminKey=${AdminKey}`);
+  if (!AdminKey || !Port) {
+    rep = await getServerData(`${baseAPIURL()}/check-adminkey?adminKey=${AdminKey}`);
+    return rep;
+  }
+
+  const url = `http://${IP}:${Port}/v1`;
+  rep = await getServerData(`${url}/check-adminkey?adminKey=${AdminKey}`);
   return rep;
 }
 
@@ -119,6 +126,7 @@ function SetGlobalConnection(data: any) {
   currentConnectionInfo.Port = data?.Port;
   currentConnectionInfo.APIKEY = data?.APIKEY;
   currentConnectionInfo.AdminKey = data?.AdminKey;
+  currentConnectionInfo.isAdmin = data?.isAdmin || false;
 }
 
 async function Generate_DeviceID() {
@@ -156,7 +164,6 @@ async function ServerAuthentication(APIKEY = null) {
 
 async function Server_SetUsers(APIKEYS: Array<any>, actionMode: any, UpdateObject?: any) {
   let URL = `${baseAPIURL()}/set-users`;
-  console.log(URL);
 
   const requestOptions = {
     method: "POST",
