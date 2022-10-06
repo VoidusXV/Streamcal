@@ -7,6 +7,7 @@ import { NormalTextInput } from "../../Designs/TextInput";
 import { WindowSize } from "../../constants/Layout";
 import SettingsButton from "../../Designs/SettingsButton";
 import { selectionColor } from "../../constants/Colors";
+import { Server_SetUsers } from "../../../backend/serverConnection";
 
 const DataEdit_Container = ({ Key, dataText, readOnly }: any) => {
   return (
@@ -73,6 +74,7 @@ const EditUserScreen = ({ navigation, route }: IEditUserScreen) => {
         dataText={currentUser.LastLogin}
       ></DataEdit_Container>
       <SettingsButton
+        onPress={async () => await Server_SetUsers([currentUser.APIKEY], "change")}
         style={{ marginTop: "5%", justifyContent: "center" }}
         ButtonText={"Apply Changes"}
       ></SettingsButton>

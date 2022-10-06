@@ -214,7 +214,7 @@ function getSelectedAPIKEYS(getUserSelections: any, getUserData: Array<IUserInfo
 }
 
 function removeAdminFromArray(UserData: Array<IUserInfo>) {
-  UserData.map((e, index) => {
+  UserData?.map((e, index) => {
     if (e.APIKEY == currentConnectionInfo.APIKEY)
       // && currentConnectionInfo.isAdmin
       UserData.splice(index, 1);
