@@ -265,6 +265,10 @@ const ManageUsersScreen = ({ navigation }: IManageUsersScreen) => {
         .then((UserData: Array<IUserInfo>) => {
           removeAdminFromArray(UserData);
           setUserData(UserData);
+
+          let UserSelectionData: any = [];
+          UserData.map(() => UserSelectionData.push(false));
+          setUserSelections(UserSelectionData);
         })
         .catch((error: any) => console.log(error.message));
     })();
