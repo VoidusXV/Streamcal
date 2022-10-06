@@ -24,6 +24,7 @@ interface ITextInput {
   maxLength?: number;
   defaultValue?: string;
   onChangeText?: any;
+  readonly?: boolean;
 }
 const NormalTextInput: React.FC<ITextInput> = ({
   PlaceholderText,
@@ -32,12 +33,13 @@ const NormalTextInput: React.FC<ITextInput> = ({
   maxLength,
   onChangeText,
   defaultValue,
+  readonly,
 }: any) => {
   const [getDefaultValue, setDefaultValue] = React.useState(defaultValue);
 
   React.useEffect(() => {
     setDefaultValue(defaultValue);
-    ClearButtonVisibility(defaultValue);
+    !readonly && ClearButtonVisibility(defaultValue);
   }, [defaultValue]);
 
   const start = WindowSize.Width * 0.1;
@@ -60,7 +62,7 @@ const NormalTextInput: React.FC<ITextInput> = ({
   }
 
   function ClearButtonVisibility(text: any) {
-    if (text == undefined) return;
+    if (text == undefined || readonly) return;
     if (text.length == 0) {
       hideClearButton();
     } else {
@@ -70,6 +72,7 @@ const NormalTextInput: React.FC<ITextInput> = ({
   return (
     <View style={[styles.TextInputBodyStyle, bodyStyle]}>
       <TextInput
+        editable={!readonly}
         maxLength={maxLength}
         style={[styles.TextInputTextStyle, textStyle]}
         placeholderTextColor={"rgba(255,255,255,0.6)"}
@@ -81,10 +84,12 @@ const NormalTextInput: React.FC<ITextInput> = ({
           setDefaultValue(text);
           onChangeText && onChangeText(text);
         }}
-        value={getDefaultValue}></TextInput>
+        value={getDefaultValue}
+      ></TextInput>
       <TouchableOpacity
         style={{ justifyContent: "space-around", marginLeft: "4%", flex: 1 }}
-        activeOpacity={0.7}>
+        activeOpacity={0.7}
+      >
         <Animated.View style={{ paddingLeft: rightValue }}>
           <Ionicons
             name={"close-circle-sharp"}
