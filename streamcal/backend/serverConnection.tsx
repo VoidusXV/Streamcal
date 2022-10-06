@@ -154,7 +154,7 @@ async function ServerAuthentication(APIKEY = null) {
   return rep;
 }
 
-async function Server_SetUsers(APIKEYS: Array<any>, actionMode: any) {
+async function Server_SetUsers(APIKEYS: Array<any>, actionMode: any, UpdateObject?: any) {
   let URL = `${baseAPIURL()}/set-users`;
   console.log(URL);
 
@@ -165,6 +165,7 @@ async function Server_SetUsers(APIKEYS: Array<any>, actionMode: any) {
       actionMode: actionMode,
       APIKEYS: APIKEYS,
       AdminKey: currentConnectionInfo.AdminKey,
+      UpdateObject: UpdateObject,
     }),
   };
 

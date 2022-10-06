@@ -272,6 +272,7 @@ app.get("/v1/get-users", (req, res) => {
       }
       const API_KEYS_Coll = database.collection("API_KEYS");
       let Users = await GetUsers(_isAdmin, API_KEYS_Coll);
+      Users?.map((e) => delete e?._id);
 
       res.send(Users).end();
     })();
@@ -287,8 +288,12 @@ app.post("/v1/set-users", (req, res) => {
       const actionMode = req.body.actionMode;
       const APIKEYS = req.body.APIKEYS || [];
       const API_AdminKey = req.body.AdminKey;
+      let UpdateObject =
+        Object.keys(req.body.UpdateObject).length != 0 ? req.body.UpdateObject : null;
 
-      if (APIKEYS.length == 0 || !actionMode || !API_AdminKey) {
+      const isChangeEmpty = actionMode == "change" && !UpdateObject;
+
+      if (APIKEYS.length == 0 || !actionMode || !API_AdminKey || isChangeEmpty) {
         res.status(403).end();
         return;
       }
@@ -297,13 +302,16 @@ app.post("/v1/set-users", (req, res) => {
       const database = MongoClient.db("Streamcal");
       const API_KEYS_Coll = database.collection("API_KEYS");
 
-      // const _isAdmin = await checkIsAdmin(database, API_AdminKey);
-      // if (!_isAdmin) {
-      //   res.status(403).end();
-      //   return;
-      // }
+      const _isAdmin = await checkIsAdmin(database, API_AdminKey);
+      console.log("Admin:", _isAdmin);
+      if (!_isAdmin) {
+        res.status(403).end();
+        return;
+      }
 
+      console.log("Testus");
       if (actionMode == "change") {
+        UpdateDocument(API_KEYS_Coll, { APIKEY: APIKEYS[0] }, UpdateObject);
       } else if (actionMode == "delete") {
         APIKEYS.forEach(async (e) => {
           const query = { APIKEY: { $regex: e } };
