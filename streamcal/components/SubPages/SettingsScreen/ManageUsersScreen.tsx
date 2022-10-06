@@ -6,6 +6,7 @@ import {
   checkAdminKey,
   currentConnectionInfo,
   getAllUsers,
+  Server_SetUsers,
 } from "../../../backend/serverConnection";
 import SettingsButton from "../../Designs/SettingsButton";
 import { Animation_Main } from "../../Designs/NotifyBox";
@@ -84,7 +85,6 @@ const UserCard = ({
       data = [...getUserSelections];
       data[index] = !data[index];
       setUserSelections(data);
-
       return;
     }
     navigation?.navigate("EditUserScreen", { item: item });
@@ -192,17 +192,59 @@ const EditingButtons = ({
 
 function UnMarkedArray(getUserSelections: any, setUserSelections: any, state = false) {
   let data = [...getUserSelections];
+  console.log(data.length);
   data.map((e: any, index: any) => {
     data[index] = state;
   });
   setUserSelections(data);
 }
 
-function getMarkedCardAmount(getUserSelections: any) {
+function getSelectedUsersAmount(getUserSelections: any) {
   let count = 0;
   getUserSelections.map((e: any) => e && count++);
   return count;
 }
+
+function getSelectedAPIKEYS(getUserSelections: any, getUserData: Array<IUserInfo>) {
+  let APIKEY: any = [];
+  getUserSelections.map((e: any, index: any) => {
+    if (e) APIKEY.push(getUserData[index].APIKEY);
+  });
+  return APIKEY;
+}
+
+function removeAdminFromArray(UserData: Array<IUserInfo>) {
+  UserData.map((e, index) => {
+    if (e.APIKEY == currentConnectionInfo.APIKEY)
+      // && currentConnectionInfo.isAdmin
+      UserData.splice(index, 1);
+  });
+}
+
+async function onPressRemove(
+  setUserData: any,
+  getUserData: any,
+  setUserSelections: any,
+  getUserSelections: any,
+  setManaging: any
+) {
+  try {
+    if (getSelectedUsersAmount(getUserSelections) <= 0) return;
+
+    console.log("remove");
+    await Server_SetUsers(getSelectedAPIKEYS(getUserSelections, getUserData), "delete");
+    UnMarkedArray(getUserSelections, setUserSelections);
+
+    let UserData = await getAllUsers(currentConnectionInfo.AdminKey);
+    removeAdminFromArray(UserData);
+    setUserData(UserData);
+  } catch (error: any) {
+    console.log(error.message);
+  } finally {
+    setManaging(false);
+  }
+}
+
 interface IFlashlist {
   item?: IUserInfo;
   index?: any;
@@ -210,16 +252,21 @@ interface IFlashlist {
   extraData?: any;
 }
 const ManageUsersScreen = ({ navigation }: IManageUsersScreen) => {
-  const [getUserData, setUserData] = React.useState<any>([]);
+  const [getUserData, setUserData] = React.useState<Array<IUserInfo>>([]);
   const [isManaging, setManaging] = React.useState(false);
-  const [getUserSelections, setUserSelections] = React.useState([false, false]);
+  const [getUserSelections, setUserSelections] = React.useState([]);
+
   //route.params?.setMessageText("");
 
   //console.log("first");
   React.useEffect(() => {
     (async () => {
-      const UserData = await getAllUsers(currentConnectionInfo.AdminKey);
-      setUserData(UserData);
+      await getAllUsers(currentConnectionInfo.AdminKey)
+        .then((UserData: Array<IUserInfo>) => {
+          removeAdminFromArray(UserData);
+          setUserData(UserData);
+        })
+        .catch((error: any) => console.log(error.message));
     })();
   }, []);
 
@@ -264,17 +311,29 @@ const ManageUsersScreen = ({ navigation }: IManageUsersScreen) => {
               ...styles.ManageTextStyle,
               fontSize: WindowSize.Width * 0.045,
             }}>
-            {getMarkedCardAmount(getUserSelections)} Selected Users
+            {getSelectedUsersAmount(getUserSelections)} Selected Users
           </Text>
-          <Text
-            style={{
-              ...styles.ManageTextStyle,
-              fontSize: WindowSize.Width * 0.045,
-              marginLeft: "5%",
-              color: "red",
-            }}>
-            Remove
-          </Text>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={async () =>
+              await onPressRemove(
+                setUserData,
+                getUserData,
+                setUserSelections,
+                getUserSelections,
+                setManaging
+              )
+            }>
+            <Text
+              style={{
+                ...styles.ManageTextStyle,
+                fontSize: WindowSize.Width * 0.045,
+                marginLeft: "5%",
+                color: "red",
+              }}>
+              Remove
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>

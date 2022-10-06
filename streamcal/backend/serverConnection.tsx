@@ -154,6 +154,22 @@ async function ServerAuthentication(APIKEY = null) {
   return rep;
 }
 
+async function Server_SetUsers(APIKEYS: any, actionMode: any) {
+  let URL = `${baseAPIURL()}/set-users`;
+  console.log(URL);
+
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      actionMode: actionMode,
+      APIKEYS: APIKEYS,
+      AdminKey: currentConnectionInfo.AdminKey,
+    }),
+  };
+
+  await fetch(URL, requestOptions);
+}
 export {
   getAllContent,
   getCoverURL,
@@ -171,4 +187,5 @@ export {
   SetGlobalConnection,
   ServerAuthentication,
   AuthResponse,
+  Server_SetUsers,
 };

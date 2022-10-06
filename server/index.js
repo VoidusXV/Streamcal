@@ -175,11 +175,13 @@ app.get("/v1/Media/Cover", (req, res) => {
   }
 });
 
+//http://localhost:3005/v1/create-apikey?adminKey=OH13N-S316Z-4W25U-07RYY-C5V5B
 // Database API
 app.get("/v1/create-apikey", (req, res) => {
   try {
     (async () => {
       const API_AdminKey = new URLSearchParams(req.url).get("/v1/create-apikey?adminKey");
+      const API_Description = new URLSearchParams(req.url).get("des");
 
       await MongoClient.connect();
       //await MongoClient.db("admin").command({ ping: 1 });
@@ -204,6 +206,7 @@ app.get("/v1/create-apikey", (req, res) => {
         LastLogin: new Date().toUTCString(),
         History: [{}],
         DeviceID: "",
+        Description: API_Description || "",
       };
 
       await API_KEYS_Coll.insertOne(New_APIKEY_Doc);
@@ -255,6 +258,10 @@ app.get("/v1/get-users", (req, res) => {
   try {
     (async () => {
       const API_AdminKey = new URLSearchParams(req.url).get("/v1/get-users?adminKey");
+      if (!API_AdminKey) {
+        res.status(403).end();
+        return;
+      }
 
       await MongoClient.connect();
       const database = MongoClient.db("Streamcal");
@@ -273,39 +280,46 @@ app.get("/v1/get-users", (req, res) => {
     res.status(403).end();
   }
 });
-
+//http://localhost:3005/v1/set-users
 app.post("/v1/set-users", (req, res) => {
   try {
     (async () => {
-      const t = req.body.kopf;
+      const actionMode = req.body.actionMode;
+      const APIKEYS = req.body.APIKEYS || [];
+      const API_AdminKey = req.body.AdminKey;
 
-      console.log("Body", t);
-      res.status(200).end();
-
-      return;
-      const API_AdminKey = new URLSearchParams(req.url).get("/v1/set-users?adminKey");
+      if (APIKEYS.length == 0 || !actionMode || !API_AdminKey) {
+        res.status(403).end();
+        return;
+      }
 
       await MongoClient.connect();
       const database = MongoClient.db("Streamcal");
       const API_KEYS_Coll = database.collection("API_KEYS");
 
-      const _isAdmin = await checkIsAdmin(database, API_AdminKey);
-      if (!_isAdmin) {
-        res.status(403).end();
-        return;
+      // const _isAdmin = await checkIsAdmin(database, API_AdminKey);
+      // if (!_isAdmin) {
+      //   res.status(403).end();
+      //   return;
+      // }
+
+      if (actionMode == "change") {
+      } else if (actionMode == "delete") {
+        APIKEYS.forEach(async (e) => {
+          const query = { APIKEY: { $regex: e } };
+          await API_KEYS_Coll.deleteMany(query);
+        });
       }
+      //console.log("Deleted " + result.deletedCount + " documents");
 
-      const query = { APIKEY: { $regex: "47998-13906-97558-11397-26896" } };
-      const result = await API_KEYS_Coll.deleteMany(query);
-      console.log("Deleted " + result.deletedCount + " documents");
-
-      //  res.send("Set Users").end();
+      res.end();
     })();
   } catch (e) {
-    console.log("check-adminkey:", e);
+    console.log("set-users:", e);
     res.status(403).end();
   }
 });
+
 const LoginStatus = {
   UserNotExist: "-1",
   New_User: "0",
