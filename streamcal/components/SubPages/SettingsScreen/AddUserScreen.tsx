@@ -4,6 +4,8 @@ import { WindowSize } from "../../constants/Layout";
 import { NormalTextInput } from "../../Designs/TextInput";
 import { IServerInfo, IUserInfo } from "../../constants/interfaces";
 import { currentConnectionInfo } from "../../../backend/serverConnection";
+import SettingsButton from "../../Designs/SettingsButton";
+import { AntDesign } from "@expo/vector-icons";
 
 const DataEdit_Container = ({ dataText, readOnly, onChangeText, PlaceholderText }: any) => {
   return (
@@ -43,11 +45,13 @@ const AddUserScreen = () => {
         dataText={getEditedUser?.Port}
         readOnly
       ></DataEdit_Container>
-      <DataEdit_Container
-        PlaceholderText={"APIKEY"}
-        onChangeText={(e: any) => setEditedUser({ ...getEditedUser, APIKEY: e })}
-        dataText={getEditedUser?.APIKEY}
-      ></DataEdit_Container>
+
+      <SettingsButton
+        IconFamily={AntDesign}
+        IconName="adduser"
+        style={{ paddingLeft: "15%", marginTop: "5%" }}
+        ButtonText={"Add New User"}
+      ></SettingsButton>
     </ScrollView>
   );
 };

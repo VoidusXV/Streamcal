@@ -28,7 +28,8 @@ const DataEdit_Container = ({ Key, dataText, readOnly, onChangeText }: any) => {
       <NormalTextInput
         readonly={readOnly}
         onChangeText={onChangeText}
-        defaultValue={dataText}></NormalTextInput>
+        defaultValue={dataText}
+      ></NormalTextInput>
     </View>
   );
 };
@@ -42,7 +43,8 @@ const SwitchContainer = ({ onValueChange, value }: any) => {
         marginTop: "5%",
         marginBottom: "2%",
         alignItems: "center",
-      }}>
+      }}
+    >
       <Text style={{ color: "white", fontSize: WindowSize.Width * 0.05, marginLeft: "5%" }}>
         Access:
       </Text>
@@ -67,7 +69,8 @@ const QRCode_ModalContainer = ({ onClose }: any) => {
             width: "90%",
             height: "60%",
             borderRadius: WindowSize.Width * 0.02,
-          }}>
+          }}
+        >
           {/* <Text>HUNDKOPF</Text> */}
         </TouchableOpacity>
       </View>
@@ -81,9 +84,8 @@ interface IEditUserScreen {
 }
 const EditUserScreen = ({ navigation, route }: IEditUserScreen) => {
   const currentUser: IUserInfo = route?.params?.item;
-  //const [getAccess, setAccess] = React.useState(currentUser.Enabled);
   const [getEditedUser, setEditedUser] = React.useState<IUserInfo>(currentUser);
-  //const [getQR_Modal, setQR_Modal] = React.useState<boolean>(false);
+  const [getQR_Modal, setQR_Modal] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     navigation?.setOptions({ headerTitle: currentUser.Description });
@@ -91,29 +93,38 @@ const EditUserScreen = ({ navigation, route }: IEditUserScreen) => {
 
   return (
     <ScrollView
-      contentContainerStyle={{ alignItems: "center", paddingBottom: WindowSize.Width * 0.1 }}>
+      contentContainerStyle={{ alignItems: "center", paddingBottom: WindowSize.Width * 0.1 }}
+    >
       <DataEdit_Container
         Key={"Description"}
         onChangeText={(e: any) => setEditedUser({ ...getEditedUser, Description: e })}
-        dataText={getEditedUser.Description}></DataEdit_Container>
+        dataText={getEditedUser.Description}
+      ></DataEdit_Container>
       <DataEdit_Container
         Key={"APIKEY"}
         onChangeText={(e: any) => setEditedUser({ ...getEditedUser, APIKEY: e })}
-        dataText={getEditedUser.APIKEY}></DataEdit_Container>
+        dataText={getEditedUser.APIKEY}
+      ></DataEdit_Container>
       <SwitchContainer
         value={getEditedUser.Enabled}
-        onValueChange={(e: any) =>
-          setEditedUser({ ...getEditedUser, Enabled: e })
-        }></SwitchContainer>
+        onValueChange={(e: any) => setEditedUser({ ...getEditedUser, Enabled: e })}
+      ></SwitchContainer>
+      <DataEdit_Container
+        readOnly
+        Key={"DeviceID"}
+        dataText={currentUser.DeviceID}
+      ></DataEdit_Container>
       <DataEdit_Container
         readOnly
         Key={"Registration Date"}
-        dataText={currentUser.FirstLogin}></DataEdit_Container>
+        dataText={currentUser.FirstLogin}
+      ></DataEdit_Container>
       <DataEdit_Container
         readOnly
         Key={"Last Login Date"}
-        dataText={currentUser.LastLogin}></DataEdit_Container>
-      {/* <SettingsButton
+        dataText={currentUser.LastLogin}
+      ></DataEdit_Container>
+      <SettingsButton
         onPress={() => setQR_Modal(true)}
         IconFamily={MaterialCommunityIcons}
         IconName={"qrcode-scan"}
@@ -123,7 +134,8 @@ const EditUserScreen = ({ navigation, route }: IEditUserScreen) => {
           justifyContent: "center",
           paddingRight: "12%",
         }}
-        ButtonText={"Show QR-Code"}></SettingsButton> */}
+        ButtonText={"Show QR-Code"}
+      ></SettingsButton>
       <SettingsButton
         onPress={async () => {
           await Server_SetUsers([currentUser.APIKEY], "change", getEditedUser);
@@ -131,15 +143,17 @@ const EditUserScreen = ({ navigation, route }: IEditUserScreen) => {
         }}
         //onPress={() => console.log(getEditedUser)}
         style={{ marginTop: "5%", justifyContent: "center" }}
-        ButtonText={"Apply Changes"}></SettingsButton>
+        ButtonText={"Apply Changes"}
+      ></SettingsButton>
 
-      {/* <Modal
+      <Modal
         transparent
         animationType="slide"
         visible={getQR_Modal}
-        onRequestClose={() => setQR_Modal(false)}>
+        onRequestClose={() => setQR_Modal(false)}
+      >
         <QRCode_ModalContainer onClose={() => setQR_Modal(false)}></QRCode_ModalContainer>
-      </Modal> */}
+      </Modal>
     </ScrollView>
   );
 };

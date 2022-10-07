@@ -203,8 +203,8 @@ app.get("/v1/create-apikey", (req, res) => {
       const New_APIKEY_Doc = {
         APIKEY: APIKEY,
         Enabled: true,
-        FirstLogin: new Date().toUTCString(),
-        LastLogin: new Date().toUTCString(),
+        FirstLogin: "", // new Date().toUTCString(),
+        LastLogin: "", // new Date().toUTCString(),
         History: [{}],
         DeviceID: "",
         Description: API_Description || "",

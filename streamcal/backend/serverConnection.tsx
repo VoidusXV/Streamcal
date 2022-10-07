@@ -165,6 +165,7 @@ async function ServerAuthentication(APIKEY = null) {
 async function Server_SetUsers(APIKEYS: Array<any>, actionMode: any, UpdateObject?: any) {
   let URL = `${baseAPIURL()}/set-users`;
 
+  console.log(currentConnectionInfo.AdminKey);
   const requestOptions = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -178,6 +179,8 @@ async function Server_SetUsers(APIKEYS: Array<any>, actionMode: any, UpdateObjec
 
   await fetch(URL, requestOptions);
 }
+
+async function CreateAPIKEY() {}
 export {
   getAllContent,
   getCoverURL,

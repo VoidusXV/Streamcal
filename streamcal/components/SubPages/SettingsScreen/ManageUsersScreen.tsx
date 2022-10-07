@@ -42,6 +42,7 @@ interface IUserCard {
   isManaging?: any;
   getUserSelections?: any;
   setUserSelections?: any;
+  onLongPress?: any;
 }
 const UserCard = ({
   item,
@@ -50,6 +51,7 @@ const UserCard = ({
   isManaging,
   getUserSelections,
   setUserSelections,
+  onLongPress,
 }: IUserCard) => {
   const isSelected = getUserSelections[index];
 
@@ -95,13 +97,16 @@ const UserCard = ({
         paddingBottom: "2%",
         paddingLeft: "5%",
         transform: [{ scale }],
-      }}>
+      }}
+    >
       <TouchableOpacity
         //style={{ transform: [{ rotateY: "180deg" }, { translateX: 20 }] }}
         activeOpacity={0.8}
         onPress={onPress}
+        onLongPress={onLongPress}
         onPressIn={onPressIn}
-        onPressOut={onPressOut}>
+        onPressOut={onPressOut}
+      >
         <Text
           style={{
             color: "white",
@@ -110,7 +115,8 @@ const UserCard = ({
             maxWidth: "90%",
 
             //textDecorationLine: "underline",
-          }}>
+          }}
+        >
           {item?.Description}
         </Text>
         <Text
@@ -118,7 +124,8 @@ const UserCard = ({
             color: "white",
             fontSize: WindowSize.Width * 0.045,
             maxWidth: "90%",
-          }}>
+          }}
+        >
           {item?.APIKEY}
         </Text>
         <Text
@@ -126,7 +133,8 @@ const UserCard = ({
             color: "white",
             fontSize: WindowSize.Width * 0.045,
             maxWidth: "90%",
-          }}>
+          }}
+        >
           {item?.LastLogin}
         </Text>
       </TouchableOpacity>
@@ -178,7 +186,8 @@ const EditingButtons = ({
           alignItems: "center",
         }}
         onPress={RightButtons}
-        activeOpacity={0.6}>
+        activeOpacity={0.6}
+      >
         <Text style={styles.ManageTextStyle}>{!isManaging ? "MANAGE" : "CANCEL"}</Text>
       </TouchableOpacity>
     </View>
@@ -288,7 +297,8 @@ const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
         onCancel={() => UnMarkedArray(getUserSelections, setUserSelections)}
         onSelectAll={() => UnMarkedArray(getUserSelections, setUserSelections, true)}
         onUnSelectAll={() => UnMarkedArray(getUserSelections, setUserSelections)}
-        onAddUser={() => navigation.navigate("AddUserScreen")}></EditingButtons>
+        onAddUser={() => navigation.navigate("AddUserScreen")}
+      ></EditingButtons>
       <FlashList
         estimatedItemSize={10}
         data={getUserData}
@@ -301,8 +311,10 @@ const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
             navigation={navigation}
             isManaging={extraData.isManaging}
             getUserSelections={extraData.getUserSelections}
-            setUserSelections={extraData.setUserSelections}></UserCard>
-        )}></FlashList>
+            setUserSelections={extraData.setUserSelections}
+          ></UserCard>
+        )}
+      ></FlashList>
 
       {isManaging && (
         <View
@@ -316,12 +328,14 @@ const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
             flexDirection: "row",
             alignItems: "center",
             padding: "5%",
-          }}>
+          }}
+        >
           <Text
             style={{
               ...styles.ManageTextStyle,
               fontSize: WindowSize.Width * 0.045,
-            }}>
+            }}
+          >
             {getSelectedUsersAmount(getUserSelections)} Selected Users
           </Text>
           <TouchableOpacity
@@ -334,14 +348,16 @@ const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
                 getUserSelections,
                 setManaging
               )
-            }>
+            }
+          >
             <Text
               style={{
                 ...styles.ManageTextStyle,
                 fontSize: WindowSize.Width * 0.045,
                 marginLeft: "5%",
                 color: "red",
-              }}>
+              }}
+            >
               Remove
             </Text>
           </TouchableOpacity>
