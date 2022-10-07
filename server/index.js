@@ -219,7 +219,7 @@ app.get("/v1/create-apikey", (req, res) => {
     console.log("Watch_Error:", e);
     res.status(403).end();
   } finally {
-    MongoClient.close();
+    //MongoClient.close();
   }
 });
 
@@ -239,7 +239,7 @@ app.get("/v1/check-apikey", (req, res) => {
     console.log("Watch_Error:", e);
     res.status(403).end();
   } finally {
-    MongoClient.close();
+    //MongoClient.close();
   }
 });
 
@@ -257,7 +257,7 @@ app.get("/v1/check-adminkey", (req, res) => {
     console.log("check-adminkey:", e);
     res.status(403).end();
   } finally {
-    MongoClient.close();
+    //MongoClient.close();
   }
 });
 
@@ -287,7 +287,7 @@ app.get("/v1/get-users", (req, res) => {
     console.log("check-adminkey:", e);
     res.status(403).end();
   } finally {
-    MongoClient.close();
+    //MongoClient.close();
   }
 });
 //http://localhost:3005/v1/set-users
@@ -335,7 +335,7 @@ app.post("/v1/set-users", (req, res) => {
     console.log("set-users:", e);
     res.status(403).end();
   } finally {
-    MongoClient.close();
+    //MongoClient.close();
   }
 });
 
@@ -403,7 +403,7 @@ app.get("/v1/authenticate-user", (req, res) => {
   } catch (e) {
     res.status(403).end();
   } finally {
-    MongoClient.close();
+    //MongoClient.close();
   }
 });
 
