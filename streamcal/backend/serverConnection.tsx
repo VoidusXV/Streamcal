@@ -180,7 +180,11 @@ async function Server_SetUsers(APIKEYS: Array<any>, actionMode: any, UpdateObjec
   await fetch(URL, requestOptions);
 }
 
-async function CreateAPIKEY() {}
+async function CreateAPIKEY(adminKey: any, description?: any) {
+  let URL = `${baseAPIURL()}/create-apikey?adminKey=${adminKey}&des=${description}`;
+  await fetch(URL);
+}
+
 export {
   getAllContent,
   getCoverURL,
@@ -199,4 +203,5 @@ export {
   ServerAuthentication,
   AuthResponse,
   Server_SetUsers,
+  CreateAPIKEY,
 };

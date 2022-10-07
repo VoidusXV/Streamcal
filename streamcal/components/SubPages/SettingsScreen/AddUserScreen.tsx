@@ -3,7 +3,7 @@ import React from "react";
 import { WindowSize } from "../../constants/Layout";
 import { NormalTextInput } from "../../Designs/TextInput";
 import { IServerInfo, IUserInfo } from "../../constants/interfaces";
-import { currentConnectionInfo } from "../../../backend/serverConnection";
+import { CreateAPIKEY, currentConnectionInfo } from "../../../backend/serverConnection";
 import SettingsButton from "../../Designs/SettingsButton";
 import { AntDesign } from "@expo/vector-icons";
 
@@ -20,12 +20,12 @@ const DataEdit_Container = ({ dataText, readOnly, onChangeText, PlaceholderText 
   );
 };
 
-const AddUserScreen = () => {
+const AddUserScreen = ({ navigation }: any) => {
   const [getEditedUser, setEditedUser] = React.useState<IServerInfo>({
     Server: currentConnectionInfo?.Server,
     Port: currentConnectionInfo?.Port,
   });
-  console.log(getEditedUser);
+  //console.log(getEditedUser);
   return (
     <ScrollView
       contentContainerStyle={{ alignItems: "center", paddingBottom: WindowSize.Width * 0.1 }}
@@ -51,6 +51,10 @@ const AddUserScreen = () => {
         IconName="adduser"
         style={{ paddingLeft: "15%", marginTop: "5%" }}
         ButtonText={"Add New User"}
+        onPress={async () => {
+          await CreateAPIKEY(currentConnectionInfo.AdminKey, getEditedUser.Description);
+          navigation.navigate("Settings_DefaultScreen");
+        }}
       ></SettingsButton>
     </ScrollView>
   );

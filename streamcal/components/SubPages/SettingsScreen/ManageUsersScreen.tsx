@@ -278,6 +278,7 @@ const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
       }
       await getAllUsers(currentConnectionInfo.AdminKey)
         .then((UserData: Array<IUserInfo>) => {
+          console.log("Get Users");
           removeAdminFromArray(UserData);
           setUserData(UserData);
 
