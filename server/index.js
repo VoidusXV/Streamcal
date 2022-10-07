@@ -182,6 +182,7 @@ app.get("/v1/create-apikey", (req, res) => {
     (async () => {
       const API_AdminKey = new URLSearchParams(req.url).get("/v1/create-apikey?adminKey");
       const API_Description = new URLSearchParams(req.url).get("des");
+      const API_ShowKey = new URLSearchParams(req.url).get("sk");
 
       await MongoClient.connect();
       //await MongoClient.db("admin").command({ ping: 1 });
@@ -197,7 +198,7 @@ app.get("/v1/create-apikey", (req, res) => {
       }
 
       let APIKEY = Generate_APIKEY();
-      if (APIKEY_Exists(API_KEYS_Data, APIKEY)) APIKEY = Generate_APIKEY();
+      while (APIKEY_Exists(API_KEYS_Data, APIKEY)) APIKEY = Generate_APIKEY();
 
       const New_APIKEY_Doc = {
         APIKEY: APIKEY,
@@ -211,12 +212,14 @@ app.get("/v1/create-apikey", (req, res) => {
 
       await API_KEYS_Coll.insertOne(New_APIKEY_Doc);
       res.send("API-KEY successfully created").status(200).end();
-
+      //res.send(APIKEY).status(200).end();
       //TODO: Finally => Connection close
     })();
   } catch (e) {
     console.log("Watch_Error:", e);
     res.status(403).end();
+  } finally {
+    MongoClient.close();
   }
 });
 
@@ -235,6 +238,8 @@ app.get("/v1/check-apikey", (req, res) => {
   } catch (e) {
     console.log("Watch_Error:", e);
     res.status(403).end();
+  } finally {
+    MongoClient.close();
   }
 });
 
@@ -251,6 +256,8 @@ app.get("/v1/check-adminkey", (req, res) => {
   } catch (e) {
     console.log("check-adminkey:", e);
     res.status(403).end();
+  } finally {
+    MongoClient.close();
   }
 });
 
@@ -279,6 +286,8 @@ app.get("/v1/get-users", (req, res) => {
   } catch (e) {
     console.log("check-adminkey:", e);
     res.status(403).end();
+  } finally {
+    MongoClient.close();
   }
 });
 //http://localhost:3005/v1/set-users
@@ -325,6 +334,8 @@ app.post("/v1/set-users", (req, res) => {
   } catch (e) {
     console.log("set-users:", e);
     res.status(403).end();
+  } finally {
+    MongoClient.close();
   }
 });
 
@@ -391,6 +402,8 @@ app.get("/v1/authenticate-user", (req, res) => {
     })();
   } catch (e) {
     res.status(403).end();
+  } finally {
+    MongoClient.close();
   }
 });
 

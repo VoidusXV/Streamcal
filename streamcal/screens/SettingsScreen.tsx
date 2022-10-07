@@ -37,7 +37,8 @@ const TitleContainer = () => (
       borderBottomWidth: 1,
       borderBottomColor: "rgba(255,255,255,0.6)",
       height: WindowSize.Width * 0.15,
-    }}>
+    }}
+  >
     <Text style={{ color: "white", fontSize: WindowSize.Width * 0.07 }}>Einstellungen</Text>
   </View>
 );
@@ -55,13 +56,15 @@ const SettingButton = ({ onPress, style, ButtonText, IconFamily, IconName }: any
       backgroundColor: "#253959",
       borderRadius: WindowSize.Width * 0.01,
       ...style,
-    }}>
+    }}
+  >
     <>
       <IconFamily
         name={IconName}
         size={IconSize}
         style={{ marginLeft: "5%" }}
-        color="white"></IconFamily>
+        color="white"
+      ></IconFamily>
       <Text style={{ color: "white", fontSize: fontSize, marginLeft: "5%" }}>{ButtonText}</Text>
     </>
   </TouchableHighlight>
@@ -76,7 +79,8 @@ const ServerConnection_Modal = ({ visible, onRequestClose }: any) => {
       visible={visible}
       transparent
       style={{ backgroundColor: "red" }}
-      onRequestClose={onRequestClose}>
+      onRequestClose={onRequestClose}
+    >
       <View style={{ width: "100%", height: "100%", backgroundColor: backgroundColor }}>
         <MaterialCommunityIcons name="history" size={24} color="white" />
         {/* <SettingButton onPress={() => console.log("teteitj485t9")}></SettingButton> */}
@@ -89,7 +93,7 @@ const SettingsScreen = ({ navigation }: any) => {
   // const [getNavigationStateIndex, setNavigationStateIndex] = React.useState(0);
 
   const [getMessageText, setMessageText] = React.useState("");
-  console.log(getMessageText);
+  //console.log(getMessageText);
 
   const NavigatorListener = (state: any) => {
     //setNavigationStateIndex(state.data.state.index);
@@ -115,52 +119,52 @@ const SettingsScreen = ({ navigation }: any) => {
         screenOptions={{
           contentStyle: { backgroundColor: backgroundColor },
           headerShown: false,
-          //headerMode: "none",
+          headerStyle: { backgroundColor: backgroundColor },
+          headerTintColor: "white",
+
           presentation: "fullScreenModal",
           //animationDuration: 1,
           //animation: "slide_from_right",
-        }}>
+        }}
+      >
         <Stack.Screen
           name="Settings_DefaultScreen"
-          component={Settings_DefaultScreen}></Stack.Screen>
+          component={Settings_DefaultScreen}
+        ></Stack.Screen>
         <Stack.Screen
-          options={{
-            headerShown: true,
-            headerStyle: { backgroundColor: backgroundColor },
-            headerTintColor: "white",
-            headerTitle: "Server Connection",
-          }}
           name="ServerConnectionScreen"
-          component={ServerConnectionScreen}></Stack.Screen>
+          component={ServerConnectionScreen}
+        ></Stack.Screen>
         <Stack.Screen
           options={{
             headerShown: true,
-            headerStyle: { backgroundColor: backgroundColor },
-            headerTintColor: "white",
             headerTitle: "Server Connection History",
           }}
           name="ServerHistoryScreen"
-          component={ServerHistoryScreen}></Stack.Screen>
+          component={ServerHistoryScreen}
+        ></Stack.Screen>
         <Stack.Screen
           initialParams={{ setMessageText }}
           options={{
             headerShown: true,
-            headerStyle: { backgroundColor: backgroundColor },
-            headerTintColor: "white",
             headerTitle: "Manage Users",
           }}
           name="ManageUsersScreen"
-          component={ManagerUsersScreen}></Stack.Screen>
+          component={ManagerUsersScreen}
+        ></Stack.Screen>
         <Stack.Screen
           name="EditUserScreen"
+          options={{ headerShown: true }}
+          component={EditUserScreen}
+        ></Stack.Screen>
+        <Stack.Screen
           options={{
             headerShown: true,
-            headerStyle: { backgroundColor: backgroundColor },
-            headerTintColor: "white",
-            headerTitle: "User",
+            headerTitle: "Add User",
           }}
-          component={EditUserScreen}></Stack.Screen>
-        <Stack.Screen name="AddUserScreen" component={AddUserScreen}></Stack.Screen>
+          name="AddUserScreen"
+          component={AddUserScreen}
+        ></Stack.Screen>
 
         <Stack.Screen name="QRCode_ScannerScreen" component={QRCode_Scanner}></Stack.Screen>
       </Stack.Navigator>
