@@ -6,6 +6,8 @@ import {
   ScrollView,
   Animated,
   TouchableWithoutFeedback,
+  Modal,
+  TouchableOpacity,
 } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,7 +34,8 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
         width: "100%",
         height: WindowSize.Width * 1.1,
         position: "absolute",
-      }}>
+      }}
+    >
       <View
         style={{
           width: "100%",
@@ -40,12 +43,14 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
           backgroundColor: `rgba(${backgrounColorRGB},${scrollValue / WindowSize.Width})`,
           position: "absolute",
           zIndex: 2,
-        }}></View>
+        }}
+      ></View>
 
       <FadingEdgesView
         style={{ width: "100%", height: "100%", backgroundColor: "red" }}
         // BottomGradient_Position={WindowSize.Width * 0.2}
-        ParentBackgroundColor={backgroundColor}>
+        ParentBackgroundColor={backgroundColor}
+      >
         <Image
           source={{ uri: CoverURL }}
           resizeMethod="scale"
@@ -55,7 +60,8 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
             width: "100%",
             height: "100%",
             zIndex: 0,
-          }}></Image>
+          }}
+        ></Image>
         <Text
           onLayout={(e) => setTextHeight(e.nativeEvent.layout.height)}
           style={{
@@ -68,7 +74,8 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
             marginLeft: "5%",
             //maxWidth: "90%",
             // backgroundColor: "red",
-          }}>
+          }}
+        >
           {ContentTitle}
         </Text>
       </FadingEdgesView>
@@ -85,10 +92,12 @@ const DescriptionContainer = ({ DescriptionText }: any) => {
         justifyContent: "center",
         paddingTop: "3%",
         paddingBottom: "3%",
-      }}>
+      }}
+    >
       <Text
         numberOfLines={2}
-        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
+        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
+      >
         {DescriptionText}
       </Text>
     </View>
@@ -108,7 +117,8 @@ const ContentInfo = ({ SeasonNum, EpisodeNum, DescriptionText }: any) => (
     <DescriptionContainer DescriptionText={DescriptionText}></DescriptionContainer>
     <Text
       onPress={() => console.log("Show More Details")}
-      style={{ ...styles.InfoText, textDecorationLine: "underline", textAlign: "center" }}>
+      style={{ ...styles.InfoText, textDecorationLine: "underline", textAlign: "center" }}
+    >
       Show More Details
     </Text>
   </>
@@ -122,29 +132,45 @@ const SelectionBox = () => (
         color: "white",
         textAlign: "center",
         letterSpacing: 2,
-      }}>
+      }}
+    >
       FOLGEN
     </Text>
   </View>
 );
-const Season_SelectionBox = ({ TitleText }: any) => {
+
+const Season_SelectionBox = ({ TitleText, onPress }: any) => {
   return (
     <View style={styles.Season_SelectionBox}>
-      <View style={{ width: "20%", ...styles.ContainerMiddle }}>
+      <TouchableOpacity
+        onPress={onPress}
+        style={{ width: "100%", alignItems: "center", flexDirection: "row" }}
+      >
         <MaterialIcons
           name="keyboard-arrow-down"
           size={WindowSize.Width * 0.09}
-          color="white"></MaterialIcons>
-      </View>
-      <View style={{ flex: 1, justifyContent: "center" }}>
+          color="white"
+          style={{ marginLeft: "5%" }}
+        ></MaterialIcons>
         <Text
           style={{
             color: "white",
             fontSize: WindowSize.Width * 0.06,
-          }}>
+            marginLeft: "5%",
+          }}
+        >
           {TitleText}
         </Text>
-      </View>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const SeasonModalContainer = ({ onClose, SeasonData }: any) => {
+  console.log(SeasonData);
+  return (
+    <View style={{ backgroundColor: backgroundColor, width: "100%", height: "100%" }}>
+      <Text></Text>
     </View>
   );
 };
@@ -165,13 +191,15 @@ const TopBar = ({ navigation, Title, scrollValue }: any) => {
         justifyContent: "center",
         alignItems: "flex-start",
         paddingLeft: "2%",
-      }}>
+      }}
+    >
       <View style={{ flexDirection: "row" }}>
         <MaterialIcons
           name="arrow-back"
           size={Mini_IconSize}
           onPress={() => navigation.goBack()}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
         <Text
           numberOfLines={1}
           style={{
@@ -181,7 +209,8 @@ const TopBar = ({ navigation, Title, scrollValue }: any) => {
             color: "white",
             maxWidth: "85%",
             opacity: scrollEnd,
-          }}>
+          }}
+        >
           {Title}
         </Text>
       </View>
@@ -194,8 +223,8 @@ const ViewContent = ({ route, navigation }: any) => {
   const [isLoaded, setLoaded] = React.useState(false);
 
   const [getMediaLocation, setMediaLocation] = React.useState<any>([]);
-  const [getVideoThumbnailURLs, setVideoThumbnailURLs] = React.useState<any>([]);
   const [getSeason, setSeason] = React.useState(0);
+  const [isSeasonModal, setSeasonModal] = React.useState(false);
 
   const [getScrollValue, setScrollValue] = React.useState(0);
   // console.log(getMediaLocation.Series.Seasons[0]);
@@ -203,10 +232,6 @@ const ViewContent = ({ route, navigation }: any) => {
   let data: any;
   React.useEffect(() => {
     (async () => {
-      const URL = "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4";
-      const thumbnailURL = await generateThumbnail(URL);
-      setVideoThumbnailURLs([thumbnailURL]);
-
       data = await getMediaLocations(contentData.ID);
       setMediaLocation(data);
       setLoaded(true);
@@ -219,27 +244,45 @@ const ViewContent = ({ route, navigation }: any) => {
         scrollValue={getScrollValue}
         navigation={navigation}
         alphaColor={getScrollValue}
-        Title={contentData.Title}></TopBar>
+        Title={contentData.Title}
+      ></TopBar>
 
       <ScrollView
         onScroll={(e) => setScrollValue(e.nativeEvent.contentOffset.y)}
-        style={styles.container}>
+        style={styles.container}
+      >
         {isLoaded && (
           <>
             <ImageContainer
               scrollValue={getScrollValue}
               CoverURL={contentData?.Cover}
-              ContentTitle={contentData?.Title}></ImageContainer>
+              ContentTitle={contentData?.Title}
+            ></ImageContainer>
             <View style={styles.ContentContainer}>
               <ContentInfo
                 DescriptionText={contentData.Description}
                 SeasonNum={getSeasonAmount(getMediaLocation)}
-                EpisodeNum={getEpisodeAmount(getMediaLocation)}></ContentInfo>
+                EpisodeNum={getEpisodeAmount(getMediaLocation)}
+              ></ContentInfo>
               <SelectionBox></SelectionBox>
-              <Season_SelectionBox TitleText="Staffel 1"></Season_SelectionBox>
+              <Season_SelectionBox
+                onPress={() => setSeasonModal(true)}
+                TitleText="Season 1"
+              ></Season_SelectionBox>
+
+              <Modal
+                transparent
+                visible={isSeasonModal}
+                onRequestClose={() => setSeasonModal(false)}
+                animationType="slide"
+              >
+                <SeasonModalContainer
+                  SeasonData={getMediaLocation.Series.Seasons}
+                ></SeasonModalContainer>
+              </Modal>
 
               <FlashList
-                data={getMediaLocation.Series.Seasons[0].Episodes} // Staffel 1
+                data={getMediaLocation.Series.Seasons[getSeason].Episodes} // Staffel 1
                 //keyExtractor={(item: any) => item.ID}
                 estimatedItemSize={20}
                 contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
@@ -259,8 +302,10 @@ const ViewContent = ({ route, navigation }: any) => {
                     }}
                     Source={{
                       uri: getThumbnailURL(contentData?.ID, getSeason + 1, item.Episode),
-                    }}></MediaItemCard>
-                )}></FlashList>
+                    }}
+                  ></MediaItemCard>
+                )}
+              ></FlashList>
             </View>
           </>
         )}
