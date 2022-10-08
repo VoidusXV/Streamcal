@@ -31,7 +31,7 @@ const AddUserScreen = ({ navigation }: any) => {
       contentContainerStyle={{ alignItems: "center", paddingBottom: WindowSize.Width * 0.1 }}
     >
       <DataEdit_Container
-        PlaceholderText={"Description"}
+        PlaceholderText={"User Description"}
         onChangeText={(e: any) => setEditedUser({ ...getEditedUser, Description: e })}
         dataText={getEditedUser?.Description}
       ></DataEdit_Container>

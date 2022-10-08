@@ -103,7 +103,7 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
             defaultValue={getServerInfo?.Description}
             onChangeText={(e: any) => setServerInfo({ ...getServerInfo, Description: e })}
             bodyStyle={{ ...styles.NormalTextInputStyle }}
-            PlaceholderText={"Description"}
+            PlaceholderText={"Server Description"}
           ></NormalTextInput>
           <NormalTextInput
             defaultValue={getServerInfo?.Server}

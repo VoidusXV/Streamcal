@@ -102,11 +102,22 @@ const QRCode_ModalContainer = ({ onClose, APIKEY }: any) => {
               yeet
             </Text>
           </View>
-          <QRCode
-            getRef={(e) => (QRCode_Ref.current = e)}
-            size={WindowSize.Width * 0.7}
-            value={JSON.stringify(ScanObject)}
-          ></QRCode>
+          <View
+            style={{
+              backgroundColor: "white",
+              height: "70%",
+              width: "80%",
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: WindowSize.Width * 0.02,
+            }}
+          >
+            <QRCode
+              getRef={(e) => (QRCode_Ref.current = e)}
+              size={WindowSize.Width * 0.7}
+              value={JSON.stringify(ScanObject)}
+            ></QRCode>
+          </View>
           <MaterialCommunityIcons
             //  onPress={async () => await Clipboard.setImageAsync("")}
             onPress={() => {
@@ -116,7 +127,7 @@ const QRCode_ModalContainer = ({ onClose, APIKEY }: any) => {
             name="content-copy"
             size={WindowSize.Width * 0.08}
             color="white"
-            style={{ marginLeft: "85%", marginTop: "10%" }}
+            style={{ marginLeft: "70%", marginTop: "5%" }}
           ></MaterialCommunityIcons>
         </TouchableOpacity>
       </View>
@@ -142,7 +153,7 @@ const EditUserScreen = ({ navigation, route }: IEditUserScreen) => {
       contentContainerStyle={{ alignItems: "center", paddingBottom: WindowSize.Width * 0.1 }}
     >
       <DataEdit_Container
-        Key={"Description"}
+        Key={"User Description"}
         onChangeText={(e: any) => setEditedUser({ ...getEditedUser, Description: e })}
         dataText={getEditedUser.Description}
       ></DataEdit_Container>
