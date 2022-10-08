@@ -19,7 +19,7 @@ import VideoPlayer from "../components/SubPages/ViewContent/MediaScreen/VideoPla
 
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
 import { backgroundColor, selectionColor } from "../components/constants/Colors";
-import { WindowSize } from "../components/constants/Layout";
+import { Mini_IconSize, WindowSize } from "../components/constants/Layout";
 import Seperator from "../components/Designs/Seperator";
 import MediaItemCard from "../components/Designs/MediaItemCard";
 import { StatusBar } from "expo-status-bar";
@@ -176,8 +176,6 @@ async function zoomImage(imageURI: any, index: any) {
 }
 
 let timer: any = null;
-const videoURL = "http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=video"; // //"http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"; //http://192.168.2.121:3005/v1/test2?id=0&season=1&episode=7&dr=video  //"https://eea3-2003-ea-c73b-5f87-41fb-85e8-7931-729f.eu.ngrok.io/v1/test";
-const Cover = require("../assets/covers/One_Piece.jpg");
 
 interface IGeneratedImages {
   zoomImageIndex: any;
@@ -263,14 +261,22 @@ const MediaScreen = ({ route, navigation }: any) => {
           }}
         >
           {isLoading && (
-            <LoadingIndicator
-              style={{
-                position: "absolute",
-                //backgroundColor: "red",
-                height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
-                zIndex: 1,
-              }}
-            ></LoadingIndicator>
+            <>
+              <MaterialIcons
+                name="arrow-back"
+                size={Mini_IconSize}
+                style={{ position: "absolute", zIndex: 2, marginLeft: "2%", marginTop: "2%" }}
+                onPress={() => navigation.goBack()}
+                color="white"
+              ></MaterialIcons>
+              <LoadingIndicator
+                style={{
+                  position: "absolute",
+                  height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
+                  zIndex: 1,
+                }}
+              ></LoadingIndicator>
+            </>
           )}
           <VideoPlayer
             // style={{ opacity: 0 }}

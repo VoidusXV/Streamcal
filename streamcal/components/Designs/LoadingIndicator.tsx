@@ -13,7 +13,8 @@ const LoadingIndicator: React.FC<ILoadingIndicator> = ({ style }: any) => {
       <ActivityIndicator
         size={LoadingIndicatorSize}
         color={selectionColor}
-        style={{ marginBottom: 0 }}></ActivityIndicator>
+        style={{ marginBottom: 0 }}
+      ></ActivityIndicator>
     </View>
   );
 };
