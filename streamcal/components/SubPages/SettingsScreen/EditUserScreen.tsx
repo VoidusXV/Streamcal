@@ -15,9 +15,11 @@ import { IUserInfo } from "../../constants/interfaces";
 import { NormalTextInput } from "../../Designs/TextInput";
 import { WindowSize } from "../../constants/Layout";
 import SettingsButton from "../../Designs/SettingsButton";
-import { selectionColor } from "../../constants/Colors";
+import { backgroundColor, selectionColor } from "../../constants/Colors";
 import { currentConnectionInfo, Server_SetUsers } from "../../../backend/serverConnection";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import QRCode from "react-native-qrcode-svg";
+import * as Clipboard from "expo-clipboard";
 
 const DataEdit_Container = ({ Key, dataText, readOnly, onChangeText }: any) => {
   return (
@@ -58,20 +60,64 @@ const SwitchContainer = ({ onValueChange, value }: any) => {
   );
 };
 
-const QRCode_ModalContainer = ({ onClose }: any) => {
+const QRCode_ModalContainer = ({ onClose, APIKEY }: any) => {
+  const QRCode_Ref = React.useRef<any>(null);
+
+  const ScanObject = {
+    APIKEY: APIKEY,
+    Server: currentConnectionInfo.Server,
+    Port: currentConnectionInfo.Port,
+  };
+
   return (
     <TouchableWithoutFeedback onPress={onClose}>
       <View style={styles.QRCode_ModalContainer}>
         <TouchableOpacity
           activeOpacity={1}
           style={{
-            backgroundColor: selectionColor,
-            width: "90%",
+            backgroundColor: backgroundColor,
+            width: WindowSize.Width * 0.95,
             height: "60%",
             borderRadius: WindowSize.Width * 0.02,
+            alignItems: "center",
           }}
         >
-          {/* <Text>HUNDKOPF</Text> */}
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                //position: "absolute",
+                color: "white",
+                fontSize: WindowSize.Width * 0.06,
+                marginLeft: "45%",
+                marginTop: "3%",
+                marginBottom: "5%",
+              }}
+            >
+              yeet
+            </Text>
+          </View>
+          <QRCode
+            getRef={(e) => (QRCode_Ref.current = e)}
+            size={WindowSize.Width * 0.7}
+            value={JSON.stringify(ScanObject)}
+          ></QRCode>
+          <MaterialCommunityIcons
+            //  onPress={async () => await Clipboard.setImageAsync("")}
+            onPress={() => {
+              QRCode_Ref.current?.toDataURL(async (e: any) => await Clipboard.setImageAsync(e));
+              console.log("Testwtst");
+            }}
+            name="content-copy"
+            size={WindowSize.Width * 0.08}
+            color="white"
+            style={{ marginLeft: "85%", marginTop: "10%" }}
+          ></MaterialCommunityIcons>
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
@@ -152,7 +198,10 @@ const EditUserScreen = ({ navigation, route }: IEditUserScreen) => {
         visible={getQR_Modal}
         onRequestClose={() => setQR_Modal(false)}
       >
-        <QRCode_ModalContainer onClose={() => setQR_Modal(false)}></QRCode_ModalContainer>
+        <QRCode_ModalContainer
+          onClose={() => setQR_Modal(false)}
+          APIKEY={getEditedUser.APIKEY}
+        ></QRCode_ModalContainer>
       </Modal>
     </ScrollView>
   );
@@ -165,7 +214,7 @@ const styles = StyleSheet.create({
   QRCode_ModalContainer: {
     width: "100%",
     height: "100%",
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: "rgba(0,0,0,0.8)",
     justifyContent: "center",
     alignItems: "center",
   },
