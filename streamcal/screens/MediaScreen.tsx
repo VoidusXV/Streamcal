@@ -68,7 +68,7 @@ async function changeScreenOrientation() {
   return true;
 }
 interface INextEpisode_Container {
-  AllData: any;
+  Episodes: any;
   ContentID: any;
   ContentTitle: any;
   getSeason: any;
@@ -76,14 +76,15 @@ interface INextEpisode_Container {
   index: any;
 }
 const NextEpisode_Container = ({
-  AllData,
+  Episodes,
   ContentID,
   ContentTitle,
   getSeason,
   navigation,
   index,
 }: INextEpisode_Container) => {
-  const EpisodeData = AllData[index];
+  // console.log(AllData);
+  const EpisodeData = Episodes[index];
 
   if (EpisodeData) {
     return (
@@ -99,15 +100,14 @@ const NextEpisode_Container = ({
           isMediaScreen={true}
           routeParams={{
             item: EpisodeData,
-            ContentName: ContentTitle,
+            ContentTitle: ContentTitle,
             ContentID: ContentID,
-            AllData: AllData,
+            Episodes: Episodes,
             index: index,
           }}
           Source={{
             uri: getThumbnailURL(ContentID, getSeason + 1, EpisodeData.Episode),
-          }}
-        ></MediaItemCard>
+          }}></MediaItemCard>
       </View>
     );
   } else return <></>;
@@ -135,10 +135,8 @@ const FollowingEpisodes_Container = ({ data, ContentID, index }: any) => {
               Description={item.Description}
               Source={{
                 uri: `http://192.168.2.121:3005/v1/test2?id=${ContentID}&season=1&episode=${item.Episode}&dr=thumb`,
-              }}
-            ></MediaItemCard>
-          )}
-        ></FlashList>
+              }}></MediaItemCard>
+          )}></FlashList>
       </View>
     );
   } else {
@@ -182,9 +180,27 @@ interface IGeneratedImages {
   zoomImageURI: any;
 }
 
-const MediaScreen = ({ route, navigation }: any) => {
-  const { item, AllData, ContentTitle, ContentID, index } = route.params;
+function GoToEpisode(
+  index: any,
+  navigation: any,
+  ContentTitle: any,
+  Episodes: any,
+  ContentID: any
+) {
+  if (!Episodes[index]) return null;
+  navigation.replace("MediaScreen", {
+    item: Episodes[index],
+    ContentTitle: ContentTitle,
+    ContentID: ContentID,
+    Episodes: Episodes,
+    index: index,
+  });
+}
 
+const MediaScreen = ({ route, navigation }: any) => {
+  const { item, Episodes, ContentTitle, ContentID, index } = route.params;
+
+  //console.log(Episodes[index]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isFullScreen, setFullScreen] = React.useState<any>(false);
   const [getImage, setImage] = React.useState<any>(null);
@@ -243,14 +259,12 @@ const MediaScreen = ({ route, navigation }: any) => {
       console.log("Loading Should be done");
     })();
   }, []);
-  //        <LoadingIndicator style={{ backgroundColor: "red" }}></LoadingIndicator>
 
   return (
     <ScrollView
       scrollEnabled={isFullScreen ? false : true}
       style={!isFullScreen ? styles.container : { backgroundColor: "black" }}
-      contentContainerStyle={{ paddingBottom: 50 }}
-    >
+      contentContainerStyle={{ paddingBottom: 50 }}>
       {isFullScreen && <StatusBar hidden></StatusBar>}
 
       {getImage && (
@@ -258,8 +272,7 @@ const MediaScreen = ({ route, navigation }: any) => {
           style={{
             height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
             backgroundColor: "black",
-          }}
-        >
+          }}>
           {isLoading && (
             <>
               <MaterialIcons
@@ -267,25 +280,30 @@ const MediaScreen = ({ route, navigation }: any) => {
                 size={Mini_IconSize}
                 style={{ position: "absolute", zIndex: 2, marginLeft: "2%", marginTop: "2%" }}
                 onPress={() => navigation.goBack()}
-                color="white"
-              ></MaterialIcons>
+                color="white"></MaterialIcons>
               <LoadingIndicator
                 style={{
                   position: "absolute",
                   height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
                   zIndex: 1,
-                }}
-              ></LoadingIndicator>
+                }}></LoadingIndicator>
             </>
           )}
           <VideoPlayer
             // style={{ opacity: 0 }}
+            onSkipForward={() =>
+              GoToEpisode(index + 1, navigation, ContentTitle, Episodes, ContentID)
+            }
+            onSkipBackward={() =>
+              GoToEpisode(index - 1, navigation, ContentTitle, Episodes, ContentID)
+            }
             navigation={navigation}
             VideoRef={VideoRef}
             CroppedImages={getGeneratedImages}
             isFullScreen={isFullScreen}
-            ScreenButtonOnPress={async () => setFullScreen(await changeScreenOrientation())}
-          ></VideoPlayer>
+            ScreenButtonOnPress={async () =>
+              setFullScreen(await changeScreenOrientation())
+            }></VideoPlayer>
         </View>
       )}
 
@@ -297,8 +315,7 @@ const MediaScreen = ({ route, navigation }: any) => {
             //backgroundColor: "red",
             flexDirection: "column",
             justifyContent: "center",
-          }}
-        >
+          }}>
           <Text
             style={{
               ...styles.EpisodeText,
@@ -307,14 +324,12 @@ const MediaScreen = ({ route, navigation }: any) => {
               marginTop: "4%",
               color: "#95b9fc",
               //textDecorationLine: "underline",
-            }}
-          >
+            }}>
             {ContentTitle}
           </Text>
 
           <Text
-            style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
-          >
+            style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
             Folge {item.Episode}: {item.Title}
           </Text>
           <Octicons
@@ -322,18 +337,16 @@ const MediaScreen = ({ route, navigation }: any) => {
             name="download"
             size={WindowSize.Width * 0.07}
             style={{ marginLeft: "auto", marginRight: "7%" }}
-            color="white"
-          ></Octicons>
+            color="white"></Octicons>
         </View>
         <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
         <NextEpisode_Container
-          AllData={AllData}
+          Episodes={Episodes}
           getSeason={0}
           ContentID={ContentID}
           ContentTitle={ContentTitle}
           navigation={navigation}
-          index={index + 1}
-        ></NextEpisode_Container>
+          index={index + 1}></NextEpisode_Container>
         {/* <FollowingEpisodes_Container
           ContentID={ContentID}
           index={index}

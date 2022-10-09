@@ -17,4 +17,32 @@ interface IServerInfo {
   isAdmin?: any;
 }
 
-export { IUserInfo, IServerInfo };
+interface ICurrentContentInfo {
+  Cover?: any;
+  Description?: any;
+  Title?: any;
+  ID?: any;
+}
+
+interface IMediaData {
+  Movies?: any;
+  Series?: {
+    Seasons?: [
+      {
+        Episodes?: [
+          {
+            Description?: any;
+            Duration?: any;
+            Episode?: any;
+            Path?: any;
+            Thumbnail?: any;
+            Title?: any;
+          }
+        ];
+        SeasonNum?: any;
+      }
+    ];
+  };
+}
+
+export { IUserInfo, IServerInfo, ICurrentContentInfo, IMediaData };

@@ -46,15 +46,13 @@ const TopButton: React.FC<ITopButton> = ({
       zIndex: 1,
       width: isFullscreen ? WindowSize.Height : "100%",
       //backgroundColor: "blue",
-    }}
-  >
+    }}>
     <MaterialIcons
       name="arrow-back"
       size={Mini_IconSize}
       style={{ opacity: isFullscreen ? 0 : 1 }}
       onPress={BackButtonOnPress}
-      color="white"
-    ></MaterialIcons>
+      color="white"></MaterialIcons>
 
     <View style={{ flexDirection: "row" }}>
       <MaterialIcons
@@ -62,28 +60,24 @@ const TopButton: React.FC<ITopButton> = ({
         size={Mini_IconSize}
         style={{ marginRight: WindowSize.Width * 0.1 }}
         color="white"
-        onPress={onSkipBackward}
-      ></MaterialIcons>
+        onPress={onSkipBackward}></MaterialIcons>
       <MaterialIcons
         name="fast-forward"
         size={Mini_IconSize}
         style={{ marginRight: WindowSize.Width * 0.1 }}
         color="white"
-        onPress={onSkipForward}
-      ></MaterialIcons>
+        onPress={onSkipForward}></MaterialIcons>
 
       <MaterialIcons
         name="settings"
         size={Mini_IconSize}
         style={{ marginRight: WindowSize.Width * 0.1 }}
-        color="white"
-      ></MaterialIcons>
+        color="white"></MaterialIcons>
       <MaterialIcons
         onPress={ScreenButtonOnPress}
         name={!isFullscreen ? "open-in-full" : "close-fullscreen"}
         size={Mini_IconSize}
-        color="white"
-      ></MaterialIcons>
+        color="white"></MaterialIcons>
     </View>
   </View>
 );
@@ -115,8 +109,7 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
 
         //position: "absolute",
         //top: WindowSize.Width * 0.1,
-      }}
-    >
+      }}>
       <View style={{ justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
         <MaterialIcons
           name="replay-10"
@@ -125,8 +118,7 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
             onPressAllButtons();
           }}
           size={IconSize * 0.9}
-          style={{ marginRight: "5%", color: "white" }}
-        ></MaterialIcons>
+          style={{ marginRight: "5%", color: "white" }}></MaterialIcons>
         <MaterialIcons
           name={status.isPlaying ? "pause" : "play-arrow"}
           onPress={async () => {
@@ -142,8 +134,7 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
             textAlign: "center",
             //backgroundColor: "blue",
             color: "white",
-          }}
-        ></MaterialIcons>
+          }}></MaterialIcons>
         <MaterialIcons
           name="forward-10"
           onPress={async () => {
@@ -151,8 +142,7 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
             onPressAllButtons();
           }}
           size={IconSize * 0.9}
-          style={{ marginLeft: "5%", color: "white" }}
-        ></MaterialIcons>
+          style={{ marginLeft: "5%", color: "white" }}></MaterialIcons>
       </View>
     </View>
   );
@@ -186,8 +176,7 @@ const SliderBar: React.FC<ISliderBar> = ({
         justifyContent: "flex-end",
         flex: 1,
         width: isFullscreen ? "90%" : "100%",
-      }}
-    >
+      }}>
       <View
         style={{
           width: "100%",
@@ -197,21 +186,18 @@ const SliderBar: React.FC<ISliderBar> = ({
           paddingLeft: "3%",
           paddingRight: "4%",
           marginBottom: "3%",
-        }}
-      >
+        }}>
         <Text
           style={{
             color: "white",
-          }}
-        >
+          }}>
           {value ? MilisecondsToTimespamp(value) : "00:00"}
         </Text>
 
         <Text
           style={{
             color: "white",
-          }}
-        >
+          }}>
           {maximumValue ? MilisecondsToTimespamp(maximumValue) : "00:00"}
         </Text>
       </View>
@@ -232,11 +218,11 @@ const SliderBar: React.FC<ISliderBar> = ({
         onValueChange={onValueChange}
         value={value}
         onTouchStart={onTouchStart}
-        onSlidingComplete={onSlidingComplete}
-      ></Slider>
+        onSlidingComplete={onSlidingComplete}></Slider>
     </TouchableOpacity>
   );
 };
+
 interface IGeneratedImages {
   zoomImageIndex: any;
   zoomImageURI: any;
@@ -249,6 +235,7 @@ interface ISlider_Preview {
   CroppedImages: IGeneratedImages[];
   isFullScreen: any;
 }
+
 const Slider_Preview: React.FC<ISlider_Preview> = ({
   getSliderValue,
   status,
@@ -256,7 +243,6 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({
   isFullScreen,
 }: ISlider_Preview) => {
   const zoomImageIndex = Math.trunc(getSliderValue / 1000 / 10);
-  //const [getImage, setImage] = React.useState<any>(imageURI || "");
   const ImageURI_ByIndex = CroppedImages.find(
     (e: any) => e.zoomImageIndex === zoomImageIndex
   )?.zoomImageURI;
@@ -290,13 +276,11 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({
         top: !isFullScreen ? WindowSize.Width * 0.2 : WindowSize.Width * 0.55,
         left: pos(),
         zIndex: 2,
-      }}
-    >
+      }}>
       <Image
         resizeMode="cover"
         style={{ flex: 1, borderWidth: 1, borderColor: "white" }}
-        source={{ uri: ImageURI_ByIndex }}
-      ></Image>
+        source={{ uri: ImageURI_ByIndex }}></Image>
       <Text style={{ color: "white", textAlign: "center" }}>
         {MilisecondsToTimespamp(getSliderValue)}
       </Text>
@@ -311,6 +295,8 @@ interface IVideoPlayer {
   navigation?: any;
   ScreenButtonOnPress?: any;
   style?: ViewStyle | ViewStyle[];
+  onSkipBackward?: any;
+  onSkipForward?: any;
 }
 
 let timer: any = null;
@@ -322,6 +308,8 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
   navigation,
   ScreenButtonOnPress,
   style,
+  onSkipBackward,
+  onSkipForward,
 }: any) => {
   // UseStates
   const [getStatus, setStatus] = React.useState<any>({});
@@ -386,8 +374,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
         height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
         alignSelf: "center",
         ...style,
-      }}
-    >
+      }}>
       <Video
         ref={VideoRef}
         //source={{ uri: videoURL }}
@@ -404,8 +391,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
         onPlaybackStatusUpdate={(status: any) => {
           !isSliding.current && setSliderValue(status.positionMillis);
           !isSliding.current && setStatus(status);
-        }}
-      ></Video>
+        }}></Video>
 
       <Animated.View
         style={{
@@ -416,20 +402,19 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
           opacity: IconsOpacity,
           width: Width,
           height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
-        }}
-      >
+        }}>
         <TouchableOpacity
           onPress={() => (isIcons ? fadeOut() : fadeIn())}
           activeOpacity={1}
-          style={{ width: "100%", height: "100%" }}
-        >
+          style={{ width: "100%", height: "100%" }}>
           {isIcons && (
             <>
               <TopButton
                 isFullscreen={isFullScreen}
                 BackButtonOnPress={() => navigation.goBack()}
                 ScreenButtonOnPress={ScreenButtonOnPress}
-              ></TopButton>
+                onSkipBackward={onSkipBackward}
+                onSkipForward={onSkipForward}></TopButton>
 
               <Middle_Buttons
                 isFullscreen={isFullScreen}
@@ -438,16 +423,14 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
                 onPressAllButtons={() => {
                   clearTimeout(timer);
                   autoFade();
-                }}
-              ></Middle_Buttons>
+                }}></Middle_Buttons>
               {isSliding.current && (
                 <Slider_Preview
                   status={getStatus}
                   getSliderValue={getSliderValue}
                   imageURI={getCroppedImage}
                   CroppedImages={CroppedImages}
-                  isFullScreen={isFullScreen}
-                ></Slider_Preview>
+                  isFullScreen={isFullScreen}></Slider_Preview>
               )}
               <SliderBar
                 isFullscreen={false}
@@ -461,8 +444,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
                   isSliding.current = false;
                   autoFade();
                 }}
-                onTouchStart={() => (isSliding.current = true)}
-              ></SliderBar>
+                onTouchStart={() => (isSliding.current = true)}></SliderBar>
             </>
           )}
         </TouchableOpacity>
