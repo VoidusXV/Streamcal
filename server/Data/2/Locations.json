@@ -1,0 +1,28 @@
+{
+  "Series": {
+    "Seasons": [
+      {
+        "SeasonNum": 1,
+        "Episodes": [
+          {
+            "Episode": 1,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/1/1.mp4",
+            "Title": "Aufbruch x und x Gefährten",
+            "Description": "Gons Vater Gin überließ ihn vor Jahren seiner Tante Mito und entschied sich für den gefährlichen Beruf des Hunters. Nun ist Gon zwölf Jahre alt, und er will seinen Vater finden. Mito hat ihm versprochen, dass er an der Hunter-Prüfung teilnehmen darf, wenn er den sogenannten „Herr des Teiches“ angelt. Als es ihm gelingt, den riesigen Fisch zu fangen, muss ihn Mito schweren Herzens ziehen lassen.\r\n\r\n.",
+            "Duration": 1427206
+          },
+          {
+            "Episode": 2,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/2/2.mp4",
+            "Title": "Prüfung x der x Prüfungen",
+            "Description": "Gon und seine Freunde erreichen Dolle Harbour. Der Kapitän des Schiffs gibt ihnen den Tipp, als Abkürzung zur Hunter-Prüfung auf einen nahen Berg zu klettern. Auf dem Weg dorthin müssen sie einige Herausforderungen meistern, wie das Rätsel einer alten Dame.",
+            "Duration": 1427334
+          }
+        ]
+      }
+    ]
+  },
+  "Movies": {}
+}

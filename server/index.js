@@ -367,7 +367,7 @@ app.get("/v1/authenticate-user", (req, res) => {
 
       if (!User) {
         res.send(LoginStatus.UserNotExist).end();
-        console.log("UserNotExist");
+        console.log("UserNotExist", new Date().toUTCString());
         return;
       }
 
@@ -375,7 +375,7 @@ app.get("/v1/authenticate-user", (req, res) => {
 
       if (!User.Enabled) {
         res.send(LoginStatus.Account_Disabled).end();
-        console.log("Account Disabled");
+        console.log("Account Disabled", new Date().toUTCString());
         return;
       }
       if (!User.DeviceID) {
@@ -385,15 +385,15 @@ app.get("/v1/authenticate-user", (req, res) => {
         res.send(LoginStatus.New_User).end();
       } else if (User.DeviceID != API_DeviceID) {
         // Authentication Failed => Wrong DeviceID
-        console.log("Authentication Failed => Wrong DeviceID");
+        console.log("Authentication Failed => Wrong DeviceID", new Date().toUTCString());
         res.send(LoginStatus.Wrong_Device).end();
       } else if (User.DeviceID == API_DeviceID) {
         // Login succeed
         updateObject = { LastLogin: new Date().toUTCString() };
-        console.log("Login succeed");
+        console.log("Login succeed", new Date().toUTCString());
         res.send(LoginStatus.Login_Succeed).end();
       } else {
-        console.log("Unkown: Login Failed");
+        console.log("Unkown: Login Failed", new Date().toUTCString());
         res.status(403).end();
       }
 
@@ -407,6 +407,9 @@ app.get("/v1/authenticate-user", (req, res) => {
   }
 });
 
+app.get("/status", (req, res) => {
+  res.send("0").end();
+});
 app.get("*", (req, res) => {
   //res.send(mediaData);
   //res.send("kok").status(200).end();

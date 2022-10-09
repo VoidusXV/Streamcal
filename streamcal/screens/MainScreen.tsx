@@ -12,6 +12,7 @@ import SettingsScreen from "./SettingsScreen";
 import { Ionicons, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { backgroundColor } from "../components/constants/Colors";
+import serverStatus from "../hooks/serverStatus";
 
 const Tab = createBottomTabNavigator();
 
@@ -21,7 +22,12 @@ const isFocused = (focused: any) => {
 
 export default function MainScreen() {
   const isLoadingComplete = useCachedResources();
-  if (!isLoadingComplete) {
+  const getServerStatus = serverStatus();
+  console.log(getServerStatus);
+
+  if (getServerStatus == "0") {
+    return null;
+  } else if (!isLoadingComplete) {
     return null;
   } else {
     return (

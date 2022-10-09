@@ -290,7 +290,6 @@ const MediaScreen = ({ route, navigation }: any) => {
             </>
           )}
           <VideoPlayer
-            // style={{ opacity: 0 }}
             onSkipForward={() =>
               GoToEpisode(index + 1, navigation, ContentTitle, Episodes, ContentID)
             }
