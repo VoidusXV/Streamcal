@@ -23,9 +23,8 @@ const isFocused = (focused: any) => {
 export default function MainScreen() {
   const isLoadingComplete = useCachedResources();
   const getServerStatus = serverStatus();
-  console.log(getServerStatus);
 
-  if (getServerStatus == "0") {
+  if (getServerStatus == "0" && !__DEV__) {
     return null;
   } else if (!isLoadingComplete) {
     return null;

@@ -1,6 +1,6 @@
 node_modules/
 MediaTest/
-Data/
+server/Data/
 .expo/
 dist/
 npm-debug.*
