@@ -360,15 +360,13 @@ namespace MediaHandler
                 string ContentPath = $"{serverDataPath}/Content.json";
                 string Content_JsonFile = File.ReadAllText(ContentPath);
 
-                //string NewContent_Locations = File.ReadAllText(NewContentJsonPath);
-                //var NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_Locations);
-                //string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.Season}_{NewContent_LocationsObject.Episode}";
 
+                ScrapperProcess scrapperProcess = new ScrapperProcess(textBox1.Text, serverDataPath);
+                await scrapperProcess.Start();
 
-
-                await ScrappingProcess();
-                MoveFiles();
-                DeleteFiles();
+                //await ScrappingProcess();
+                //MoveFiles();
+                //DeleteFiles();
                 MessageBox.Show("Media successfully downloaded", "Downloaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
