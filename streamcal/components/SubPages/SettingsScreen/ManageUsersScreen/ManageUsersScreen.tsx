@@ -1,5 +1,4 @@
-import { Animated, Modal, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import React from "react";
 import {
@@ -7,20 +6,25 @@ import {
   currentConnectionInfo,
   getAllUsers,
   Server_SetUsers,
-} from "../../../backend/serverConnection";
-import SettingsButton from "../../Designs/SettingsButton";
-import { Animation_Main } from "../../Designs/NotifyBox";
-import { WindowSize } from "../../constants/Layout";
-import { selectionColor } from "../../constants/Colors";
+} from "../../../../backend/serverConnection";
+import SettingsButton from "../../../Designs/SettingsButton";
+import { Animation_Main } from "../../../Designs/NotifyBox";
+import { WindowSize } from "../../../constants/Layout";
+import { selectionColor } from "../../../constants/Colors";
 import { FlashList } from "@shopify/flash-list";
-import { IUserInfo } from "../../constants/interfaces";
-import { RouteProp } from "@react-navigation/native";
-
-interface IManageUsersScreen {
-  navigation?: any; //NativeStackScreenProps<any,any>;
-  setMessageText?: any;
-  route?: RouteProp<any>;
-}
+import { IUserInfo } from "../../../constants/interfaces";
+import {
+  IUserCard,
+  IManageUsersScreen,
+  IEditingButtons,
+  IFlashlist,
+} from "./ManageUsersInterfaces";
+import {
+  getSelectedUsersAmount,
+  getSelectedAPIKEYS,
+  UnMarkedArray,
+  removeAdminFromArray,
+} from "./ManageUsersFunctions";
 
 async function AdminAuth() {
   const adminNotPossible =
@@ -35,15 +39,6 @@ async function AdminAuth() {
   return isAdmin;
 }
 
-interface IUserCard {
-  item?: IUserInfo;
-  index: any;
-  navigation?: NativeStackNavigationProp<any>;
-  isManaging?: any;
-  getUserSelections?: any;
-  setUserSelections?: any;
-  onLongPress?: any;
-}
 const UserCard = ({
   item,
   index,
@@ -97,16 +92,14 @@ const UserCard = ({
         paddingBottom: "2%",
         paddingLeft: "5%",
         transform: [{ scale }],
-      }}
-    >
+      }}>
       <TouchableOpacity
         //style={{ transform: [{ rotateY: "180deg" }, { translateX: 20 }] }}
         activeOpacity={0.8}
         onPress={onPress}
         onLongPress={onLongPress}
         onPressIn={onPressIn}
-        onPressOut={onPressOut}
-      >
+        onPressOut={onPressOut}>
         <Text
           style={{
             color: "white",
@@ -115,8 +108,7 @@ const UserCard = ({
             maxWidth: "90%",
 
             //textDecorationLine: "underline",
-          }}
-        >
+          }}>
           {item?.Description}
         </Text>
         <Text
@@ -124,8 +116,7 @@ const UserCard = ({
             color: "white",
             fontSize: WindowSize.Width * 0.045,
             maxWidth: "90%",
-          }}
-        >
+          }}>
           {item?.APIKEY}
         </Text>
         <Text
@@ -133,8 +124,7 @@ const UserCard = ({
             color: "white",
             fontSize: WindowSize.Width * 0.045,
             maxWidth: "90%",
-          }}
-        >
+          }}>
           {item?.LastLogin}
         </Text>
       </TouchableOpacity>
@@ -142,15 +132,6 @@ const UserCard = ({
   );
 };
 
-interface IEditingButtons {
-  setManaging?: any;
-  isManaging?: any;
-  onManage?: any;
-  onCancel?: any;
-  onAddUser?: any;
-  onSelectAll?: any;
-  onUnSelectAll?: any;
-}
 const EditingButtons = ({
   isManaging,
   setManaging,
@@ -186,44 +167,12 @@ const EditingButtons = ({
           alignItems: "center",
         }}
         onPress={RightButtons}
-        activeOpacity={0.6}
-      >
+        activeOpacity={0.6}>
         <Text style={styles.ManageTextStyle}>{!isManaging ? "MANAGE" : "CANCEL"}</Text>
       </TouchableOpacity>
     </View>
   );
 };
-
-function UnMarkedArray(getUserSelections: any, setUserSelections: any, state = false) {
-  let data = [...getUserSelections];
-  console.log(data.length);
-  data.map((e: any, index: any) => {
-    data[index] = state;
-  });
-  setUserSelections(data);
-}
-
-function getSelectedUsersAmount(getUserSelections: any) {
-  let count = 0;
-  getUserSelections.map((e: any) => e && count++);
-  return count;
-}
-
-function getSelectedAPIKEYS(getUserSelections: any, getUserData: Array<IUserInfo>) {
-  let APIKEY: any = [];
-  getUserSelections?.map((e: any, index: any) => {
-    if (e) APIKEY.push(getUserData[index].APIKEY);
-  });
-  return APIKEY;
-}
-
-function removeAdminFromArray(UserData: Array<IUserInfo>) {
-  UserData?.map((e, index) => {
-    if (e?.APIKEY == currentConnectionInfo?.APIKEY)
-      // && currentConnectionInfo.isAdmin
-      UserData?.splice(index, 1);
-  });
-}
 
 async function onPressRemove(
   setUserData: any,
@@ -249,12 +198,6 @@ async function onPressRemove(
   }
 }
 
-interface IFlashlist {
-  item?: IUserInfo;
-  index?: any;
-  target?: any;
-  extraData?: any;
-}
 const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
   const [getUserData, setUserData] = React.useState<Array<IUserInfo>>([]);
   const [isManaging, setManaging] = React.useState(false);
@@ -298,8 +241,7 @@ const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
         onCancel={() => UnMarkedArray(getUserSelections, setUserSelections)}
         onSelectAll={() => UnMarkedArray(getUserSelections, setUserSelections, true)}
         onUnSelectAll={() => UnMarkedArray(getUserSelections, setUserSelections)}
-        onAddUser={() => navigation.navigate("AddUserScreen")}
-      ></EditingButtons>
+        onAddUser={() => navigation.navigate("AddUserScreen")}></EditingButtons>
       <FlashList
         estimatedItemSize={10}
         data={getUserData}
@@ -312,10 +254,8 @@ const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
             navigation={navigation}
             isManaging={extraData.isManaging}
             getUserSelections={extraData.getUserSelections}
-            setUserSelections={extraData.setUserSelections}
-          ></UserCard>
-        )}
-      ></FlashList>
+            setUserSelections={extraData.setUserSelections}></UserCard>
+        )}></FlashList>
 
       {isManaging && (
         <View
@@ -329,14 +269,12 @@ const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
             flexDirection: "row",
             alignItems: "center",
             padding: "5%",
-          }}
-        >
+          }}>
           <Text
             style={{
               ...styles.ManageTextStyle,
               fontSize: WindowSize.Width * 0.045,
-            }}
-          >
+            }}>
             {getSelectedUsersAmount(getUserSelections)} Selected Users
           </Text>
           <TouchableOpacity
@@ -349,16 +287,14 @@ const ManageUsersScreen = ({ navigation, route }: IManageUsersScreen) => {
                 getUserSelections,
                 setManaging
               )
-            }
-          >
+            }>
             <Text
               style={{
                 ...styles.ManageTextStyle,
                 fontSize: WindowSize.Width * 0.045,
                 marginLeft: "5%",
                 color: "red",
-              }}
-            >
+              }}>
               Remove
             </Text>
           </TouchableOpacity>
@@ -381,9 +317,6 @@ const styles = StyleSheet.create({
   ManageTextStyle: {
     color: "white",
     fontSize: WindowSize.Width * 0.04,
-    //textAlign: "right",
-    //marginRight: "7%",
-    //marginTop: "5%",
     fontWeight: "500",
   },
 });

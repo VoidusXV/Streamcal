@@ -45,4 +45,8 @@ interface IMediaData {
   };
 }
 
-export { IUserInfo, IServerInfo, ICurrentContentInfo, IMediaData };
+interface IGeneratedImages {
+  zoomImageIndex: any;
+  zoomImageURI: any;
+}
+export { IUserInfo, IServerInfo, ICurrentContentInfo, IMediaData, IGeneratedImages };

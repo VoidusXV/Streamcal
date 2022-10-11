@@ -8,7 +8,7 @@ import { backgroundColor } from "./components/constants/Colors";
 //Screens
 import MainScreen from "./screens/MainScreen";
 import ViewContent from "./screens/ViewContent";
-import MediaScreen from "./screens/MediaScreen";
+import MediaScreen from "./screens/MediaScreen/MediaScreen";
 
 import NotifyBox from "./components/Designs/NotifyBox";
 const Stack = createNativeStackNavigator();

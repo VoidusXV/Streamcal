@@ -15,7 +15,7 @@ import {
   ServerAuthentication,
   AuthResponse,
 } from "../backend/serverConnection";
-import { GetData_AsyncStorage } from "../components/DataHandling";
+import { GetData_AsyncStorage } from "../components/constants/DataHandling";
 import SettingsButton from "../components/Designs/SettingsButton";
 import LoadingIndicator from "../components/Designs/LoadingIndicator";
 

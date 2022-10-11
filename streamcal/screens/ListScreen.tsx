@@ -18,7 +18,7 @@ import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
 
 import FadingEdgesView from "../components/Designs/FadingEdgesView";
 import { Asset } from "expo-asset";
-import VideoPlayer from "../components/SubPages/ViewContent/MediaScreen/VideoPlayer";
+import VideoPlayer from "../components/SubPages/ViewContent/MediaScreen/VideoPlayer/VideoPlayer";
 import NotifyBox, { Animation_Main } from "../components/Designs/NotifyBox";
 import SettingsButton from "../components/Designs/SettingsButton";
 
@@ -80,12 +80,10 @@ const DescriptionContainer = ({ DescriptionText }: any) => {
         justifyContent: "center",
         paddingTop: "3%",
         paddingBottom: "3%",
-      }}
-    >
+      }}>
       <Text
         numberOfLines={2}
-        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
-      >
+        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
         {DescriptionText}
       </Text>
     </View>
@@ -107,8 +105,7 @@ export default function ListScreen() {
         onPress={() => {
           b(new Date().getMilliseconds());
           Animation_Main();
-        }}
-      ></SettingsButton>
+        }}></SettingsButton>
 
       {/* <DescriptionContainer DescriptionText={t}></DescriptionContainer> */}
       {/* <FadingEdgesView

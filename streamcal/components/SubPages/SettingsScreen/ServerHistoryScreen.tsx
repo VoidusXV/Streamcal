@@ -3,7 +3,7 @@ import React from "react";
 import { WindowSize } from "../../constants/Layout";
 import { selectionColor } from "../../constants/Colors";
 import { FlashList } from "@shopify/flash-list";
-import { GetData_AsyncStorage, StoreData_AsyncStorage } from "../../DataHandling";
+import { GetData_AsyncStorage, StoreData_AsyncStorage } from "../../constants/DataHandling";
 import { IServerInfo } from "../../../backend/serverConnection";
 
 const HistoryCard = ({ item, navigation }: { item: IServerInfo; navigation: any }) => {

@@ -15,38 +15,24 @@ import {
 import React from "react";
 import { Video, AVPlaybackStatus, ResizeMode, PitchCorrectionQuality } from "expo-av";
 import * as ScreenOrientation from "expo-screen-orientation";
-import VideoPlayer from "../components/SubPages/ViewContent/MediaScreen/VideoPlayer";
+import VideoPlayer from "../../components/SubPages/ViewContent/MediaScreen/VideoPlayer/VideoPlayer";
 
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
-import { backgroundColor, selectionColor } from "../components/constants/Colors";
-import { Mini_IconSize, WindowSize } from "../components/constants/Layout";
-import Seperator from "../components/Designs/Seperator";
-import MediaItemCard from "../components/Designs/MediaItemCard";
+import { backgroundColor, selectionColor } from "../../components/constants/Colors";
+import { Mini_IconSize, WindowSize } from "../../components/constants/Layout";
+import Seperator from "../../components/Designs/Seperator";
+import MediaItemCard from "../../components/Designs/MediaItemCard";
 import { StatusBar } from "expo-status-bar";
 import { FlashList } from "@shopify/flash-list";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { Asset } from "expo-asset";
 import * as NavigationBar from "expo-navigation-bar";
-import { getPreviewImageURL, getThumbnailURL, getVideoURL } from "../backend/serverConnection";
-import LoadingIndicator from "../components/Designs/LoadingIndicator";
+import { getPreviewImageURL, getThumbnailURL, getVideoURL } from "../../backend/serverConnection";
+import LoadingIndicator from "../../components/Designs/LoadingIndicator";
+import { INextEpisode_Container } from "./MediaScreenInterfaces";
+import { IGeneratedImages } from "../../components/constants/interfaces";
 
 //LogBox.ignoreAllLogs();
-
-function MilisecondsToTimespamp(num: any) {
-  let sec = Math.trunc(num / 1000);
-  let min = Math.trunc(sec / 60);
-  let result = "";
-
-  if (sec > 60) sec = sec % 60;
-
-  if (min < 10) result += `0${min}:`;
-  else result += `${min}:`;
-
-  if (sec < 10) result += `0${sec}`;
-  else result += sec;
-
-  return result;
-}
 
 async function changeScreenOrientation() {
   const Orientation: any = await ScreenOrientation.getOrientationAsync();
@@ -67,14 +53,7 @@ async function changeScreenOrientation() {
 
   return true;
 }
-interface INextEpisode_Container {
-  Episodes: any;
-  ContentID: any;
-  ContentTitle: any;
-  getSeason: any;
-  navigation: any;
-  index: any;
-}
+
 const NextEpisode_Container = ({
   Episodes,
   ContentID,
@@ -113,7 +92,7 @@ const NextEpisode_Container = ({
   } else return <></>;
 };
 
-const FollowingEpisodes_Container = ({ Episodes, ContentID, index }: any) => {
+const FollowingEpisodes_Container = ({ Episodes, ContentID, index, getSeason }: any) => {
   const splicedEpisodes = [...Episodes];
   splicedEpisodes.splice(0, index + 2);
   if (splicedEpisodes && splicedEpisodes.length > 0) {
@@ -133,7 +112,7 @@ const FollowingEpisodes_Container = ({ Episodes, ContentID, index }: any) => {
               Duration={item.Duration}
               Description={item.Description}
               Source={{
-                uri: `http://192.168.2.121:3005/v1/test2?id=${ContentID}&season=1&episode=${item.Episode}&dr=thumb`,
+                uri: getThumbnailURL(ContentID, getSeason + 1, splicedEpisodes[index].Episode), // `http://192.168.2.121:3005/v1/test2?id=${ContentID}&season=1&episode=${item.Episode}&dr=thumb`,
               }}></MediaItemCard>
           )}></FlashList>
       </View>
@@ -173,11 +152,6 @@ async function zoomImage(imageURI: any, index: any) {
 }
 
 let timer: any = null;
-
-interface IGeneratedImages {
-  zoomImageIndex: any;
-  zoomImageURI: any;
-}
 
 function GoToEpisode(
   index: any,
@@ -345,10 +319,11 @@ const MediaScreen = ({ route, navigation }: any) => {
           ContentTitle={ContentTitle}
           navigation={navigation}
           index={index + 1}></NextEpisode_Container>
-        <FollowingEpisodes_Container
+        {/* <FollowingEpisodes_Container
+          Episodes={Episodes}
           ContentID={ContentID}
-          index={index}
-          Episodes={Episodes}></FollowingEpisodes_Container>
+          getSeason={0}
+          index={index}></FollowingEpisodes_Container> */}
       </View>
     </ScrollView>
   );

@@ -1,11 +1,18 @@
 import { StyleSheet, Text, View, Animated, TouchableOpacity, Image, ViewStyle } from "react-native";
-import { Video, AVPlaybackStatus, ResizeMode, PitchCorrectionQuality } from "expo-av";
+import { Video, ResizeMode } from "expo-av";
 
 import React from "react";
-import { WindowSize } from "../../../constants/Layout";
+import { WindowSize } from "../../../../constants/Layout";
 import { MaterialIcons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
-import { selectionColor } from "../../../constants/Colors";
+import { selectionColor } from "../../../../constants/Colors";
+import {
+  IMiddle_Buttons,
+  ISliderBar,
+  ISlider_Preview,
+  ITopButton,
+  IVideoPlayer,
+} from "./VideoPlayerInterfaces";
 
 const IconSize = WindowSize.Width * 0.15;
 const Mini_IconSize = WindowSize.Width * 0.08;
@@ -24,13 +31,6 @@ function MilisecondsToTimespamp(num: any) {
   else result += sec;
 
   return result;
-}
-interface ITopButton {
-  isFullscreen: any;
-  BackButtonOnPress?: any;
-  ScreenButtonOnPress?: any;
-  onSkipForward?: any;
-  onSkipBackward?: any;
 }
 
 const TopButton: React.FC<ITopButton> = ({
@@ -82,12 +82,6 @@ const TopButton: React.FC<ITopButton> = ({
   </View>
 );
 
-interface IMiddle_Buttons {
-  isFullscreen: any;
-  status: any;
-  VideoRef: any;
-  onPressAllButtons: any;
-}
 const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
   isFullscreen,
   status,
@@ -147,16 +141,6 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
     </View>
   );
 };
-
-interface ISliderBar {
-  isFullscreen: Boolean;
-  positionMilli?: Number;
-  maximumValue: Number;
-  onValueChange?: any;
-  onSlidingComplete?: any;
-  value?: Number;
-  onTouchStart?: any;
-}
 
 const SliderBar: React.FC<ISliderBar> = ({
   isFullscreen,
@@ -223,19 +207,6 @@ const SliderBar: React.FC<ISliderBar> = ({
   );
 };
 
-interface IGeneratedImages {
-  zoomImageIndex: any;
-  zoomImageURI: any;
-}
-
-interface ISlider_Preview {
-  getSliderValue: any;
-  imageURI: any;
-  status: any;
-  CroppedImages: IGeneratedImages[];
-  isFullScreen: any;
-}
-
 const Slider_Preview: React.FC<ISlider_Preview> = ({
   getSliderValue,
   status,
@@ -287,17 +258,6 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({
     </View>
   );
 };
-
-interface IVideoPlayer {
-  VideoRef: any;
-  CroppedImages: any;
-  isFullScreen?: any;
-  navigation?: any;
-  ScreenButtonOnPress?: any;
-  style?: ViewStyle | ViewStyle[];
-  onSkipBackward?: any;
-  onSkipForward?: any;
-}
 
 let timer: any = null;
 
