@@ -11,35 +11,50 @@ using System.Windows.Forms;
 
 namespace MediaHandler
 {
-    class ScrapperProcess
+    public delegate void LOGS(string text);
+
+    public class ScrapperProcess
     {
+        public event LOGS LogAdded;
+
         WebClient webClient = new WebClient();
         static string currentPath = Directory.GetCurrentDirectory();
-        static string processesPath = currentPath + "/Processes/0";
-        string scrapperPath = currentPath + "/scrapper";
-        string NewContentJsonPath = processesPath + "/NewContent.json";
+        string processesPath;// = currentPath + $"/Processes/{ProcessIndex}";
+        string scrapperPath;// = currentPath + "/scrapper";
+        string NewContentJsonPath;// = processesPath + "/NewContent.json";
         string serverDataPath;
         string ffmpegPath = "..\\ffmpeg.exe";
 
+        public string Logs = "";
+        public string URL = "";
 
-        string URL;
-        public ScrapperProcess(string URL, string serverDataPath)
+        public ScrapperProcess(string URL, string serverDataPath, int ProcessIndex)
         {
             this.URL = URL;
             this.serverDataPath = serverDataPath;
+            Console.WriteLine("ProcessIndex:" + ProcessIndex);
+            processesPath = currentPath + $"/Processes/{ProcessIndex}";
+            scrapperPath = currentPath + "/scrapper";
+            NewContentJsonPath = processesPath + "/NewContent.json";
         }
 
         public async Task Start()
         {
 
-            // Console.WriteLine(File.Exists(NewContentJsonPath));
-            //return;
-            if (!Directory.Exists(processesPath))
-                Directory.CreateDirectory(processesPath);
+            try
+            {
+                // Console.WriteLine(File.Exists(NewContentJsonPath));
+                //return;
+                if (!Directory.Exists(processesPath))
+                    Directory.CreateDirectory(processesPath);
 
-            await ScrappingProcess(URL);
-            MoveFiles();
-            DeleteFiles();
+                await ScrappingProcess(URL);
+                MoveFiles();
+            }
+            finally
+            {
+                DeleteFiles();
+            }
         }
 
         void onProcessExited(object sender, EventArgs e)
@@ -77,6 +92,8 @@ namespace MediaHandler
                 AddLog("Scrapping started");
                 await RunCmd(URL, scrapperPath + "/scrapper.exe", hidden: false);
                 AddLog("Scrapping successfully ended");
+                if (!File.Exists(NewContentJsonPath))
+                    return;
                 //progressBar1.Value = 10;
 
                 string indexURL;
@@ -104,6 +121,7 @@ namespace MediaHandler
                 // progressBar1.Value = 100;
 
                 await GeneratePreviewImagesAndThumbnail(Media_FileName);
+                AddLog("========================================================\nDone");
 
             }
             catch (Exception ex)
@@ -341,6 +359,9 @@ namespace MediaHandler
         void AddLog(string text)
         {
             Console.WriteLine(text);
+            Logs += text + "\n";
+            LogAdded?.Invoke(text + "\n");
         }
+
     }
 }

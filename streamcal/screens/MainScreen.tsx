@@ -22,11 +22,12 @@ const isFocused = (focused: any) => {
 
 export default function MainScreen() {
   const isLoadingComplete = useCachedResources();
-  const getServerStatus = serverStatus();
+  // const getServerStatus = serverStatus();
 
-  if (getServerStatus == "0" && !__DEV__) {
-    return null;
-  } else if (!isLoadingComplete) {
+  // if (getServerStatus == "0" && !__DEV__) {
+  //   return null;
+  // } else
+  if (!isLoadingComplete) {
     return null;
   } else {
     return (

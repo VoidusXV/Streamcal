@@ -16,6 +16,7 @@ using Ookii.Dialogs.WinForms;
 
 namespace MediaHandler
 {
+
     public partial class Form1 : Form
     {
 
@@ -27,13 +28,16 @@ namespace MediaHandler
         static string NewContentJsonPath = processesPath + "/NewContent.json";
         static string serverDataPath;
 
+
+        public static List<ScrapperProcess> CurrentProcesses = new List<ScrapperProcess>();
+        // ProcessForm processForm = new ProcessForm();
+
         public Form1()
         {
             InitializeComponent();
             Setup();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
-
 
         void Setup()
         {
@@ -355,18 +359,36 @@ namespace MediaHandler
 
                 richTextBox1.Clear();
                 progressBar1.Value = 0;
-                button3.Enabled = false;
+                //button3.Enabled = false;
 
                 string ContentPath = $"{serverDataPath}/Content.json";
                 string Content_JsonFile = File.ReadAllText(ContentPath);
 
+                
+                if (checkBox1.Checked)
+                {
 
-                ScrapperProcess scrapperProcess = new ScrapperProcess(textBox1.Text, serverDataPath);
-                await scrapperProcess.Start();
-
+                    List<Task> TaskProcesses = new List<Task>();
+                    for (int i = 0; i <= numericUpDown2.Value - numericUpDown1.Value; i++)
+                    {
+                        string URL = textBox1.Text + (numericUpDown1.Value + i);
+                        ScrapperProcess scrapperProcess = new ScrapperProcess(URL, serverDataPath, GetProcessIndex() + 1);
+                        CurrentProcesses.Add(scrapperProcess);
+                        TaskProcesses.Add(scrapperProcess.Start());
+                    }
+                    Console.WriteLine("CurrentProcesses:" + CurrentProcesses.Count);
+                    await Task.WhenAll(TaskProcesses);
+                }
+                else
+                {
+                    ScrapperProcess scrapperProcess = new ScrapperProcess(textBox1.Text, serverDataPath, GetProcessIndex() + 1);
+                    CurrentProcesses.Add(scrapperProcess);
+                    await scrapperProcess.Start();
+                }
                 //await ScrappingProcess();
                 //MoveFiles();
                 //DeleteFiles();
+
                 MessageBox.Show("Media successfully downloaded", "Downloaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -376,7 +398,7 @@ namespace MediaHandler
             finally
             {
                 progressBar1.Value = 0;
-                button3.Enabled = true;
+                //button3.Enabled = true;
             }
         }
 
@@ -409,10 +431,6 @@ namespace MediaHandler
             GetContentInfo();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
 
         void Move_ExistingContent(int index, FileHandler.NewContent_Locations NewContent_JsonObject, List<FileHandler.Data_Content> Content_JsonObject, bool NewContent = false)
         {
@@ -587,6 +605,39 @@ namespace MediaHandler
         {
             APIKEY_Generator APIKEY_Generator = new APIKEY_Generator();
             APIKEY_Generator.Show();
+        }
+
+        private void button7_Click_1(object sender, EventArgs e)
+        {
+            //ScrapperProcess
+            // ProcessForm processForm = new ProcessForm(CurrentProcesses);
+
+            try
+            {
+                ProcessForm processForm = new ProcessForm(CurrentProcesses);
+                processForm.Show();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+
+        int GetProcessIndex()
+        {
+            var directories = Directory.GetDirectories(processesPath).Where(x => int.TryParse(Path.GetFileName(x), out int n));
+
+            if (directories.Count() == 0)
+                return -1;
+
+            return Convert.ToInt32(Path.GetFileName(directories.Max<string>()));
+        }
+
+        private void button8_Click_1(object sender, EventArgs e)
+        {
+            ProcessForm processForm = new ProcessForm("Kopf\n23242424\n");
+            processForm.Show();
         }
     }
 }

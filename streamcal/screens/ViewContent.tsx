@@ -209,7 +209,7 @@ const TopBar = ({ navigation, Title, scrollValue }: any) => {
     <Animated.View
       style={{
         width: "100%",
-        height: WindowSize.Width * 0.1,
+        height: WindowSize.Width * 0.15,
         // backgroundColor: `rgba(${backgrounColorRGB},${scrollEnd})`,
         backgroundColor: alphaColor >= 1 ? backgroundColor : "transparent",
         position: "absolute",

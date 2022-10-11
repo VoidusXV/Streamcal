@@ -113,18 +113,17 @@ const NextEpisode_Container = ({
   } else return <></>;
 };
 
-const FollowingEpisodes_Container = ({ data, ContentID, index }: any) => {
-  //data.splice(0, 2);
-  const splicedData = [...data];
-  splicedData.splice(0, index + 2);
-  if (splicedData && splicedData.length > 0) {
+const FollowingEpisodes_Container = ({ Episodes, ContentID, index }: any) => {
+  const splicedEpisodes = [...Episodes];
+  splicedEpisodes.splice(0, index + 2);
+  if (splicedEpisodes && splicedEpisodes.length > 0) {
     return (
       <View style={{ marginTop: "5%", flex: 1 }}>
         <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
           Weitere Folgen
         </Text>
         <FlashList
-          data={splicedData} // Staffel 1
+          data={splicedEpisodes} // Staffel 1
           estimatedItemSize={8}
           contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
           renderItem={({ item, index }: any) => (
@@ -346,10 +345,10 @@ const MediaScreen = ({ route, navigation }: any) => {
           ContentTitle={ContentTitle}
           navigation={navigation}
           index={index + 1}></NextEpisode_Container>
-        {/* <FollowingEpisodes_Container
+        <FollowingEpisodes_Container
           ContentID={ContentID}
           index={index}
-          data={AllData}></FollowingEpisodes_Container> */}
+          Episodes={Episodes}></FollowingEpisodes_Container>
       </View>
     </ScrollView>
   );

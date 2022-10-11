@@ -1,6 +1,6 @@
 node_modules/
 MediaTest/
-server/Data/
+Data/
 .expo/
 dist/
 npm-debug.*
@@ -373,3 +373,4 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+

@@ -21,6 +21,14 @@
             "Duration": 1427334
           },
           {
+            "Episode": 3,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/3/3.mp4",
+            "Title": "Rivalen x ums x Überleben",
+            "Description": "Gons größter Wunsch ist es, ein Hunter zu werden, ein Hüter des Gleichgewichts zwischen Menschen und ihrer Umwelt. Dadurch möchte er seinen verschollenen Vater finden, der ebenfalls Hunter ist. Zusammen mit seinen neuen Weggefährten Kurapika, Leorio und Killua erlebt Gon eine abenteuerliche Geschichte, deren Ausmaß er sich bei der Hunter-Prüfung noch nicht einmal vorstellen kann...",
+            "Duration": 1427334
+          },
+          {
             "Episode": 4,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/4/4.mp4",
@@ -29,12 +37,180 @@
             "Duration": 1427548
           },
           {
+            "Episode": 5,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/5/5.mp4",
+            "Title": "Hisoka x ist x verstohlen",
+            "Description": "Der Sumpf fordert seine ersten Opfer, und Gon und Killua werden von Kurapika und Leorio getrennt. Letztere finden sich nun in einem Kampf mit Hisoka wieder, der die beiden ohne Grund angreift.",
+            "Duration": 1427420
+          },
+          {
             "Episode": 6,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/6/6.mp4",
-            "Title": "Eine x unerwartete x Aufgabe",
+            "Title": "Eine x unerwartete x Aufgabex",
             "Description": "Am zweiten Prüfungsort angekommen, erwartet alle eine ungewöhnliche Aufgabe. Unter Aufsicht der beiden Prüfer Menchi und Buhara müssen alle Anwärter ihre Kochfähigkeiten unter Beweis stellen, und auch der Vorsitzende der Hunter-Vereinigung selbst überrascht die Prüflinge mit seinem Besuch.",
             "Duration": 1426886
+          },
+          {
+            "Episode": 7,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/7/7.mp4",
+            "Title": "Entscheidungskampf x im x Luftschiff",
+            "Description": "Auf Neteros Luftschiff versucht der hinterlistige Tonpa Kurapika und Leorio davon abzuhalten, sich von den Strapazen der letzten Prüfungen zu erholen, während zwischen Gon, Killua und dem Vorsitzenden Netero höchstpersönlich ein",
+            "Duration": 1427356
+          },
+          {
+            "Episode": 8,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/8/8.mp4",
+            "Title": "Entscheidung x durch x Mehrheitsbeschluss?",
+            "Description": "Am dritten Prüfungsort angekommen, erklärt Beans den noch übriggebliebenen Anwärtern die nächste Aufgabe. Diese besteht darin, den sogenannten Trick-Tower herabzusteigen, was sich aber letzten Endes als weitaus schwieriger erweist, als zunächst angenommen.",
+            "Duration": 1427462
+          },
+          {
+            "Episode": 9,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/9/9.mp4",
+            "Title": "Seid auf der Hut x vor x Häftlingen",
+            "Description": "Der Kampf mit den Gefangenen im Trick-Tower erreicht einen neuen dramatischen Höhepunkt, als Kurapika mit seiner Vergangenheit konfrontiert wird.",
+            "Duration": 1427462
+          },
+          {
+            "Episode": 10,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/10/10.mp4",
+            "Title": "Der Anlass x für x den Trick",
+            "Description": "Gons Gruppe schlägt sich weiterhin tapfer in der Arena des Trick-Towers, während Hisoka auf einen alten Bekannten trifft.",
+            "Duration": 1430726
+          },
+          {
+            "Episode": 10,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/10/10.mp4",
+            "Title": "Der Anlass x für x den Trick",
+            "Description": "Gons Gruppe schlägt sich weiterhin tapfer in der Arena des Trick-Towers, während Hisoka auf einen alten Bekannten trifft.",
+            "Duration": 1430726
+          },
+          {
+            "Episode": 15,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/15/15.mp4",
+            "Title": "Betrügerisches x gegenseitiges x Gerangel",
+            "Description": "Kurapika und Leorio schließen im letzten Teil der vierten Prüfungsaufgabe ein vorläufiges Bündnis, um sich so einen Vorteil zu verschaffen.",
+            "Duration": 1427548
+          },
+          {
+            "Episode": 16,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/16/16.mp4",
+            "Title": "Betrügerisches x gegenseitiges x Gerangel",
+            "Description": "Kurapika und Leorio schließen im letzten Teil der vierten Prüfungsaufgabe ein vorläufiges Bündnis, um sich so einen Vorteil zu verschaffen.",
+            "Duration": 1427548
+          },
+          {
+            "Episode": 17,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/17/17.mp4",
+            "Title": "Falle x in der x Höhle",
+            "Description": "Gon schließt sich Kurapika und Leorio an. Gemeinsam wollen sie versuchen, Ponzus Namensplakette in die Finger zu bekommen.",
+            "Duration": 1426950
+          },
+          {
+            "Episode": 18,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/18/18.mp4",
+            "Title": "Ein x wichtiges x Gespräch",
+            "Description": "Gon, Kurapika und Leorio befinden sich in einer ausweglosen Situation. Es bleibt ihnen nicht mehr viel Zeit, um die Prüfung noch zu bestehen.",
+            "Duration": 1431942
+          },
+          {
+            "Episode": 19,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/19/19.mp4",
+            "Title": "Ein x wichtiges x Gespräch",
+            "Description": "Gon, Kurapika und Leorio befinden sich in einer ausweglosen Situation. Es bleibt ihnen nicht mehr viel Zeit, um die Prüfung noch zu bestehen.",
+            "Duration": 1431942
+          },
+          {
+            "Episode": 20,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/20/20.mp4",
+            "Title": "Ein x wichtiges x Gespräch",
+            "Description": "Gon, Kurapika und Leorio befinden sich in einer ausweglosen Situation. Es bleibt ihnen nicht mehr viel Zeit, um die Prüfung noch zu bestehen.",
+            "Duration": 1431942
+          },
+          {
+            "Episode": 22,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/22/22.mp4",
+            "Title": "Ein x gefährlicher x Wachhund",
+            "Description": "In der Region von Padokea angekommen, stellt sich Gon, Kurapika und Leorio ein weiteres Problem in den Weg. Der Weg zum Anwesen der Familie Zoldyck wird durch ein massives Tor versperrt, hinter dem ein riesiger Wachhund sein Unwesen treibt.",
+            "Duration": 1427441
+          },
+          {
+            "Episode": 23,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/23/23.mp4",
+            "Title": "Die Pflicht x des x Wächters",
+            "Description": "Das Trio trainiert weiterhin eifrig, um das massive Tor zu öffnen. Währenddessen bekommt der gefolterte Killua die Nachricht, dass seine Freunde sich am Rand des Grundstücks aufhalten.",
+            "Duration": 1427356
+          },
+          {
+            "Episode": 24,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/24/24.mp4",
+            "Title": "Die x Familie x Zoldyck",
+            "Description": "Killua hat ein ernstes Gespräch mit seinem Vater Silva, der fest davon überzeugt ist, dass Killua eines Tages das Oberhaupt der Familie Zoldyck wird. Gon, Kurapika und Leorio machen sich weiter auf in Richtung des Anwesens.",
+            "Duration": 1427142
+          },
+          {
+            "Episode": 25,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/25/25.mp4",
+            "Title": "Du musst sehen x um x treffen zu können",
+            "Description": "Der Butler Gotoh will mit einem kleinen Spiel herausfinden, ob Gon, Kurapika und Leorio es wirklich wert sind, Killuas Freunde zu sein. Mit schmutzigen Tricks und einem Augenzwinkern zu viel, wird es nicht leicht, gegen eine solche Gegenwehr zu bestehen.",
+            "Duration": 1427292
+          },
+          {
+            "Episode": 26,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/26/26.mp4",
+            "Title": "Seither x und x danach",
+            "Description": "Gon schickt seiner Tante Mito erneut einen Brief zur Wal-Insel und lässt die letzten Geschehnisse noch einmal Revue passieren.",
+            "Duration": 1431046
+          },
+          {
+            "Episode": 27,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/27/27.mp4",
+            "Title": "Ankunft x in der x Arena",
+            "Description": "Gon und Killua erreichen die Himmels-Arena, welche Ruhm und Reichtum für diejenigen bereithält, die es schaffen, sich zum obersten Stockwerk empor zu kämpfen. Dort treffen sie auf Zushi, der fast die gleiche Fähigkeit wie Killuas Bruder Illumi besitzt.",
+            "Duration": 1423388
+          },
+          {
+            "Episode": 28,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/28/28.mp4",
+            "Title": "Nen x und x Ren",
+            "Description": "Gon und Killua kämpfen sich bis zum 200. Stockwerk weiter empor, wo sie von Hisoka aufgehalten werden, welcher ihnen den Weg durch eine seltsame Energiebarriere versperrt. Zushis Meister Wing sieht sich in der Position, Gon und Killua die Grundlagen von Nen beizubringen.",
+            "Duration": 1423046
+          },
+          {
+            "Episode": 29,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/29/29.mp4",
+            "Title": "Erwachen x und x Potential",
+            "Description": "Gon und Hisoka melden sich beide für ihren Kampf in der Himmels-Arena an. Doch bevor Gon gegen Hisoka antreten darf, muss er sich zunächst, gemeinsam mit Killua, den sogenannten „Floor Masters“ stellen.",
+            "Duration": 1423878
+          },
+          {
+            "Episode": 30,
+            "Thumbnail": "Thumbnail.jpg",
+            "Path": "/Series/Season_1/30/30.mp4",
+            "Title": "Heftiger Kampf x und x Konflikt",
+            "Description": "Angetrieben vom Willen und Wunsch Hisoka im Kampf zu besiegen, trainiert Gon weiterhin unter der Führung von Wing hart und kämpft schließlich gegen Gido, dem ersten der drei „Floor Masters“. Währenddessen trifft Killua einen Fremden, der ihm anbietet, mehr über Nen zu lehren.",
+            "Duration": 1423196
           }
         ]
       }
