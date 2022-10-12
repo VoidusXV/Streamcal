@@ -187,6 +187,7 @@ async function CreateAPIKEY(adminKey: any, description?: any) {
 }
 
 export {
+  getServerData,
   getAllContent,
   getCoverURL,
   getSeasonAmount,
