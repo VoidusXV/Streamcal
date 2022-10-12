@@ -30,6 +30,7 @@ namespace MediaHandler
 
 
         public static List<ScrapperProcess> CurrentProcesses = new List<ScrapperProcess>();
+        public static List<BackgroundWorker> backgroundWorkers = new List<BackgroundWorker>();
         // ProcessForm processForm = new ProcessForm();
 
         public Form1()
@@ -369,6 +370,7 @@ namespace MediaHandler
                 {
 
                     List<Task> TaskProcesses = new List<Task>();
+                  
                     for (int i = 0; i <= numericUpDown2.Value - numericUpDown1.Value; i++)
                     {
                         string URL = textBox1.Text + (numericUpDown1.Value + i);

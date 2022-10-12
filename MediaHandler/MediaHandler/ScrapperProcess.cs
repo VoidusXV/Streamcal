@@ -47,12 +47,23 @@ namespace MediaHandler
                 if (!Directory.Exists(processesPath))
                     Directory.CreateDirectory(processesPath);
 
+
+                //Unknown Error 
+
+                //TODO: Create Another ConsoleForm and add data via args[]
+
                 await ScrappingProcess(URL);
+                AddLog("ScrappingProcess Done");
                 MoveFiles();
+                DeleteFiles();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ScrapperProcessStart Error:" + ex.Message);
             }
             finally
             {
-                DeleteFiles();
+                //  DeleteFiles();
             }
         }
 
@@ -109,7 +120,7 @@ namespace MediaHandler
                 Create_TsList($"{processesPath}/TS_Files");
                 //progressBar1.Value = 80;
 
-               
+
                 string NewContent_Locations = File.ReadAllText(NewContentJsonPath);
                 var NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_Locations);
                 string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.Season}_{NewContent_LocationsObject.Episode}";
@@ -357,9 +368,16 @@ namespace MediaHandler
 
         void AddLog(string text)
         {
-            Console.WriteLine(text);
-            Logs += text + "\n";
-            LogAdded?.Invoke(text + "\n");
+            try
+            {
+                Console.WriteLine(text);
+                Logs += text + "\n";
+                LogAdded?.Invoke(text + "\n");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("AddLog Error:" + ex.Message);
+            }
         }
 
     }
