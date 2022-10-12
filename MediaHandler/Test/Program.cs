@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -30,8 +29,7 @@ namespace Test
 
     }
 
-
-    internal class Program
+    public class Program
     {
         static IWebDriver driver;
         static IDevToolsSession session;
@@ -42,7 +40,10 @@ namespace Test
         static string currentPath = Directory.GetCurrentDirectory();
         static string NewContent_Path = $"{currentPath}/NewContent.json";
 
-        static void Main(string[] args)
+
+
+
+        public static void Main(string[] args)
         {
             /* driver = new ChromeDriver();
              driver.Url = "https://aniworld.to/anime/stream/kurokos-basketball/staffel-1/episode-1";
@@ -234,5 +235,7 @@ namespace Test
             });
             task.Start();
         }
+
+
     }
 }

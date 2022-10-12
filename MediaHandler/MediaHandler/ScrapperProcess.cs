@@ -8,7 +8,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
 namespace MediaHandler
 {
     public delegate void LOGS(string text);
@@ -110,7 +109,7 @@ namespace MediaHandler
                 Create_TsList($"{processesPath}/TS_Files");
                 //progressBar1.Value = 80;
 
-
+               
                 string NewContent_Locations = File.ReadAllText(NewContentJsonPath);
                 var NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_Locations);
                 string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.Season}_{NewContent_LocationsObject.Episode}";

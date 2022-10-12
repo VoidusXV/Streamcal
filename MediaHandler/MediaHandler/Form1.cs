@@ -297,7 +297,7 @@ namespace MediaHandler
              return new FileHandler.Series { Title = Title, Episode = Episode, Season = Season };
 
          }*/
-        void GetContentInfo()
+        public void GetContentInfo()
         {
             //string[] htmlFile = File.ReadAllLines($"{processesPath}/video.html");
             //var title = Get_TitleSeasonEpisode(htmlFile);
@@ -364,7 +364,7 @@ namespace MediaHandler
                 string ContentPath = $"{serverDataPath}/Content.json";
                 string Content_JsonFile = File.ReadAllText(ContentPath);
 
-                
+
                 if (checkBox1.Checked)
                 {
 
@@ -423,7 +423,6 @@ namespace MediaHandler
         private void button2_Click(object sender, EventArgs e)
         {
             richTextBox1.Clear();
-
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -639,5 +638,7 @@ namespace MediaHandler
             ProcessForm processForm = new ProcessForm("Kopf\n23242424\n");
             processForm.Show();
         }
+
+ 
     }
 }
