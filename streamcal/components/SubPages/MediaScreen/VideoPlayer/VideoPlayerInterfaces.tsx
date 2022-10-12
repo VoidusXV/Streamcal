@@ -1,5 +1,5 @@
 import { ViewStyle } from "react-native";
-import { IGeneratedImages } from "../../../../constants/interfaces";
+import { IGeneratedImages } from "../../../constants/interfaces";
 
 interface ISliderBar {
   isFullscreen: Boolean;
@@ -28,6 +28,7 @@ interface IVideoPlayer {
   style?: ViewStyle | ViewStyle[];
   onSkipBackward?: any;
   onSkipForward?: any;
+  isLoading?: any;
 }
 
 interface ITopButton {

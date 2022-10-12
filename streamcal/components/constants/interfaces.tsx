@@ -24,29 +24,29 @@ interface ICurrentContentInfo {
   ID?: any;
 }
 
+interface IEpisodes {
+  Description?: any;
+  Duration?: any;
+  Episode?: any;
+  Path?: any;
+  Thumbnail?: any;
+  Title?: any;
+}
+interface ISeasons {
+  Episodes?: [IEpisodes];
+  SeasonNum?: any;
+}
+
+interface ISeries {
+  Seasons?: [ISeasons];
+}
 interface IMediaData {
   Movies?: any;
-  Series?: {
-    Seasons?: [
-      {
-        Episodes?: [
-          {
-            Description?: any;
-            Duration?: any;
-            Episode?: any;
-            Path?: any;
-            Thumbnail?: any;
-            Title?: any;
-          }
-        ];
-        SeasonNum?: any;
-      }
-    ];
-  };
+  Series?: ISeries;
 }
 
 interface IGeneratedImages {
   zoomImageIndex: any;
   zoomImageURI: any;
 }
-export { IUserInfo, IServerInfo, ICurrentContentInfo, IMediaData, IGeneratedImages };
+export { IUserInfo, IServerInfo, ICurrentContentInfo, IMediaData, IGeneratedImages, IEpisodes };

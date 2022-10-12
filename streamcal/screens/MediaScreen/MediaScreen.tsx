@@ -15,7 +15,7 @@ import {
 import React from "react";
 import { Video, AVPlaybackStatus, ResizeMode, PitchCorrectionQuality } from "expo-av";
 import * as ScreenOrientation from "expo-screen-orientation";
-import VideoPlayer from "../../components/SubPages/ViewContent/MediaScreen/VideoPlayer/VideoPlayer";
+import VideoPlayer from "../../components/SubPages/MediaScreen/VideoPlayer/VideoPlayer";
 
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
 import { backgroundColor, selectionColor } from "../../components/constants/Colors";
@@ -29,7 +29,7 @@ import { Asset } from "expo-asset";
 import * as NavigationBar from "expo-navigation-bar";
 import { getPreviewImageURL, getThumbnailURL, getVideoURL } from "../../backend/serverConnection";
 import LoadingIndicator from "../../components/Designs/LoadingIndicator";
-import { INextEpisode_Container } from "./MediaScreenInterfaces";
+import { IMediaRouteParams, IMediaScreen } from "./MediaScreenInterfaces";
 import { IGeneratedImages } from "../../components/constants/interfaces";
 
 //LogBox.ignoreAllLogs();
@@ -55,15 +55,13 @@ async function changeScreenOrientation() {
 }
 
 const NextEpisode_Container = ({
-  Episodes,
-  ContentID,
-  ContentTitle,
-  getSeason,
+  routeParams,
   navigation,
-  index,
-}: INextEpisode_Container) => {
-  // console.log(AllData);
-  const EpisodeData = Episodes[index];
+}: {
+  routeParams: IMediaRouteParams;
+  navigation: any;
+}) => {
+  const EpisodeData = routeParams?.Episodes?.[routeParams?.index + 1];
 
   if (EpisodeData) {
     return (
@@ -78,14 +76,16 @@ const NextEpisode_Container = ({
           navigation={navigation}
           isMediaScreen={true}
           routeParams={{
+            ...routeParams,
             item: EpisodeData,
-            ContentTitle: ContentTitle,
-            ContentID: ContentID,
-            Episodes: Episodes,
-            index: index,
+            index: routeParams?.index + 1,
           }}
           Source={{
-            uri: getThumbnailURL(ContentID, getSeason + 1, EpisodeData.Episode),
+            uri: getThumbnailURL(
+              routeParams?.ContentID,
+              routeParams?.getSeason + 1,
+              EpisodeData?.Episode
+            ),
           }}></MediaItemCard>
       </View>
     );
@@ -153,30 +153,29 @@ async function zoomImage(imageURI: any, index: any) {
 
 let timer: any = null;
 
-function GoToEpisode(
-  index: any,
+function SkipEpisode(
+  routeParams: IMediaRouteParams,
   navigation: any,
-  ContentTitle: any,
-  Episodes: any,
-  ContentID: any
+  index: any,
+  isFullScreen: any
 ) {
-  if (!Episodes[index]) return null;
+  if (!routeParams?.Episodes?.[routeParams?.index + index]) return;
+
   navigation.replace("MediaScreen", {
-    item: Episodes[index],
-    ContentTitle: ContentTitle,
-    ContentID: ContentID,
-    Episodes: Episodes,
-    index: index,
+    ...routeParams,
+    item: routeParams?.Episodes?.[routeParams?.index + index],
+    index: routeParams?.index + index,
+    isFullScreen: isFullScreen,
   });
 }
 
-const MediaScreen = ({ route, navigation }: any) => {
-  const { item, Episodes, ContentTitle, ContentID, index } = route.params;
+const MediaScreen = ({ route, navigation }: IMediaScreen) => {
+  const { item, Episodes, ContentTitle, ContentID, index, getSeason }: IMediaRouteParams =
+    route?.params;
 
-  //console.log(Episodes[index]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isFullScreen, setFullScreen] = React.useState<any>(false);
-  const [getImage, setImage] = React.useState<any>(null);
+  //const [getImage, setImage] = React.useState<any>(null);
   const [getGeneratedImages, setGeneratedImages] = React.useState<any>([{}]);
   let generatedImages: IGeneratedImages[] = [];
 
@@ -187,7 +186,7 @@ const MediaScreen = ({ route, navigation }: any) => {
   React.useEffect(() => {
     const backAction = () => {
       if (!isFullScreen) {
-        navigation.goBack();
+        navigation?.goBack();
         return true;
       }
       ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
@@ -205,10 +204,13 @@ const MediaScreen = ({ route, navigation }: any) => {
 
   React.useEffect(() => {
     (async () => {
+      console.log("route.params?.isFullScreen:", route?.params?.isFullScreen);
+      //if(route.params?.isFullScreen)
+
       setIsLoading(true);
       // TODO: Running both asyncs at the same time
       await image.downloadAsync();
-      setImage(image);
+      //setImage(image);
 
       await VideoRef?.current?.loadAsync({ uri: videoURL });
       await VideoRef.current.playAsync();
@@ -240,44 +242,39 @@ const MediaScreen = ({ route, navigation }: any) => {
       contentContainerStyle={{ paddingBottom: 50 }}>
       {isFullScreen && <StatusBar hidden></StatusBar>}
 
-      {getImage && (
-        <View
-          style={{
-            height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
-            backgroundColor: "black",
-          }}>
-          {isLoading && (
-            <>
-              <MaterialIcons
-                name="arrow-back"
-                size={Mini_IconSize}
-                style={{ position: "absolute", zIndex: 2, marginLeft: "2%", marginTop: "2%" }}
-                onPress={() => navigation.goBack()}
-                color="white"></MaterialIcons>
-              <LoadingIndicator
-                style={{
-                  position: "absolute",
-                  height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
-                  zIndex: 1,
-                }}></LoadingIndicator>
-            </>
-          )}
-          <VideoPlayer
-            onSkipForward={() =>
-              GoToEpisode(index + 1, navigation, ContentTitle, Episodes, ContentID)
-            }
-            onSkipBackward={() =>
-              GoToEpisode(index - 1, navigation, ContentTitle, Episodes, ContentID)
-            }
-            navigation={navigation}
-            VideoRef={VideoRef}
-            CroppedImages={getGeneratedImages}
-            isFullScreen={isFullScreen}
-            ScreenButtonOnPress={async () =>
-              setFullScreen(await changeScreenOrientation())
-            }></VideoPlayer>
-        </View>
-      )}
+      <View
+        style={{
+          height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
+          backgroundColor: "black",
+        }}>
+        {isLoading && (
+          <>
+            <MaterialIcons
+              name="arrow-back"
+              size={Mini_IconSize}
+              style={{ position: "absolute", zIndex: 2, marginLeft: "2%", marginTop: "2%" }}
+              onPress={() => navigation?.goBack()}
+              color="white"></MaterialIcons>
+            <LoadingIndicator
+              style={{
+                position: "absolute",
+                height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
+                zIndex: 1,
+              }}></LoadingIndicator>
+          </>
+        )}
+        <VideoPlayer
+          onSkipForward={() => SkipEpisode(route?.params, navigation, 1, isFullScreen)}
+          onSkipBackward={() => SkipEpisode(route?.params, navigation, -1, isFullScreen)}
+          navigation={navigation}
+          VideoRef={VideoRef}
+          CroppedImages={getGeneratedImages}
+          isFullScreen={isFullScreen}
+          isLoading={(e: any) => setIsLoading(e)}
+          ScreenButtonOnPress={async () =>
+            setFullScreen(await changeScreenOrientation())
+          }></VideoPlayer>
+      </View>
 
       <View style={{ flex: 1 }}>
         <View
@@ -313,16 +310,12 @@ const MediaScreen = ({ route, navigation }: any) => {
         </View>
         <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
         <NextEpisode_Container
-          Episodes={Episodes}
-          getSeason={0}
-          ContentID={ContentID}
-          ContentTitle={ContentTitle}
-          navigation={navigation}
-          index={index + 1}></NextEpisode_Container>
+          routeParams={{ ...route?.params, isFullScreen: isFullScreen }}
+          navigation={navigation}></NextEpisode_Container>
         {/* <FollowingEpisodes_Container
           Episodes={Episodes}
           ContentID={ContentID}
-          getSeason={0}
+          getSeason={getSeason}
           index={index}></FollowingEpisodes_Container> */}
       </View>
     </ScrollView>

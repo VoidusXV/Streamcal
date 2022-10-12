@@ -1,10 +1,20 @@
-interface INextEpisode_Container {
-  Episodes: any;
-  ContentID: any;
-  ContentTitle: any;
-  getSeason: any;
-  navigation: any;
-  index: any;
+import { IEpisodes } from "../../components/constants/interfaces";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RouteProp } from "@react-navigation/native";
+
+interface IMediaRouteParams {
+  item?: any;
+  Episodes?: [IEpisodes];
+  ContentTitle?: any;
+  ContentID?: any;
+  index?: any;
+  getSeason?: any;
+  //navigation?: NativeStackNavigationProp<any, any>;
+  isFullScreen?: any;
 }
 
-export { INextEpisode_Container };
+interface IMediaScreen {
+  route?: any;
+  navigation?: NativeStackNavigationProp<any>;
+}
+export { IMediaRouteParams, IMediaScreen };

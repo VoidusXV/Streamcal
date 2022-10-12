@@ -9,6 +9,7 @@ import {
 import React from "react";
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
 import { WindowSize } from "../../components/constants/Layout";
+import { IMediaRouteParams } from "../../screens/MediaScreen/MediaScreenInterfaces";
 interface IMediaItemCard {
   ID_Path: number;
   Title?: any;
@@ -18,7 +19,7 @@ interface IMediaItemCard {
   Source?: ImageSourcePropType | ImageSourcePropType[];
   Duration?: number;
   Description?: any;
-  routeParams?: any;
+  routeParams?: IMediaRouteParams;
   isMediaScreen?: any;
 }
 
@@ -52,7 +53,7 @@ const MediaItemCard: React.FC<IMediaItemCard> = ({
           <Image
             source={Source}
             resizeMode="cover"
-            style={{ width: "100%", height: "100%" }}></Image>
+            style={{ width: "100%", height: "100%", backgroundColor: "black" }}></Image>
           <Octicons
             name="play"
             size={WindowSize.Width * 0.15}

@@ -137,15 +137,17 @@ const Season_SelectionBox = ({ TitleText, onPress }: any) => {
         onPress={onPress}
         style={{ width: "100%", alignItems: "center", flexDirection: "row" }}>
         <MaterialIcons
-          name="keyboard-arrow-down"
-          size={WindowSize.Width * 0.09}
+          name="arrow-drop-down"
+          size={WindowSize.Width * 0.07}
           color="white"
-          style={{ marginLeft: "5%" }}></MaterialIcons>
+          style={{ marginLeft: "3%" }}></MaterialIcons>
         <Text
+          numberOfLines={1}
           style={{
             color: "white",
-            fontSize: WindowSize.Width * 0.06,
-            marginLeft: "5%",
+            fontSize: WindowSize.Width * 0.05,
+            marginLeft: "2%",
+            maxWidth: "85%",
           }}>
           {TitleText}
         </Text>
@@ -285,7 +287,7 @@ const ViewContent = ({ route, navigation }: any) => {
               <SelectionBox></SelectionBox>
               <Season_SelectionBox
                 onPress={() => setSeasonModal(true)}
-                TitleText={`Season ${getMediaLocation?.Series?.Seasons?.[getSeason].SeasonNum}`}></Season_SelectionBox>
+                TitleText={`Season ${getMediaLocation?.Series?.Seasons?.[getSeason].SeasonNum} - ${contentData.Title}`}></Season_SelectionBox>
 
               <Modal
                 transparent
@@ -319,6 +321,8 @@ const ViewContent = ({ route, navigation }: any) => {
                       ContentID: contentData?.ID,
                       Episodes: getMediaLocation?.Series?.Seasons?.[getSeason].Episodes,
                       index: index,
+                      getSeason: getSeason,
+                      isFullScreen: false,
                     }}
                     Source={{
                       uri: getThumbnailURL(contentData?.ID, getSeason + 1, item.Episode),

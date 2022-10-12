@@ -2,10 +2,10 @@ import { StyleSheet, Text, View, Animated, TouchableOpacity, Image, ViewStyle } 
 import { Video, ResizeMode } from "expo-av";
 
 import React from "react";
-import { WindowSize } from "../../../../constants/Layout";
+import { WindowSize } from "../../../constants/Layout";
 import { MaterialIcons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
-import { selectionColor } from "../../../../constants/Colors";
+import { selectionColor } from "../../../constants/Colors";
 import {
   IMiddle_Buttons,
   ISliderBar,
@@ -270,10 +270,10 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
   style,
   onSkipBackward,
   onSkipForward,
-}: any) => {
+  isLoading,
+}: IVideoPlayer) => {
   // UseStates
   const [getStatus, setStatus] = React.useState<any>({});
-  const [isLoaded, setLoaded] = React.useState<any>(true);
   const [isIcons, setIcons] = React.useState(true);
   const [getCroppedImage, setCroppedImage] = React.useState<any>(null);
 
@@ -340,11 +340,11 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
         //source={{ uri: videoURL }}
         onLayout={(e) => (videoLayout.current = e)}
         onLoadStart={() => {
-          setLoaded(false);
+          isLoading && isLoading(true);
         }}
         onLoad={(e: any) => {
           Duration.current = e.durationMillis;
-          setLoaded(true);
+          isLoading && isLoading(false);
         }}
         style={{ ...styles.video }}
         resizeMode={ResizeMode.COVER}

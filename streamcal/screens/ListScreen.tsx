@@ -18,7 +18,7 @@ import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
 
 import FadingEdgesView from "../components/Designs/FadingEdgesView";
 import { Asset } from "expo-asset";
-import VideoPlayer from "../components/SubPages/ViewContent/MediaScreen/VideoPlayer/VideoPlayer";
+import VideoPlayer from "../components/SubPages/MediaScreen/VideoPlayer/VideoPlayer";
 import NotifyBox, { Animation_Main } from "../components/Designs/NotifyBox";
 import SettingsButton from "../components/Designs/SettingsButton";
 
