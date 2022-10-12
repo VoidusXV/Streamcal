@@ -80,33 +80,52 @@ const DescriptionContainer = ({ DescriptionText }: any) => {
         justifyContent: "center",
         paddingTop: "3%",
         paddingBottom: "3%",
-      }}>
+      }}
+    >
       <Text
         numberOfLines={2}
-        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
+        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
+      >
         {DescriptionText}
       </Text>
     </View>
   );
 };
 
-export default function ListScreen() {
+export default function ListScreen({ navigation }: any) {
   const [a, b] = React.useState<any>("");
+  let t: any;
 
-  const t =
-    "Dank einer geheimen Organisation namens Lycoris, die nur aus Mädchen besteht, herrscht Frieden. Die elitäre, freigeistige Chisato ist die stärkste Agentin aller Zeiten und bildet zusammen mit der kühlen, talentierten, aber geheimnisvollen Takina ein nahezu perfektes Duo";
+  React.useEffect(() => {
+    return () => {};
+  }, []);
+
   return (
     <View style={styles.container}>
       {/* <DropDownMenu endHeight={300}></DropDownMenu> */}
 
       <NotifyBox MessageText={a}></NotifyBox>
-
+      {/* 
       <SettingsButton
         onPress={() => {
           b(new Date().getMilliseconds());
           Animation_Main();
-        }}></SettingsButton>
+        }}
+      ></SettingsButton> */}
 
+      <SettingsButton
+        ButtonText={"Start"}
+        onPress={() => {
+          console.log("Start");
+          t = setTimeout(async () => console.log("Not Canceled"), 4000);
+        }}
+      ></SettingsButton>
+      <SettingsButton
+        ButtonText={"Stop"}
+        onPress={() => {
+          clearTimeout(t);
+        }}
+      ></SettingsButton>
       {/* <DescriptionContainer DescriptionText={t}></DescriptionContainer> */}
       {/* <FadingEdgesView
         style={{ width: "100%", height: "100%", borderWidth: 1, borderColor: "green" }}

@@ -33,12 +33,12 @@ interface IEpisodes {
   Title?: any;
 }
 interface ISeasons {
-  Episodes?: [IEpisodes];
+  Episodes?: Array<IEpisodes>;
   SeasonNum?: any;
 }
 
 interface ISeries {
-  Seasons?: [ISeasons];
+  Seasons?: Array<ISeasons>;
 }
 interface IMediaData {
   Movies?: any;
@@ -49,4 +49,12 @@ interface IGeneratedImages {
   zoomImageIndex: any;
   zoomImageURI: any;
 }
-export { IUserInfo, IServerInfo, ICurrentContentInfo, IMediaData, IGeneratedImages, IEpisodes };
+export {
+  IUserInfo,
+  IServerInfo,
+  ICurrentContentInfo,
+  IMediaData,
+  IGeneratedImages,
+  ISeries,
+  IEpisodes,
+};

@@ -8,7 +8,7 @@ import {
   Modal,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { Children } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { backgrounColorRGB, backgroundColor } from "../components/constants/Colors";
@@ -23,6 +23,7 @@ import {
   getThumbnailURL,
 } from "../backend/serverConnection";
 import { ICurrentContentInfo, IMediaData } from "../components/constants/interfaces";
+import LoadingIndicator from "../components/Designs/LoadingIndicator";
 
 const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
   const [getTextHeight, setTextHeight] = React.useState<any>(0);
@@ -32,7 +33,8 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
         width: "100%",
         height: WindowSize.Width * 1.1,
         position: "absolute",
-      }}>
+      }}
+    >
       <View
         style={{
           width: "100%",
@@ -40,12 +42,14 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
           backgroundColor: `rgba(${backgrounColorRGB},${scrollValue / WindowSize.Width})`,
           position: "absolute",
           zIndex: 2,
-        }}></View>
+        }}
+      ></View>
 
       <FadingEdgesView
         style={{ width: "100%", height: "100%", backgroundColor: "red" }}
         // BottomGradient_Position={WindowSize.Width * 0.2}
-        ParentBackgroundColor={backgroundColor}>
+        ParentBackgroundColor={backgroundColor}
+      >
         <Image
           source={{ uri: CoverURL }}
           resizeMethod="scale"
@@ -55,7 +59,8 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
             width: "100%",
             height: "100%",
             zIndex: 0,
-          }}></Image>
+          }}
+        ></Image>
         <Text
           onLayout={(e) => setTextHeight(e.nativeEvent.layout.height)}
           style={{
@@ -68,7 +73,8 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
             marginLeft: "5%",
             //maxWidth: "90%",
             // backgroundColor: "red",
-          }}>
+          }}
+        >
           {ContentTitle}
         </Text>
       </FadingEdgesView>
@@ -86,10 +92,12 @@ const DescriptionContainer = ({ DescriptionText }: any) => {
         justifyContent: "center",
         paddingTop: "3%",
         paddingBottom: "3%",
-      }}>
+      }}
+    >
       <Text
         numberOfLines={2}
-        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
+        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
+      >
         {DescriptionText}
       </Text>
     </View>
@@ -109,7 +117,8 @@ const ContentInfo = ({ SeasonNum, EpisodeNum, DescriptionText }: any) => (
     <DescriptionContainer DescriptionText={DescriptionText}></DescriptionContainer>
     <Text
       onPress={() => console.log("Show More Details")}
-      style={{ ...styles.InfoText, textDecorationLine: "underline", textAlign: "center" }}>
+      style={{ ...styles.InfoText, textDecorationLine: "underline", textAlign: "center" }}
+    >
       Show More Details
     </Text>
   </>
@@ -123,7 +132,8 @@ const SelectionBox = () => (
         color: "white",
         textAlign: "center",
         letterSpacing: 2,
-      }}>
+      }}
+    >
       EPISODES
     </Text>
   </View>
@@ -135,12 +145,14 @@ const Season_SelectionBox = ({ TitleText, onPress }: any) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={onPress}
-        style={{ width: "100%", alignItems: "center", flexDirection: "row" }}>
+        style={{ width: "100%", alignItems: "center", flexDirection: "row" }}
+      >
         <MaterialIcons
           name="arrow-drop-down"
           size={WindowSize.Width * 0.07}
           color="white"
-          style={{ marginLeft: "3%" }}></MaterialIcons>
+          style={{ marginLeft: "3%" }}
+        ></MaterialIcons>
         <Text
           numberOfLines={1}
           style={{
@@ -148,7 +160,8 @@ const Season_SelectionBox = ({ TitleText, onPress }: any) => {
             fontSize: WindowSize.Width * 0.05,
             marginLeft: "2%",
             maxWidth: "85%",
-          }}>
+          }}
+        >
           {TitleText}
         </Text>
       </TouchableOpacity>
@@ -170,7 +183,8 @@ const SeasonModalContainer = ({ onClose, onPress, SeasonData, ContentTitle }: an
           paddingLeft: "5%",
           borderBottomWidth: 1,
           borderColor: "white",
-        }}>
+        }}
+      >
         <MaterialIcons name="close" size={Mini_IconSize} color="white" onPress={onClose} />
         <Text style={{ color: "white", fontSize: WindowSize.Width * 0.06, marginLeft: "5%" }}>
           Seasons
@@ -192,12 +206,14 @@ const SeasonModalContainer = ({ onClose, onPress, SeasonData, ContentTitle }: an
                 borderColor: "rgba(255,255,255,0.5)",
                 justifyContent: "center",
                 // backgroundColor: "red",
-              }}>
+              }}
+            >
               <Text style={{ color: "white", fontSize: WindowSize.Width * 0.05, marginLeft: "5%" }}>
                 Season {item?.SeasonNum} - {ContentTitle}
               </Text>
             </TouchableOpacity>
-          )}></FlashList>
+          )}
+        ></FlashList>
       </View>
     </View>
   );
@@ -219,13 +235,15 @@ const TopBar = ({ navigation, Title, scrollValue }: any) => {
         justifyContent: "center",
         alignItems: "flex-start",
         paddingLeft: "2%",
-      }}>
+      }}
+    >
       <View style={{ flexDirection: "row" }}>
         <MaterialIcons
           name="arrow-back"
           size={Mini_IconSize}
           onPress={() => navigation.goBack()}
-          color="white"></MaterialIcons>
+          color="white"
+        ></MaterialIcons>
         <Text
           numberOfLines={1}
           style={{
@@ -235,7 +253,8 @@ const TopBar = ({ navigation, Title, scrollValue }: any) => {
             color: "white",
             maxWidth: "85%",
             opacity: scrollEnd,
-          }}>
+          }}
+        >
           {Title}
         </Text>
       </View>
@@ -246,20 +265,24 @@ const TopBar = ({ navigation, Title, scrollValue }: any) => {
 const ViewContent = ({ route, navigation }: any) => {
   const contentData: ICurrentContentInfo = route.params?.contentData;
 
-  const [isLoaded, setLoaded] = React.useState(false);
-  const [getMediaLocation, setMediaLocation] = React.useState<IMediaData>();
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [getMediaLocation, setMediaLocation] = React.useState<IMediaData>({});
   const [getSeason, setSeason] = React.useState(0);
   const [isSeasonModal, setSeasonModal] = React.useState(false);
-
   const [getScrollValue, setScrollValue] = React.useState(0);
 
   let data: any;
   React.useEffect(() => {
-    (async () => {
-      data = await getMediaLocations(contentData.ID);
+    let unsub = setTimeout(async () => {
+      data = await getMediaLocations(contentData?.ID);
       setMediaLocation(data);
-      setLoaded(true);
-    })();
+      setIsLoading(false);
+    }, 0);
+
+    return () => {
+      clearTimeout(unsub);
+      console.log("Unload ViewContent");
+    };
   }, []);
 
   return (
@@ -268,32 +291,39 @@ const ViewContent = ({ route, navigation }: any) => {
         scrollValue={getScrollValue}
         navigation={navigation}
         alphaColor={getScrollValue}
-        Title={contentData.Title}></TopBar>
+        Title={contentData?.Title}
+      ></TopBar>
 
       <ScrollView
         onScroll={(e) => setScrollValue(e.nativeEvent.contentOffset.y)}
-        style={styles.container}>
-        {isLoaded && (
+        style={styles.container}
+      >
+        {isLoading && <LoadingIndicator></LoadingIndicator>}
+        {!isLoading && (
           <>
             <ImageContainer
               scrollValue={getScrollValue}
               CoverURL={contentData?.Cover}
-              ContentTitle={contentData?.Title}></ImageContainer>
+              ContentTitle={contentData?.Title}
+            ></ImageContainer>
             <View style={styles.ContentContainer}>
               <ContentInfo
-                DescriptionText={contentData.Description}
+                DescriptionText={contentData?.Description}
                 SeasonNum={getSeasonAmount(getMediaLocation)}
-                EpisodeNum={getEpisodeAmount(getMediaLocation)}></ContentInfo>
+                EpisodeNum={getEpisodeAmount(getMediaLocation)}
+              ></ContentInfo>
               <SelectionBox></SelectionBox>
               <Season_SelectionBox
                 onPress={() => setSeasonModal(true)}
-                TitleText={`Season ${getMediaLocation?.Series?.Seasons?.[getSeason].SeasonNum} - ${contentData.Title}`}></Season_SelectionBox>
+                TitleText={`Season ${getMediaLocation?.Series?.Seasons?.[getSeason].SeasonNum} - ${contentData.Title}`}
+              ></Season_SelectionBox>
 
               <Modal
                 transparent
                 visible={isSeasonModal}
                 onRequestClose={() => setSeasonModal(false)}
-                animationType="slide">
+                animationType="slide"
+              >
                 <SeasonModalContainer
                   onClose={() => setSeasonModal(false)}
                   SeasonData={getMediaLocation?.Series?.Seasons}
@@ -301,7 +331,8 @@ const ViewContent = ({ route, navigation }: any) => {
                   onPress={(index: any) => {
                     setSeason(index);
                     setSeasonModal(false);
-                  }}></SeasonModalContainer>
+                  }}
+                ></SeasonModalContainer>
               </Modal>
 
               <FlashList
@@ -326,8 +357,10 @@ const ViewContent = ({ route, navigation }: any) => {
                     }}
                     Source={{
                       uri: getThumbnailURL(contentData?.ID, getSeason + 1, item.Episode),
-                    }}></MediaItemCard>
-                )}></FlashList>
+                    }}
+                  ></MediaItemCard>
+                )}
+              ></FlashList>
             </View>
           </>
         )}

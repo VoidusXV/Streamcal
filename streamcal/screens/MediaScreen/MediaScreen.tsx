@@ -86,7 +86,8 @@ const NextEpisode_Container = ({
               routeParams?.getSeason + 1,
               EpisodeData?.Episode
             ),
-          }}></MediaItemCard>
+          }}
+        ></MediaItemCard>
       </View>
     );
   } else return <></>;
@@ -113,8 +114,10 @@ const FollowingEpisodes_Container = ({ Episodes, ContentID, index, getSeason }: 
               Description={item.Description}
               Source={{
                 uri: getThumbnailURL(ContentID, getSeason + 1, splicedEpisodes[index].Episode), // `http://192.168.2.121:3005/v1/test2?id=${ContentID}&season=1&episode=${item.Episode}&dr=thumb`,
-              }}></MediaItemCard>
-          )}></FlashList>
+              }}
+            ></MediaItemCard>
+          )}
+        ></FlashList>
       </View>
     );
   } else {
@@ -203,14 +206,18 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
   }, [isFullScreen]);
 
   React.useEffect(() => {
+    let isCancelled = false;
+
     (async () => {
-      console.log("route.params?.isFullScreen:", route?.params?.isFullScreen);
-      //if(route.params?.isFullScreen)
+      if (route.params?.isFullScreen) {
+        setFullScreen(route.params?.isFullScreen);
+      }
 
       setIsLoading(true);
-      // TODO: Running both asyncs at the same time
+      if (isCancelled) return;
+
       await image.downloadAsync();
-      //setImage(image);
+      if (isCancelled) return;
 
       await VideoRef?.current?.loadAsync({ uri: videoURL });
       await VideoRef.current.playAsync();
@@ -223,6 +230,7 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
 
       console.log("Starting Generate CroppedImages:", ImageAmount);
       for (let index = 0; index < ImageAmount; index++) {
+        if (isCancelled) return;
         generatedImages.push({
           zoomImageIndex: index,
           zoomImageURI: await zoomImage(image, index),
@@ -233,20 +241,27 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
       setGeneratedImages(generatedImages);
       console.log("Loading Should be done");
     })();
+
+    return () => {
+      console.log("Unload MediaScreen");
+      isCancelled = true;
+    };
   }, []);
 
   return (
     <ScrollView
       scrollEnabled={isFullScreen ? false : true}
       style={!isFullScreen ? styles.container : { backgroundColor: "black" }}
-      contentContainerStyle={{ paddingBottom: 50 }}>
+      contentContainerStyle={{ paddingBottom: 50 }}
+    >
       {isFullScreen && <StatusBar hidden></StatusBar>}
 
       <View
         style={{
           height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
           backgroundColor: "black",
-        }}>
+        }}
+      >
         {isLoading && (
           <>
             <MaterialIcons
@@ -254,13 +269,15 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
               size={Mini_IconSize}
               style={{ position: "absolute", zIndex: 2, marginLeft: "2%", marginTop: "2%" }}
               onPress={() => navigation?.goBack()}
-              color="white"></MaterialIcons>
+              color="white"
+            ></MaterialIcons>
             <LoadingIndicator
               style={{
                 position: "absolute",
                 height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
                 zIndex: 1,
-              }}></LoadingIndicator>
+              }}
+            ></LoadingIndicator>
           </>
         )}
         <VideoPlayer
@@ -271,9 +288,8 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
           CroppedImages={getGeneratedImages}
           isFullScreen={isFullScreen}
           isLoading={(e: any) => setIsLoading(e)}
-          ScreenButtonOnPress={async () =>
-            setFullScreen(await changeScreenOrientation())
-          }></VideoPlayer>
+          ScreenButtonOnPress={async () => setFullScreen(await changeScreenOrientation())}
+        ></VideoPlayer>
       </View>
 
       <View style={{ flex: 1 }}>
@@ -284,7 +300,8 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
             //backgroundColor: "red",
             flexDirection: "column",
             justifyContent: "center",
-          }}>
+          }}
+        >
           <Text
             style={{
               ...styles.EpisodeText,
@@ -293,12 +310,14 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
               marginTop: "4%",
               color: "#95b9fc",
               //textDecorationLine: "underline",
-            }}>
+            }}
+          >
             {ContentTitle}
           </Text>
 
           <Text
-            style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
+            style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
+          >
             Folge {item.Episode}: {item.Title}
           </Text>
           <Octicons
@@ -306,12 +325,14 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
             name="download"
             size={WindowSize.Width * 0.07}
             style={{ marginLeft: "auto", marginRight: "7%" }}
-            color="white"></Octicons>
+            color="white"
+          ></Octicons>
         </View>
         <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
         <NextEpisode_Container
           routeParams={{ ...route?.params, isFullScreen: isFullScreen }}
-          navigation={navigation}></NextEpisode_Container>
+          navigation={navigation}
+        ></NextEpisode_Container>
         {/* <FollowingEpisodes_Container
           Episodes={Episodes}
           ContentID={ContentID}

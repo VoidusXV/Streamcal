@@ -3,6 +3,7 @@ import React from "react";
 import Local_IP from "./Local_IP";
 import * as Device from "expo-device";
 import * as Crypto from "expo-crypto";
+import { IMediaData, ISeries } from "../components/constants/interfaces";
 
 interface IServerInfo {
   Description?: any;
@@ -63,15 +64,15 @@ async function getMediaLocations(ID: any) {
   return getServerData(mediaURL() + "?id=" + ID);
 }
 
-function getSeasonAmount(data: any) {
-  return Object.keys(data.Series.Seasons).length;
+function getSeasonAmount(data: IMediaData) {
+  return Object.keys(data.Series?.Seasons as any).length;
 }
 
-function getEpisodeAmount(data: any) {
+function getEpisodeAmount(data: IMediaData) {
   let Episodes = 0;
   const SeasonAmount = getSeasonAmount(data);
   for (let index = 0; index < SeasonAmount; index++) {
-    Episodes += Object.keys(data.Series.Seasons[index].Episodes).length;
+    Episodes += Object.keys(data?.Series?.Seasons?.[index].Episodes as any).length;
   }
   return Episodes;
 }

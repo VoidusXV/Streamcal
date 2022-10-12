@@ -4,7 +4,7 @@ import { RouteProp } from "@react-navigation/native";
 
 interface IMediaRouteParams {
   item?: any;
-  Episodes?: [IEpisodes];
+  Episodes?: Array<IEpisodes>;
   ContentTitle?: any;
   ContentID?: any;
   index?: any;
