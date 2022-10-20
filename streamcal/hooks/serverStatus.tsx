@@ -1,15 +1,28 @@
 import { useEffect, useState } from "react";
-export default function serverStatus() {
-  const [getServerStatus, setServerStatus] = useState<any>("0");
+
+interface IServerStatus {
+  Status?: any;
+  Version?: any;
+  Download_URL?: any;
+}
+
+function serverStatus() {
+  const [getServerStatus, setServerStatus] = useState<IServerStatus>({
+    Status: "",
+    Version: "",
+    Download_URL: "",
+  });
 
   useEffect(() => {
     async function loadServer() {
       try {
         const req = await fetch("https://pastebin.com/raw/Guayn0nR");
-        const data = await req.text();
-        setServerStatus(data);
-      } catch (e) {
-        setServerStatus("0");
+        const data: IServerStatus = await req.json();
+        if (data.Status) {
+          setServerStatus(data);
+        }
+      } catch (e: any) {
+        console.log("serverStatus Error", e.message);
       }
     }
 
@@ -18,3 +31,11 @@ export default function serverStatus() {
 
   return getServerStatus;
 }
+
+enum eServer {
+  Offline,
+  Online,
+}
+
+export default serverStatus;
+export { IServerStatus, eServer };

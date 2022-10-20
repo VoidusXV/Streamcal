@@ -1,145 +1,41 @@
 import React from "react";
 
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  Animated,
-  TouchableOpacity,
-  StyleProp,
-  ViewStyle,
-  Easing,
-  LayoutChangeEvent,
-} from "react-native";
+import { StyleSheet } from "react-native";
 import { backgroundColor, selectionColor } from "../components/constants/Colors";
 import { WindowSize } from "../components/constants/Layout";
-import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
 
-import FadingEdgesView from "../components/Designs/FadingEdgesView";
-import { Asset } from "expo-asset";
-import VideoPlayer from "../components/SubPages/MediaScreen/VideoPlayer/VideoPlayer";
-import NotifyBox, { Animation_Main } from "../components/Designs/NotifyBox";
-import SettingsButton from "../components/Designs/SettingsButton";
+import Downloads from "../components/SubPages/ListScreen/Downloads";
+import History from "../components/SubPages/ListScreen/History";
 
-import { MaterialIcons } from "@expo/vector-icons";
-import DropDownMenu from "../components/Designs/DropDownMenu";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
-async function zoomImage(imageURI: any, index: any) {
-  if (!imageURI) {
-    throw "Invalid imageURI";
-  }
-
-  const ImagesPerRow = 10;
-  const ImageWidth = 80;
-  const ImageHeight = 45;
-
-  const originX = (index % 10) * ImageWidth;
-  const originY = Math.trunc(index / ImagesPerRow) * ImageHeight;
-
-  const manipResult = await manipulateAsync(
-    imageURI.localUri || imageURI.uri,
-    [
-      {
-        crop: {
-          height: ImageHeight,
-          width: ImageWidth,
-          originX: originX,
-          originY: originY,
-        },
-      },
-    ],
-    { compress: 1, format: SaveFormat.JPEG }
-  );
-  return manipResult.uri;
-}
-
-function GeneratedImageExist(array: any, zoomImageIndex: any) {
-  return Boolean(array.find((element: any) => element.zoomImageIndex === zoomImageIndex));
-}
-
-function SaveGenerated_PreviewImages(array: any, zoomImageIndex: any, onAdd: any) {
-  if (GeneratedImageExist(array, zoomImageIndex)) return;
-
-  onAdd();
-  array.push(zoomImageIndex);
-}
-
-interface IGeneratedImages {
-  zoomImageIndex: any;
-  zoomImageURI: any;
-}
-
-const DescriptionContainer = ({ DescriptionText }: any) => {
-  return (
-    <View
-      style={{
-        width: "100%",
-        //backgroundColor: "red",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingTop: "3%",
-        paddingBottom: "3%",
-      }}
-    >
-      <Text
-        numberOfLines={2}
-        style={{ color: "white", fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
-      >
-        {DescriptionText}
-      </Text>
-    </View>
-  );
-};
+const Tab = createMaterialTopTabNavigator();
 
 export default function ListScreen({ navigation }: any) {
-  const [a, b] = React.useState<any>("");
-  let t: any;
-
-  React.useEffect(() => {
-    return () => {};
-  }, []);
-
   return (
-    <View style={styles.container}>
-      {/* <DropDownMenu endHeight={300}></DropDownMenu> */}
-
-      <NotifyBox MessageText={a}></NotifyBox>
-      {/* 
-      <SettingsButton
-        onPress={() => {
-          b(new Date().getMilliseconds());
-          Animation_Main();
-        }}
-      ></SettingsButton> */}
-
-      <SettingsButton
-        ButtonText={"Start"}
-        onPress={() => {
-          console.log("Start");
-          t = setTimeout(async () => console.log("Not Canceled"), 4000);
-        }}
-      ></SettingsButton>
-      <SettingsButton
-        ButtonText={"Stop"}
-        onPress={() => {
-          clearTimeout(t);
-        }}
-      ></SettingsButton>
-      {/* <DescriptionContainer DescriptionText={t}></DescriptionContainer> */}
-      {/* <FadingEdgesView
-        style={{ width: "100%", height: "100%", borderWidth: 1, borderColor: "green" }}
-        ParentBackgroundColor={"red"}>
-        <Image
-          source={Cover2}
-          resizeMethod="scale"
-          style={{
-            width: "100%",
-            height: "100%",
-            zIndex: 0,
-          }}></Image>
-      </FadingEdgesView> */}
-    </View>
+    <Tab.Navigator
+      style={{ backgroundColor: backgroundColor }}
+      pagerStyle={{ backgroundColor: "white" }}
+      backBehavior={"initialRoute"}
+      screenOptions={{
+        // tabBarIndicatorContainerStyle: {
+        //   backgroundColor: "rgba(255,255,255,0.1)",
+        // },
+        tabBarStyle: {
+          backgroundColor: backgroundColor,
+          borderColor: "white",
+        },
+        tabBarLabelStyle: { fontWeight: "500" },
+        tabBarIndicatorStyle: { backgroundColor: selectionColor },
+        tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
+        tabBarActiveTintColor: "white",
+        tabBarPressColor: "rgba(255,255,255,0.2)",
+      }}
+      sceneContainerStyle={{ backgroundColor: backgroundColor }}
+    >
+      <Tab.Screen name="History" component={History} />
+      <Tab.Screen name="Downloads" component={Downloads} />
+    </Tab.Navigator>
   );
 }
 

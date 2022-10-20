@@ -143,7 +143,7 @@ const ErrorContainer = ({ setServerOnline, isServerOnline, getAuthResponse }: an
     <View style={{ ...styles.container, ...styles.CenterChildren }}>
       <Text
         style={{
-          fontSize: WindowSize.Width * 0.07,
+          fontSize: WindowSize.Width * 0.06,
           color: "rgba(255,255,255,0.8)",
           marginBottom: "10%",
           maxWidth: "90%",

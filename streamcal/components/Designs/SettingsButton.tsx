@@ -13,14 +13,14 @@ interface ISettingsButton {
   IconName?: any;
 }
 
-const SettingsButton: React.FC<ISettingsButton> = ({
+const SettingsButton = ({
   onPress,
   style,
   textStyle,
   ButtonText,
   IconFamily,
   IconName,
-}: any) => (
+}: ISettingsButton) => (
   <TouchableHighlight
     onPress={onPress}
     underlayColor={"#202d46"}
@@ -36,7 +36,8 @@ const SettingsButton: React.FC<ISettingsButton> = ({
       backgroundColor: "#253959",
       borderRadius: WindowSize.Width * 0.01,
       ...style,
-    }}>
+    }}
+  >
     <>
       {IconFamily ? (
         <>
@@ -44,7 +45,8 @@ const SettingsButton: React.FC<ISettingsButton> = ({
             name={IconName}
             size={IconSize}
             style={{ marginLeft: "5%" }}
-            color="white"></IconFamily>
+            color="white"
+          ></IconFamily>
           <Text style={{ color: "white", fontSize: fontSize, marginLeft: "5%", ...textStyle }}>
             {ButtonText}
           </Text>
@@ -57,5 +59,4 @@ const SettingsButton: React.FC<ISettingsButton> = ({
 );
 
 export default SettingsButton;
-
-const styles = StyleSheet.create({});
+export { ISettingsButton };

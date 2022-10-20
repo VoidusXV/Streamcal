@@ -1,5 +1,5 @@
 import React from "react";
-import { StatusBar } from "react-native";
+import { Text, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import useCachedResources from "../hooks/useCachedResources";
@@ -12,8 +12,11 @@ import SettingsScreen from "./SettingsScreen";
 import { Ionicons, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { backgroundColor } from "../components/constants/Colors";
-import serverStatus from "../hooks/serverStatus";
-import { getServerData } from "../backend/serverConnection";
+import serverStatus, { eServer, IServerStatus } from "../hooks/serverStatus";
+import { getServerData, VERSION } from "../backend/serverConnection";
+import { WindowSize } from "../components/constants/Layout";
+import SettingsButton from "../components/Designs/SettingsButton";
+import ErrorView from "../components/Designs/ErrorView";
 
 const Tab = createBottomTabNavigator();
 
@@ -21,15 +24,34 @@ const isFocused = (focused: any) => {
   return focused ? "#5a82cc" : "#999999";
 };
 
-export default function MainScreen() {
-  const isLoadingComplete = useCachedResources();
-  const getServerStatus = serverStatus();
+function MainScreen() {
+  //const isLoadingComplete = useCachedResources();
+  let getServerStatus: IServerStatus = serverStatus();
 
+  console.log(getServerStatus);
   //__DEV__
-  if (getServerStatus == "0") {
-    return null;
-  } else if (!isLoadingComplete) {
-    return null;
+  if (getServerStatus.Status != eServer.Online && !__DEV__) {
+    return (
+      <ErrorView
+        ErrorText={"Master-Server is Offline, please try again later"}
+        SettingsButtonParams={{
+          ButtonText: "Retry",
+          style: { justifyContent: "center" },
+          onPress: () => console.log("first"),
+        }}
+      ></ErrorView>
+    );
+  } else if (getServerStatus.Version != VERSION && !__DEV__) {
+    return (
+      <ErrorView
+        ErrorText={"There is an update available, please download the latest version"}
+        SettingsButtonParams={{
+          ButtonText: "Download...",
+          style: { justifyContent: "center" },
+          onPress: () => console.log("Download..."),
+        }}
+      ></ErrorView>
+    );
   } else {
     return (
       <>
@@ -50,7 +72,7 @@ export default function MainScreen() {
             }}
           ></Tab.Screen>
           <Tab.Screen
-            name="Liste"
+            name="Lists"
             component={ListScreen}
             options={{
               headerShown: false,
@@ -78,3 +100,5 @@ export default function MainScreen() {
     );
   }
 }
+
+export default MainScreen;

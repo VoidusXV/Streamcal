@@ -14,6 +14,8 @@ interface IServerInfo {
   isAdmin?: any;
 }
 let currentConnectionInfo: IServerInfo = {};
+let VERSION = "1.0.0.0";
+
 //let Port = 3005;
 //let APIKEY = "";
 //let isAdmin: String = "";
@@ -206,4 +208,5 @@ export {
   AuthResponse,
   Server_SetUsers,
   CreateAPIKEY,
+  VERSION,
 };
