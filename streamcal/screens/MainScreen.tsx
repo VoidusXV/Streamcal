@@ -28,7 +28,7 @@ function MainScreen() {
   //const isLoadingComplete = useCachedResources();
   let getServerStatus: IServerStatus = serverStatus();
 
-  console.log(getServerStatus);
+  // console.log(getServerStatus);
   //__DEV__
   if (getServerStatus.Status != eServer.Online && !__DEV__) {
     return (

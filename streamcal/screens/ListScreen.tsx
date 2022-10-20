@@ -15,7 +15,6 @@ export default function ListScreen({ navigation }: any) {
   return (
     <Tab.Navigator
       style={{ backgroundColor: backgroundColor }}
-      pagerStyle={{ backgroundColor: "white" }}
       backBehavior={"initialRoute"}
       screenOptions={{
         // tabBarIndicatorContainerStyle: {
