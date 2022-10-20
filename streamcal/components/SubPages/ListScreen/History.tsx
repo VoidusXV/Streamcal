@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 import React from "react";
 import { FlashList } from "@shopify/flash-list";
 import { WindowSize } from "../../constants/Layout";
@@ -6,7 +6,7 @@ import { selectionColor } from "../../constants/Colors";
 
 const HistoryCard = () => {
   const width = WindowSize.Width * 0.47;
-  const mLeft = 1 - (width * 2) / WindowSize.Width;
+  const marginLeft = 1 - (width * 2) / WindowSize.Width;
   return (
     <View
       style={{
@@ -15,11 +15,22 @@ const HistoryCard = () => {
         backgroundColor: "white",
         borderRadius: 5,
         marginTop: WindowSize.Width * 0.05,
-        marginLeft: WindowSize.Width * (mLeft / 4),
+        marginLeft: WindowSize.Width * (marginLeft / 4),
       }}
     >
-      <View style={{ height: "50%", width: "100%", backgroundColor: "red" }}></View>
-      <View style={{ flex: 1, backgroundColor: selectionColor }}>
+      <View style={{ height: "50%", width: "100%", backgroundColor: "red" }}>
+        {/* <Image></Image> */}
+        <View
+          style={{
+            backgroundColor: selectionColor,
+            width: "50%",
+            height: "8%",
+            position: "absolute",
+            marginTop: WindowSize.Width * 0.185,
+          }}
+        ></View>
+      </View>
+      <View style={{ flex: 1, backgroundColor: "#22314d" }}>
         <Text
           numberOfLines={1}
           style={{

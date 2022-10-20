@@ -38,19 +38,22 @@ const HistoryCard = ({ item, navigation }: { item: IServerInfo; navigation: any 
         paddingBottom: "2%",
         paddingLeft: "5%",
         transform: [{ scale }],
-      }}>
+      }}
+    >
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={onPress}
         onPressIn={onPressIn}
-        onPressOut={onPressOut}>
+        onPressOut={onPressOut}
+      >
         <Text
           style={{
             color: "white",
             fontSize: WindowSize.Width * 0.045,
             maxWidth: "90%",
             textDecorationLine: "underline",
-          }}>
+          }}
+        >
           {item.Description}
         </Text>
         <Text
@@ -58,7 +61,8 @@ const HistoryCard = ({ item, navigation }: { item: IServerInfo; navigation: any 
             color: "white",
             fontSize: WindowSize.Width * 0.045,
             maxWidth: "90%",
-          }}>
+          }}
+        >
           {item.Server}:{item.Port}
         </Text>
         <Text
@@ -66,7 +70,8 @@ const HistoryCard = ({ item, navigation }: { item: IServerInfo; navigation: any 
             color: "white",
             fontSize: WindowSize.Width * 0.045,
             maxWidth: "90%",
-          }}>
+          }}
+        >
           {item.APIKEY}
         </Text>
       </TouchableOpacity>
@@ -100,16 +105,19 @@ const ServerHistoryScreen = ({ navigation }: any) => {
           marginRight: "7%",
           marginTop: "5%",
           fontWeight: "500",
-        }}>
+        }}
+      >
         CLEAR HISTORY
       </Text>
       {getHistory && getHistory.length > 0 && (
         <FlashList
           estimatedItemSize={10}
+          contentContainerStyle={{ paddingBottom: 50 }}
           data={getHistory}
           renderItem={({ item }: { item: IServerInfo }) => (
             <HistoryCard navigation={navigation} item={item}></HistoryCard>
-          )}></FlashList>
+          )}
+        ></FlashList>
       )}
     </View>
   );

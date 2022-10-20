@@ -67,7 +67,7 @@ const NextEpisode_Container = ({
     return (
       <View style={{ marginTop: "5%" }}>
         <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
-          Nächste Folge
+          Next Episode
         </Text>
         <MediaItemCard
           ID_Path={EpisodeData.Episode}
@@ -98,13 +98,13 @@ const FollowingEpisodes_Container = ({ Episodes, ContentID, index, getSeason }: 
   splicedEpisodes.splice(0, index + 2);
   if (splicedEpisodes && splicedEpisodes.length > 0) {
     return (
-      <View style={{ marginTop: "5%", flex: 1 }}>
+      <View style={{ marginTop: "5%", width: "100%", height: "100%" }}>
         <Text style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05 }}>
-          Weitere Folgen
+          Following Episodes
         </Text>
         <FlashList
           data={splicedEpisodes} // Staffel 1
-          estimatedItemSize={8}
+          estimatedItemSize={20}
           contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
           renderItem={({ item, index }: any) => (
             <MediaItemCard
@@ -318,7 +318,7 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
           <Text
             style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
           >
-            Folge {item.Episode}: {item.Title}
+            Episode {item.Episode}: {item.Title}
           </Text>
           <Octicons
             onPress={() => clearTimeout(timer)}
@@ -333,11 +333,12 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
           routeParams={{ ...route?.params, isFullScreen: isFullScreen }}
           navigation={navigation}
         ></NextEpisode_Container>
-        {/* <FollowingEpisodes_Container
+        <FollowingEpisodes_Container
           Episodes={Episodes}
           ContentID={ContentID}
           getSeason={getSeason}
-          index={index}></FollowingEpisodes_Container> */}
+          index={index}
+        ></FollowingEpisodes_Container>
       </View>
     </ScrollView>
   );

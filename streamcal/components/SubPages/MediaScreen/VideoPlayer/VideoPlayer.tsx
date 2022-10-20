@@ -418,7 +418,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
                 ></Slider_Preview>
               )}
               <SliderBar
-                isFullscreen={isFullScreen} //false
+                isFullscreen={false} //false
                 maximumValue={Duration.current}
                 value={getStatus.positionMillis}
                 onValueChange={async (e: any) => {
