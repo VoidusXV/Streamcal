@@ -5,7 +5,7 @@
         "SeasonNum": 1,
         "Episodes": [
           {
-            "Episode": 1,
+            "EpisodeNum": 1,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/1/1.mp4",
             "Title": "Easy does it",
@@ -13,7 +13,7 @@
             "Duration": 1453732
           },
           {
-            "Episode": 2,
+            "EpisodeNum": 2,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/2/2.mp4",
             "Title": "The more the merrier",

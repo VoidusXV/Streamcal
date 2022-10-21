@@ -70,7 +70,7 @@ namespace MediaHandler
 
             public class Episodes
             {
-                public int Episode { get; set; }
+                public int EpisodeNum { get; set; }
                 public string Thumbnail { get; set; }
                 public string Path { get; set; }
                 public string Title { get; set; }
