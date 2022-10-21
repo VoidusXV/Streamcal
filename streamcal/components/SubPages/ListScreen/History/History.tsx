@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { FlashList } from "@shopify/flash-list";
 import { WindowSize } from "../../../constants/Layout";
@@ -17,7 +17,7 @@ import {
 import { IFilteredEpisodeHistory, IHistory, IHistoryData } from "./HistoryInterfaces";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const HistoryCard = ({ item }: { item?: IFilteredEpisodeHistory }) => {
+const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPress: any }) => {
   const [ThumbnailURL, setThumbnailURL] = React.useState("");
 
   const width = WindowSize.Width * 0.47;
@@ -36,7 +36,9 @@ const HistoryCard = ({ item }: { item?: IFilteredEpisodeHistory }) => {
   }, []);
 
   return (
-    <View
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={onPress}
       style={{
         width: width,
         height: WindowSize.Width * 0.5,
@@ -114,7 +116,7 @@ const HistoryCard = ({ item }: { item?: IFilteredEpisodeHistory }) => {
           {`${item?.Episode?.Title}`}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -171,7 +173,22 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
         data={getHistoryData}
         numColumns={2}
         contentContainerStyle={{ paddingBottom: 200 }}
-        renderItem={({ item }) => <HistoryCard item={item}></HistoryCard>}
+        renderItem={({ item }) => (
+          <HistoryCard
+            onPress={() =>
+              navigation.replace("MediaScreen", {
+                //item,
+                ContentTitle: item?.ContentTitle,
+                ContentID: item?.HistoryData?.ContentID,
+                Episodes: item.Episode,
+                index: 0,
+                getSeason: item.HistoryData?.SeasonNum,
+                isFullScreen: false,
+              })
+            }
+            item={item}
+          ></HistoryCard>
+        )}
       ></FlashList>
     </View>
   );
