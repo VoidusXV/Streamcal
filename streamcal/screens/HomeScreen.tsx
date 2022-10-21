@@ -18,6 +18,8 @@ import {
 import { GetData_AsyncStorage } from "../components/constants/DataHandling";
 import SettingsButton from "../components/Designs/SettingsButton";
 import LoadingIndicator from "../components/Designs/LoadingIndicator";
+import { IContentInfo } from "../components/constants/interfaces";
+import { gContent } from "../components/constants/Content";
 
 const TilteContainer = () => {
   return (
@@ -165,18 +167,18 @@ const ErrorContainer = ({ setServerOnline, isServerOnline, getAuthResponse }: an
 
 interface IGetServerContentAndStatus {
   serverStatus: Boolean;
-  content: {};
+  content: Array<IContentInfo>;
 }
 async function GetServerContentAndStatus(): Promise<IGetServerContentAndStatus> {
   const serverStatus = await IsServerReachable();
-  if (!serverStatus) return { serverStatus: serverStatus, content: {} };
+  if (!serverStatus) return { serverStatus: serverStatus, content: [] };
 
   const data = await getAllContent();
   return { serverStatus: serverStatus, content: data };
 }
 
 export default function HomeScreen({ navigation }: any) {
-  const [getContent, setContent] = React.useState({});
+  const [getContent, setContent] = React.useState([]);
   const [isServerOnline, setServerOnline] = React.useState<any>(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [getAuthResponse, setAuthResponse] = React.useState(null);
@@ -214,7 +216,8 @@ export default function HomeScreen({ navigation }: any) {
         }
 
         setServerOnline(ContentAndStatus.serverStatus);
-        setContent(ContentAndStatus.content);
+        setContent(ContentAndStatus.content as any);
+        gContent.data = ContentAndStatus.content;
       } catch (e: any) {
         console.log("Listener Error", e.message);
       } finally {

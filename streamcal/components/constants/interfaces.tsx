@@ -17,6 +17,14 @@ interface IServerInfo {
   isAdmin?: any;
 }
 
+interface IContentInfo {
+  Availability?: any;
+  Description?: any;
+  Genre?: any;
+  ID?: any;
+  Title?: any;
+}
+
 interface ICurrentContentInfo {
   Cover?: any;
   Description?: any;
@@ -52,6 +60,7 @@ interface IGeneratedImages {
 export {
   IUserInfo,
   IServerInfo,
+  IContentInfo,
   ICurrentContentInfo,
   IMediaData,
   IGeneratedImages,

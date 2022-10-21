@@ -215,6 +215,7 @@ async function Server_AddHistory(ContentID: any, Season: any, Episode: any) {
 
   await fetch(URL, requestOptions);
 }
+
 async function Server_GetHistory() {
   const DeviceID = await Generate_DeviceID();
   let URL = `${baseAPIURL()}/get-history`;

@@ -4,6 +4,8 @@ import { FlashList } from "@shopify/flash-list";
 import { WindowSize } from "../../constants/Layout";
 import { selectionColor } from "../../constants/Colors";
 import { Server_GetHistory } from "../../../backend/serverConnection";
+import { gContent } from "../../constants/Content";
+import { IContentInfo } from "../../constants/interfaces";
 
 const HistoryCard = () => {
   const width = WindowSize.Width * 0.47;
@@ -21,7 +23,7 @@ const HistoryCard = () => {
     >
       <View style={{ height: "50%", width: "100%", backgroundColor: "red" }}>
         {/* <Image></Image> */}
-        <View
+        {/* <View
           style={{
             backgroundColor: selectionColor,
             width: "50%",
@@ -29,7 +31,7 @@ const HistoryCard = () => {
             position: "absolute",
             marginTop: WindowSize.Width * 0.185,
           }}
-        ></View>
+        ></View> */}
       </View>
       <View style={{ flex: 1, backgroundColor: "#22314d" }}>
         <Text
@@ -75,11 +77,34 @@ const HistoryCard = () => {
 };
 
 const data = [{ kok: "1" }, { kok: "2" }, { kok: "3" }, { kok: "4" }, {}, {}];
+
+interface IHistory {
+  ContentID: any;
+  Season: any; // TODO: change to SeasonNum and backend
+  EpisodeNum: any;
+}
+
+function getContentByContentID(contentData: Array<IContentInfo>, ContentID: any): IContentInfo {
+  for (let index = 0; index < contentData.length; index++) {
+    if (contentData[index].ID == ContentID) return contentData[index];
+  }
+  return "" as IContentInfo;
+}
+
 const History = () => {
-  const [getHistoryData, setHistoryData] = React.useState([]);
+  const [getHistoryData, setHistoryData] = React.useState<Array<IContentInfo>>([]);
   React.useEffect(() => {
     (async () => {
-      setHistoryData(await Server_GetHistory());
+      const historyData: Array<IHistory> = await Server_GetHistory();
+      let filteredHistoryData: Array<IContentInfo> = [];
+      historyData.forEach((e) =>
+        filteredHistoryData.push(getContentByContentID(gContent.data, e.ContentID))
+      );
+
+      setHistoryData(filteredHistoryData);
+
+      // historyData.
+      //console.log("Test:", gContent.data[0]);
     })();
   }, []);
 
@@ -87,7 +112,7 @@ const History = () => {
     <View style={{ width: "100%", height: "100%" }}>
       <FlashList
         estimatedItemSize={20}
-        data={data}
+        data={getHistoryData}
         numColumns={2}
         contentContainerStyle={{ paddingBottom: 200 }}
         renderItem={() => <HistoryCard></HistoryCard>}
