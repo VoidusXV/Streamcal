@@ -57,6 +57,12 @@ interface IGeneratedImages {
   zoomImageIndex: any;
   zoomImageURI: any;
 }
+
+interface IMediaDataIdentifier {
+  contentID: any;
+  mediaData?: IMediaData;
+}
+
 export {
   IUserInfo,
   IServerInfo,
@@ -66,4 +72,5 @@ export {
   IGeneratedImages,
   ISeries,
   IEpisode,
+  IMediaDataIdentifier,
 };

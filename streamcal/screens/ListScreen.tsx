@@ -5,7 +5,7 @@ import { backgroundColor, selectionColor } from "../components/constants/Colors"
 import { WindowSize } from "../components/constants/Layout";
 
 import Downloads from "../components/SubPages/ListScreen/Downloads";
-import History from "../components/SubPages/ListScreen/History";
+import History from "../components/SubPages/ListScreen/History/History";
 
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 

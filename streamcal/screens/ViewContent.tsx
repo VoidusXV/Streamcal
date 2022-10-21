@@ -24,6 +24,7 @@ import {
 } from "../backend/serverConnection";
 import { ICurrentContentInfo, IEpisode, IMediaData } from "../components/constants/interfaces";
 import LoadingIndicator from "../components/Designs/LoadingIndicator";
+import { gContent } from "../components/constants/Content";
 
 const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
   const [getTextHeight, setTextHeight] = React.useState<any>(0);
@@ -276,6 +277,8 @@ const ViewContent = ({ route, navigation }: any) => {
     const _AbortController = new AbortController();
     let unsub = setTimeout(async () => {
       data = await getMediaLocations(contentData?.ID, _AbortController);
+
+      gContent.mediaData.push({ contentID: contentData?.ID, mediaData: data });
       console.log("Loaded Media");
       setMediaLocation(data);
       setIsLoading(false);
@@ -339,7 +342,7 @@ const ViewContent = ({ route, navigation }: any) => {
               </Modal>
 
               <FlashList
-                data={getMediaLocation?.Series?.Seasons?.[getSeason].Episodes} // Staffel 1
+                data={getMediaLocation?.Series?.Seasons?.[getSeason].Episodes}
                 estimatedItemSize={20}
                 contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
                 renderItem={({ item, index }: { item?: IEpisode; index: any }) => (

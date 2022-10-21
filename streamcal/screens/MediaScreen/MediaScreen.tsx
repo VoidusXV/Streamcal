@@ -334,7 +334,7 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
             color="white"
           ></Octicons>
         </View>
-        <Seperator style={{ marginTop: "5%", height: "0.2%" }}></Seperator>
+        <Seperator style={{ marginTop: "5%", height: "0.03%" }}></Seperator>
         <NextEpisode_Container
           routeParams={{ ...route?.params, isFullScreen: isFullScreen }}
           navigation={navigation}

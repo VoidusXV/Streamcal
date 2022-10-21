@@ -209,7 +209,7 @@ async function Server_AddHistory(ContentID: any, Season: any, Episode: any) {
     body: JSON.stringify({
       APIKey: currentConnectionInfo.APIKEY,
       DeviceID: DeviceID,
-      UpdateObject: { ContentID: ContentID, Season: Season, Episode: Episode },
+      UpdateObject: { ContentID: ContentID, SeasonNum: Season, EpisodeNum: Episode },
     }),
   };
 
