@@ -396,7 +396,7 @@ app.get("/v1/authenticate-user", (req, res) => {
   }
 });
 
-app.get("/v1/get-history", (req, res) => {
+app.post("/v1/get-history", (req, res) => {
   (async () => {
     try {
       const API_APIKey = req.body.APIKey;
