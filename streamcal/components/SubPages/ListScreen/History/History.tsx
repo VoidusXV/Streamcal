@@ -12,7 +12,8 @@ import { gContent } from "../../../constants/Content";
 import { IMediaData } from "../../../constants/interfaces";
 import {
   getContentInfoByContentID,
-  getEpisodeIndexByEpisdeNum,
+  getEpisodeByEpisdeNum,
+  getIndexByEpisodeNum,
 } from "../../../../backend/MediaHandler";
 import { IFilteredEpisodeHistory, IHistory, IHistoryData } from "./HistoryInterfaces";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -28,7 +29,7 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
       setThumbnailURL(
         await getThumbnailURL(
           item?.HistoryData?.ContentID,
-          item?.SeasonNum,
+          item?.HistoryData?.SeasonNum + 1,
           item?.Episode?.EpisodeNum
         )
       );
@@ -46,8 +47,7 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
         borderRadius: 5,
         marginTop: WindowSize.Width * 0.05,
         marginLeft: WindowSize.Width * (marginLeft / 4),
-      }}
-    >
+      }}>
       <View style={{ height: "50%", width: "100%" }}>
         {ThumbnailURL && (
           <Image
@@ -58,8 +58,7 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
               borderTopLeftRadius: 5,
               borderTopRightRadius: 5,
             }}
-            source={{ uri: ThumbnailURL }}
-          ></Image>
+            source={{ uri: ThumbnailURL }}></Image>
         )}
         {/* <View
           style={{
@@ -77,8 +76,7 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
           backgroundColor: "#22314d",
           borderBottomLeftRadius: 5,
           borderBottomRightRadius: 5,
-        }}
-      >
+        }}>
         <Text
           numberOfLines={1}
           style={{
@@ -86,8 +84,7 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
             marginTop: "4%",
             color: "rgba(255,255,255,0.8)",
             maxWidth: "90%",
-          }}
-        >
+          }}>
           {item?.ContentTitle.toUpperCase()}
         </Text>
         <Text
@@ -99,9 +96,8 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
             color: "rgba(255,255,255,0.8)",
             maxWidth: "90%",
             // fontSize: WindowSize.Width * 0.04,
-          }}
-        >
-          {`SEASON ${item?.SeasonNum} | EPISODE ${item?.Episode?.EpisodeNum}`}
+          }}>
+          {`SEASON ${item?.HistoryData?.SeasonNum + 1} | EPISODE ${item?.Episode?.EpisodeNum}`}
         </Text>
         <Text
           numberOfLines={1}
@@ -111,8 +107,7 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
             color: "white",
             maxWidth: "90%",
             fontSize: WindowSize.Width * 0.04,
-          }}
-        >
+          }}>
           {`${item?.Episode?.Title}`}
         </Text>
       </View>
@@ -130,20 +125,19 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
       const historyData: Array<IHistoryData> = await Server_GetHistory();
       // const data = await getMediaLocations(contentData?.ID);
 
-      let filteredHistoryData: any = [];
+      let filteredHistoryData: Array<IFilteredEpisodeHistory> = [];
       //TODO: only do this if gContent.mediaData is empty
       for (const e of historyData) {
         const data: IMediaData = await getMediaLocations(e?.ContentID, _AbortController);
 
-        const Episode = getEpisodeIndexByEpisdeNum(
+        const Episode = getEpisodeByEpisdeNum(
           data.Series?.Seasons?.[e.SeasonNum]?.Episodes,
           e.EpisodeNum
         );
-
         filteredHistoryData.push({
           ContentTitle: getContentInfoByContentID(gContent.data, e.ContentID)?.Title,
           HistoryData: e,
-          SeasonNum: e.SeasonNum + 1,
+          Episodes: data.Series?.Seasons?.[e.SeasonNum]?.Episodes,
           Episode,
         }); //TODO: If Movies are supported make it variable
       }
@@ -176,20 +170,18 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
         renderItem={({ item }) => (
           <HistoryCard
             onPress={() =>
-              navigation.replace("MediaScreen", {
-                //item,
+              navigation.navigate("MediaScreen", {
+                Episode: item.Episode, //
                 ContentTitle: item?.ContentTitle,
                 ContentID: item?.HistoryData?.ContentID,
-                Episodes: item.Episode,
-                index: 0,
+                Episodes: item.Episodes,
+                index: getIndexByEpisodeNum(item.Episodes, item.Episode?.EpisodeNum),
                 getSeason: item.HistoryData?.SeasonNum,
                 isFullScreen: false,
               })
             }
-            item={item}
-          ></HistoryCard>
-        )}
-      ></FlashList>
+            item={item}></HistoryCard>
+        )}></FlashList>
     </View>
   );
 };

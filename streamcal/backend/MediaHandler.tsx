@@ -1,9 +1,6 @@
 import { IContentInfo, IEpisode } from "../components/constants/interfaces";
 
-function getEpisodeIndexByEpisdeNum(
-  Episodes?: Array<IEpisode>,
-  EpisodeNum?: any
-): IEpisode | undefined {
+function getEpisodeByEpisdeNum(Episodes?: Array<IEpisode>, EpisodeNum?: any): IEpisode | undefined {
   if (!Episodes) return undefined;
 
   for (let index = 0; index < Episodes.length; index++) {
@@ -24,4 +21,13 @@ function getContentInfoByContentID(
   return undefined;
 }
 
-export { getEpisodeIndexByEpisdeNum, getContentInfoByContentID };
+function getIndexByEpisodeNum(Episodes?: Array<IEpisode>, EpisodeNum?: any): any | undefined {
+  if (!Episodes) return undefined;
+
+  for (let index = 0; index < Episodes.length; index++) {
+    if (Episodes[index].EpisodeNum == EpisodeNum) return index;
+  }
+  return undefined;
+}
+
+export { getEpisodeByEpisdeNum, getContentInfoByContentID, getIndexByEpisodeNum };

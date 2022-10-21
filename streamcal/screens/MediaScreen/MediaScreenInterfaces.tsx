@@ -3,7 +3,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 
 interface IMediaRouteParams {
-  item?: IEpisode;
+  Episode?: IEpisode;
   Episodes?: Array<IEpisode>;
   ContentTitle?: any;
   ContentID?: any;

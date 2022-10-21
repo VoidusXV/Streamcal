@@ -191,7 +191,7 @@ app.get("/v1/create-apikey", (req, res) => {
         Enabled: true,
         FirstLogin: "", // new Date().toUTCString(),
         LastLogin: "", // new Date().toUTCString(),
-        History: [{}],
+        History: [],
         DeviceID: "",
         Description: API_Description || "",
       };

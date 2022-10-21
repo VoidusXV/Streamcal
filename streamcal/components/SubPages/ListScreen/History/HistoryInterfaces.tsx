@@ -14,7 +14,7 @@ interface IHistoryData {
 interface IFilteredEpisodeHistory {
   ContentTitle?: any;
   HistoryData?: IHistoryData;
-  SeasonNum?: any;
+  Episodes?: Array<IEpisode>;
   Episode?: IEpisode;
 }
 
