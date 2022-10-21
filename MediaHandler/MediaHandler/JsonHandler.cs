@@ -14,7 +14,7 @@ namespace MediaHandler
         {
             FileHandler.Locations.Episodes NewEpisode = new FileHandler.Locations.Episodes
             {
-                Episode = Episode,
+                EpisodeNum = Episode,
                 Thumbnail = "Thumbnail.jpg",
                 Path = Path,
                 Title = Title,
@@ -33,17 +33,17 @@ namespace MediaHandler
 
             //temp.Series.Seasons[NewContentSeason_Index].Episodes.Add(NewEpisode); //Old
 
-            // Sort Episode
+            // Sort EpisodeNum
 
-            Console.WriteLine("Sort Episode");
+            Console.WriteLine("Sort EpisodeNum");
             int EpisodeCount = temp.Series.Seasons[NewContentSeason_Index].Episodes.Count;
 
 
             for (int i = 0; i < EpisodeCount; i++)
             {
-                if (temp.Series.Seasons[NewContentSeason_Index].Episodes[i].Episode > Episode)
+                if (temp.Series.Seasons[NewContentSeason_Index].Episodes[i].EpisodeNum > Episode)
                 {
-                    Console.WriteLine($"Episode Insert at {i}");
+                    Console.WriteLine($"EpisodeNum Insert at {i}");
                     temp.Series.Seasons[NewContentSeason_Index].Episodes.Insert(i, NewEpisode);
                     File.WriteAllText(jsonPath, JsonConvert.SerializeObject(temp, Formatting.Indented));
 

@@ -292,10 +292,10 @@ namespace MediaHandler
              string Season = SeasonAndEpisode.Substring(1, SeasonAndEpisode.IndexOf("E") - 1);
 
              int EpisodeTextLength = SeasonAndEpisode.Length - Season.Length - 2;
-             string Episode = SeasonAndEpisode.Substring(SeasonAndEpisode.IndexOf("E") + 1, EpisodeTextLength);
+             string EpisodeNum = SeasonAndEpisode.Substring(SeasonAndEpisode.IndexOf("E") + 1, EpisodeTextLength);
 
              string Title = TitleWithEpisodeAndSeason.Replace($".{SeasonAndEpisode}", "").Replace(".", " ");
-             return new FileHandler.Series { Title = Title, Episode = Episode, Season = Season };
+             return new FileHandler.Series { Title = Title, EpisodeNum = EpisodeNum, Season = Season };
 
          }*/
         public void GetContentInfo()
@@ -566,7 +566,7 @@ namespace MediaHandler
 
             FileHandler.Locations.Episodes NewEpisode = new FileHandler.Locations.Episodes
             {
-                Episode = 5,
+                EpisodeNum = 5,
                 Thumbnail = "Thumbnail.jpg",
                 Path = "Path",
                 Title = "Title",
@@ -576,7 +576,7 @@ namespace MediaHandler
 
             for (int i = 0; i < LocationObject.Series.Seasons[0].Episodes.Count; i++)
             {
-                if (LocationObject.Series.Seasons[0].Episodes[i].Episode > NewContent_JsonObject.Episode)
+                if (LocationObject.Series.Seasons[0].Episodes[i].EpisodeNum > NewContent_JsonObject.Episode)
                 {
                     LocationObject.Series.Seasons[0].Episodes.Insert(i, NewEpisode);
                     break;

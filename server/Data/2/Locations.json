@@ -5,7 +5,7 @@
         "SeasonNum": 1,
         "Episodes": [
           {
-            "Episode": 1,
+            "EpisodeNum": 1,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/1/1.mp4",
             "Title": "Aufbruch x und x Gefährten",
@@ -13,7 +13,7 @@
             "Duration": 1427206
           },
           {
-            "Episode": 2,
+            "EpisodeNum": 2,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/2/2.mp4",
             "Title": "Prüfung x der x Prüfungen",
@@ -21,7 +21,7 @@
             "Duration": 1427334
           },
           {
-            "Episode": 3,
+            "EpisodeNum": 3,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/3/3.mp4",
             "Title": "Rivalen x ums x Überleben",
@@ -29,7 +29,7 @@
             "Duration": 1427334
           },
           {
-            "Episode": 4,
+            "EpisodeNum": 4,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/4/4.mp4",
             "Title": "Hoffnung x und x Ehrgeiz",
@@ -37,7 +37,7 @@
             "Duration": 1427548
           },
           {
-            "Episode": 5,
+            "EpisodeNum": 5,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/5/5.mp4",
             "Title": "Hisoka x ist x verstohlen",
@@ -45,7 +45,7 @@
             "Duration": 1427420
           },
           {
-            "Episode": 6,
+            "EpisodeNum": 6,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/6/6.mp4",
             "Title": "Eine x unerwartete x Aufgabex",
@@ -53,7 +53,7 @@
             "Duration": 1426886
           },
           {
-            "Episode": 7,
+            "EpisodeNum": 7,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/7/7.mp4",
             "Title": "Entscheidungskampf x im x Luftschiff",
@@ -61,7 +61,7 @@
             "Duration": 1427356
           },
           {
-            "Episode": 8,
+            "EpisodeNum": 8,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/8/8.mp4",
             "Title": "Entscheidung x durch x Mehrheitsbeschluss?",
@@ -69,7 +69,7 @@
             "Duration": 1427462
           },
           {
-            "Episode": 9,
+            "EpisodeNum": 9,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/9/9.mp4",
             "Title": "Seid auf der Hut x vor x Häftlingen",
@@ -77,7 +77,7 @@
             "Duration": 1427462
           },
           {
-            "Episode": 10,
+            "EpisodeNum": 10,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/10/10.mp4",
             "Title": "Der Anlass x für x den Trick",
@@ -85,7 +85,7 @@
             "Duration": 1430726
           },
           {
-            "Episode": 15,
+            "EpisodeNum": 15,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/15/15.mp4",
             "Title": "Betrügerisches x gegenseitiges x Gerangel",
@@ -93,7 +93,7 @@
             "Duration": 1427548
           },
           {
-            "Episode": 16,
+            "EpisodeNum": 16,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/16/16.mp4",
             "Title": "Betrügerisches x gegenseitiges x Gerangel",
@@ -101,7 +101,7 @@
             "Duration": 1427548
           },
           {
-            "Episode": 17,
+            "EpisodeNum": 17,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/17/17.mp4",
             "Title": "Falle x in der x Höhle",
@@ -109,7 +109,7 @@
             "Duration": 1426950
           },
           {
-            "Episode": 18,
+            "EpisodeNum": 18,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/18/18.mp4",
             "Title": "Ein x wichtiges x Gespräch",
@@ -117,7 +117,7 @@
             "Duration": 1431942
           },
           {
-            "Episode": 19,
+            "EpisodeNum": 19,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/19/19.mp4",
             "Title": "Ein x wichtiges x Gespräch",
@@ -125,7 +125,7 @@
             "Duration": 1431942
           },
           {
-            "Episode": 20,
+            "EpisodeNum": 20,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/20/20.mp4",
             "Title": "Ein x wichtiges x Gespräch",
@@ -133,7 +133,7 @@
             "Duration": 1431942
           },
           {
-            "Episode": 22,
+            "EpisodeNum": 22,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/22/22.mp4",
             "Title": "Ein x gefährlicher x Wachhund",
@@ -141,7 +141,7 @@
             "Duration": 1427441
           },
           {
-            "Episode": 23,
+            "EpisodeNum": 23,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/23/23.mp4",
             "Title": "Die Pflicht x des x Wächters",
@@ -149,7 +149,7 @@
             "Duration": 1427356
           },
           {
-            "Episode": 24,
+            "EpisodeNum": 24,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/24/24.mp4",
             "Title": "Die x Familie x Zoldyck",
@@ -157,7 +157,7 @@
             "Duration": 1427142
           },
           {
-            "Episode": 25,
+            "EpisodeNum": 25,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/25/25.mp4",
             "Title": "Du musst sehen x um x treffen zu können",
@@ -165,7 +165,7 @@
             "Duration": 1427292
           },
           {
-            "Episode": 26,
+            "EpisodeNum": 26,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/26/26.mp4",
             "Title": "Seither x und x danach",
@@ -173,7 +173,7 @@
             "Duration": 1431046
           },
           {
-            "Episode": 27,
+            "EpisodeNum": 27,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/27/27.mp4",
             "Title": "Ankunft x in der x Arena",
@@ -181,7 +181,7 @@
             "Duration": 1423388
           },
           {
-            "Episode": 28,
+            "EpisodeNum": 28,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/28/28.mp4",
             "Title": "Nen x und x Ren",
@@ -189,7 +189,7 @@
             "Duration": 1423046
           },
           {
-            "Episode": 29,
+            "EpisodeNum": 29,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/29/29.mp4",
             "Title": "Erwachen x und x Potential",
@@ -197,7 +197,7 @@
             "Duration": 1423878
           },
           {
-            "Episode": 30,
+            "EpisodeNum": 30,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/30/30.mp4",
             "Title": "Heftiger Kampf x und x Konflikt",
@@ -205,7 +205,7 @@
             "Duration": 1423196
           },
           {
-            "Episode": 31,
+            "EpisodeNum": 31,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/31/31.mp4",
             "Title": "Schicksal x und x Beharrlichkeit",
@@ -213,7 +213,7 @@
             "Duration": 1422406
           },
           {
-            "Episode": 33,
+            "EpisodeNum": 33,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/33/33.mp4",
             "Title": "Eine x leichtfertige x Drohung",
@@ -221,7 +221,7 @@
             "Duration": 1423004
           },
           {
-            "Episode": 34,
+            "EpisodeNum": 34,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/34/34.mp4",
             "Title": "Mit Können x zur x Revanche",
@@ -229,7 +229,7 @@
             "Duration": 1421830
           },
           {
-            "Episode": 35,
+            "EpisodeNum": 35,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/35/35.mp4",
             "Title": "Vollkommen x bestanden",

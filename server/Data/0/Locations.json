@@ -5,7 +5,7 @@
         "SeasonNum": 1,
         "Episodes": [
           {
-            "Episode": 2,
+            "EpisodeNum": 2,
             "Thumbnail": "Thumbnail.jpg",
             "Path": "/Series/Season_1/2/2.mp4",
             "Title": "Ich meine es ernst",
@@ -13,7 +13,7 @@
             "Duration": 1461600
           },
           {
-            "Episode": 7,
+            "EpisodeNum": 7,
             "Thumbnail": "Thumbnail.jpg",
             "Path": null,
             "Title": "Du wirst etwas einmaliges sehen7",

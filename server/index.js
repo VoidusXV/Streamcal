@@ -86,32 +86,18 @@ async function GetUsers(_isAdmin, API_KEYS_Coll, adminAccess = true) {
   return Users;
 }
 async function GetUserByAPIKEY(API_KEYS_Coll, API_APIKey) {
-  const Users = await GetUsers(null, API_KEYS_Coll, false);
-  let User = null;
-  Users.forEach((UserData) => {
-    if (UserData.APIKEY == API_APIKey) {
-      User = UserData;
-      return;
-    }
-  });
-
-  return User;
+  return await API_KEYS_Coll.findOne({ APIKEY: API_APIKey });
 }
 
 async function UpdateDocument(Collection, filter, updateObject) {
   const updateDoc = {
-    $set: updateObject,
+    $set: updateObject, // $set: updateObject,
   };
 
   await Collection.updateOne(filter, updateDoc).catch((e) => console.log(e));
 }
 
 // Media API
-app.get("/v1/test", (req, res) => {
-  const testVid = __dirname + "/Data/0/Series/Season_1/7/7.mp4";
-  console.log(testVid);
-  res.sendFile(testVid);
-});
 
 app.get("/v1/test2", (req, res) => {
   try {
@@ -351,9 +337,6 @@ const LoginStatus = {
 app.get("/v1/authenticate-user", (req, res) => {
   try {
     (async () => {
-      await MongoClient.connect();
-      const database = MongoClient.db("Streamcal");
-      const API_KEYS_Coll = database.collection("API_KEYS");
       const API_APIKey = new URLSearchParams(req.url).get("/v1/authenticate-user?apikey");
       const API_DeviceID = new URLSearchParams(req.url).get("deviceId");
 
@@ -362,6 +345,10 @@ app.get("/v1/authenticate-user", (req, res) => {
         res.status(403).end();
         return;
       }
+
+      await MongoClient.connect();
+      const database = MongoClient.db("Streamcal");
+      const API_KEYS_Coll = database.collection("API_KEYS");
       const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
       //console.log(User.length === 0, User);
 
@@ -385,7 +372,9 @@ app.get("/v1/authenticate-user", (req, res) => {
         res.send(LoginStatus.New_User).end();
       } else if (User.DeviceID != API_DeviceID) {
         // Authentication Failed => Wrong DeviceID
-        console.log("Authentication Failed => Wrong DeviceID", new Date().toUTCString());
+        //console.log(`Wrong DeviceID ${User.DeviceID} != ${API_DeviceID}`, new Date().toUTCString());
+        console.log("authenticate-user: Wrong DeviceID", new Date().toUTCString());
+
         res.send(LoginStatus.Wrong_Device).end();
       } else if (User.DeviceID == API_DeviceID) {
         // Login succeed
@@ -405,6 +394,78 @@ app.get("/v1/authenticate-user", (req, res) => {
   } finally {
     //MongoClient.close();
   }
+});
+
+app.get("/v1/get-history", (req, res) => {
+  (async () => {
+    try {
+      const API_APIKey = req.body.APIKey;
+      const API_DeviceID = req.body.DeviceID;
+
+      if (!API_APIKey || !API_DeviceID) {
+        console.log("get-history: missing params");
+        res.status(403);
+        return;
+      }
+
+      await MongoClient.connect();
+      const database = MongoClient.db("Streamcal");
+      const API_KEYS_Coll = database.collection("API_KEYS");
+      const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
+
+      if (User.DeviceID != API_DeviceID) {
+        console.log("get-history: wrong DeviceID");
+        res.status(403);
+        return;
+      }
+      res.send(User.History);
+    } catch (e) {
+      console.log("add-history error", e.message);
+    } finally {
+      res.end();
+    }
+  })();
+});
+
+app.post("/v1/add-history", (req, res) => {
+  (async () => {
+    try {
+      const API_APIKey = req.body.APIKey;
+      const API_DeviceID = req.body.DeviceID;
+      const UpdateObject = req.body.UpdateObject;
+
+      if (!API_APIKey || !API_DeviceID || !UpdateObject) {
+        console.log("add-history: missing params");
+        res.status(403);
+        return;
+      }
+
+      await MongoClient.connect();
+      const database = MongoClient.db("Streamcal");
+      const API_KEYS_Coll = database.collection("API_KEYS");
+      const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
+
+      if (User.DeviceID != API_DeviceID) {
+        console.log("add-history: wrong DeviceID");
+        res.status(403);
+        return;
+      }
+
+      const filter = { APIKEY: API_APIKey };
+
+      const updateDoc = {
+        $push: { History: UpdateObject },
+      };
+
+      await API_KEYS_Coll.updateOne(filter, updateDoc).catch((e) => console.log(e));
+
+      console.log("History Added");
+    } catch (e) {
+      console.log("add-history error", e.message);
+    } finally {
+      res.end();
+    }
+  })();
 });
 
 app.get("/status", (req, res) => {
