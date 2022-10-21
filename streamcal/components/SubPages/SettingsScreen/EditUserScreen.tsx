@@ -30,7 +30,8 @@ const DataEdit_Container = ({ Key, dataText, readOnly, onChangeText }: any) => {
       <NormalTextInput
         readonly={readOnly}
         onChangeText={onChangeText}
-        defaultValue={dataText}></NormalTextInput>
+        defaultValue={dataText}
+      ></NormalTextInput>
     </View>
   );
 };
@@ -44,7 +45,8 @@ const SwitchContainer = ({ onValueChange, value }: any) => {
         marginTop: "5%",
         marginBottom: "2%",
         alignItems: "center",
-      }}>
+      }}
+    >
       <Text style={{ color: "white", fontSize: WindowSize.Width * 0.05, marginLeft: "5%" }}>
         Access:
       </Text>
@@ -58,7 +60,7 @@ const SwitchContainer = ({ onValueChange, value }: any) => {
   );
 };
 
-const QRCode_ModalContainer = ({ onClose, APIKEY }: any) => {
+const QRCode_ModalContainer = ({ onClose, APIKEY, Description }: any) => {
   const QRCode_Ref = React.useRef<any>(null);
 
   const ScanObject = {
@@ -78,13 +80,15 @@ const QRCode_ModalContainer = ({ onClose, APIKEY }: any) => {
             height: "60%",
             borderRadius: WindowSize.Width * 0.02,
             alignItems: "center",
-          }}>
+          }}
+        >
           <View
             style={{
               width: "100%",
               flexDirection: "row",
               alignItems: "center",
-            }}>
+            }}
+          >
             <Text
               style={{
                 //position: "absolute",
@@ -93,8 +97,9 @@ const QRCode_ModalContainer = ({ onClose, APIKEY }: any) => {
                 marginLeft: "45%",
                 marginTop: "3%",
                 marginBottom: "5%",
-              }}>
-              yeet
+              }}
+            >
+              {Description}
             </Text>
           </View>
           <View
@@ -105,11 +110,13 @@ const QRCode_ModalContainer = ({ onClose, APIKEY }: any) => {
               justifyContent: "center",
               alignItems: "center",
               borderRadius: WindowSize.Width * 0.02,
-            }}>
+            }}
+          >
             <QRCode
               getRef={(e) => (QRCode_Ref.current = e)}
               size={WindowSize.Width * 0.7}
-              value={JSON.stringify(ScanObject)}></QRCode>
+              value={JSON.stringify(ScanObject)}
+            ></QRCode>
           </View>
           <MaterialCommunityIcons
             onPress={() => {
@@ -119,7 +126,8 @@ const QRCode_ModalContainer = ({ onClose, APIKEY }: any) => {
             name="content-copy"
             size={WindowSize.Width * 0.08}
             color="white"
-            style={{ marginLeft: "70%", marginTop: "5%" }}></MaterialCommunityIcons>
+            style={{ marginLeft: "70%", marginTop: "5%" }}
+          ></MaterialCommunityIcons>
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
@@ -141,32 +149,37 @@ const EditUserScreen = ({ navigation, route }: IEditUserScreen) => {
 
   return (
     <ScrollView
-      contentContainerStyle={{ alignItems: "center", paddingBottom: WindowSize.Width * 0.1 }}>
+      contentContainerStyle={{ alignItems: "center", paddingBottom: WindowSize.Width * 0.1 }}
+    >
       <DataEdit_Container
         Key={"User Description"}
         onChangeText={(e: any) => setEditedUser({ ...getEditedUser, Description: e })}
-        dataText={getEditedUser.Description}></DataEdit_Container>
+        dataText={getEditedUser.Description}
+      ></DataEdit_Container>
       <DataEdit_Container
         Key={"APIKEY"}
         onChangeText={(e: any) => setEditedUser({ ...getEditedUser, APIKEY: e })}
-        dataText={getEditedUser.APIKEY}></DataEdit_Container>
+        dataText={getEditedUser.APIKEY}
+      ></DataEdit_Container>
       <SwitchContainer
         value={getEditedUser.Enabled}
-        onValueChange={(e: any) =>
-          setEditedUser({ ...getEditedUser, Enabled: e })
-        }></SwitchContainer>
+        onValueChange={(e: any) => setEditedUser({ ...getEditedUser, Enabled: e })}
+      ></SwitchContainer>
       <DataEdit_Container
         readOnly
         Key={"DeviceID"}
-        dataText={currentUser.DeviceID}></DataEdit_Container>
+        dataText={currentUser.DeviceID}
+      ></DataEdit_Container>
       <DataEdit_Container
         readOnly
         Key={"Registration Date"}
-        dataText={currentUser.FirstLogin}></DataEdit_Container>
+        dataText={currentUser.FirstLogin}
+      ></DataEdit_Container>
       <DataEdit_Container
         readOnly
         Key={"Last Login Date"}
-        dataText={currentUser.LastLogin}></DataEdit_Container>
+        dataText={currentUser.LastLogin}
+      ></DataEdit_Container>
       <SettingsButton
         onPress={() => setQR_Modal(true)}
         IconFamily={MaterialCommunityIcons}
@@ -177,7 +190,8 @@ const EditUserScreen = ({ navigation, route }: IEditUserScreen) => {
           justifyContent: "center",
           paddingRight: "12%",
         }}
-        ButtonText={"Show QR-Code"}></SettingsButton>
+        ButtonText={"Show QR-Code"}
+      ></SettingsButton>
       <SettingsButton
         onPress={async () => {
           await Server_SetUsers([currentUser.APIKEY], "change", getEditedUser);
@@ -185,16 +199,20 @@ const EditUserScreen = ({ navigation, route }: IEditUserScreen) => {
         }}
         //onPress={() => console.log(getEditedUser)}
         style={{ marginTop: "5%", justifyContent: "center" }}
-        ButtonText={"Apply Changes"}></SettingsButton>
+        ButtonText={"Apply Changes"}
+      ></SettingsButton>
 
       <Modal
         transparent
         animationType="slide"
         visible={getQR_Modal}
-        onRequestClose={() => setQR_Modal(false)}>
+        onRequestClose={() => setQR_Modal(false)}
+      >
         <QRCode_ModalContainer
           onClose={() => setQR_Modal(false)}
-          APIKEY={getEditedUser.APIKEY}></QRCode_ModalContainer>
+          APIKEY={getEditedUser.APIKEY}
+          Description={getEditedUser.Description}
+        ></QRCode_ModalContainer>
       </Modal>
     </ScrollView>
   );

@@ -1,10 +1,10 @@
-import { IEpisodes } from "../../components/constants/interfaces";
+import { IEpisode } from "../../components/constants/interfaces";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 
 interface IMediaRouteParams {
-  item?: any;
-  Episodes?: Array<IEpisodes>;
+  item?: IEpisode;
+  Episodes?: Array<IEpisode>;
   ContentTitle?: any;
   ContentID?: any;
   index?: any;

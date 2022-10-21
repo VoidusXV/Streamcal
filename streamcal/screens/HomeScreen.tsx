@@ -228,7 +228,7 @@ export default function HomeScreen({ navigation }: any) {
     })();
 
     const unsubscribe = navigation.addListener("focus", async () => {
-      console.log("Start Secodns.");
+      // console.log("Start Secodns.");
       if (!getAuthResponse) await Listener();
       else await Listener(false);
     });

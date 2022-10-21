@@ -27,10 +27,15 @@ import { FlashList } from "@shopify/flash-list";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { Asset } from "expo-asset";
 import * as NavigationBar from "expo-navigation-bar";
-import { getPreviewImageURL, getThumbnailURL, getVideoURL } from "../../backend/serverConnection";
+import {
+  getPreviewImageURL,
+  getThumbnailURL,
+  getVideoURL,
+  Server_AddHistory,
+} from "../../backend/serverConnection";
 import LoadingIndicator from "../../components/Designs/LoadingIndicator";
 import { IMediaRouteParams, IMediaScreen } from "./MediaScreenInterfaces";
-import { IGeneratedImages } from "../../components/constants/interfaces";
+import { IEpisode, IGeneratedImages } from "../../components/constants/interfaces";
 
 //LogBox.ignoreAllLogs();
 
@@ -70,7 +75,7 @@ const NextEpisode_Container = ({
           Next Episode
         </Text>
         <MediaItemCard
-          ID_Path={EpisodeData.Episode}
+          ID_Path={EpisodeData.EpisodeNum}
           Duration={EpisodeData.Duration}
           Title={EpisodeData.Title}
           navigation={navigation}
@@ -84,7 +89,7 @@ const NextEpisode_Container = ({
             uri: getThumbnailURL(
               routeParams?.ContentID,
               routeParams?.getSeason + 1,
-              EpisodeData?.Episode
+              EpisodeData?.EpisodeNum
             ),
           }}
         ></MediaItemCard>
@@ -106,14 +111,14 @@ const FollowingEpisodes_Container = ({ Episodes, ContentID, index, getSeason }: 
           data={splicedEpisodes} // Staffel 1
           estimatedItemSize={20}
           contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
-          renderItem={({ item, index }: any) => (
+          renderItem={({ item, index }: { item: IEpisode; index: any }) => (
             <MediaItemCard
-              ID_Path={item.Episode}
-              Title={item.Title}
-              Duration={item.Duration}
-              Description={item.Description}
+              ID_Path={item?.EpisodeNum}
+              Title={item?.Title}
+              Duration={item?.Duration}
+              Description={item?.Description}
               Source={{
-                uri: getThumbnailURL(ContentID, getSeason + 1, splicedEpisodes[index].Episode), // `http://192.168.2.121:3005/v1/test2?id=${ContentID}&season=1&episode=${item.Episode}&dr=thumb`,
+                uri: getThumbnailURL(ContentID, getSeason + 1, splicedEpisodes[index].EpisodeNum), // `http://192.168.2.121:3005/v1/test2?id=${ContentID}&season=1&episode=${item.Episode}&dr=thumb`,
               }}
             ></MediaItemCard>
           )}
@@ -183,8 +188,8 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
   let generatedImages: IGeneratedImages[] = [];
 
   const VideoRef = React.useRef<any>(null);
-  const image = Asset.fromURI(getPreviewImageURL(ContentID, 1, item.Episode));
-  const videoURL = getVideoURL(ContentID, 1, item.Episode);
+  const image = Asset.fromURI(getPreviewImageURL(ContentID, 1, item?.EpisodeNum));
+  const videoURL = getVideoURL(ContentID, 1, item?.EpisodeNum);
 
   React.useEffect(() => {
     const backAction = () => {
@@ -216,6 +221,7 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
       setIsLoading(true);
       if (isCancelled) return;
 
+      await Server_AddHistory(ContentID, getSeason, item?.EpisodeNum);
       await image.downloadAsync();
       if (isCancelled) return;
 
@@ -223,10 +229,10 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
       await VideoRef.current.playAsync();
       setIsLoading(false);
 
-      const DurationMinutes = item.Duration / 60;
+      const DurationMinutes = item?.Duration / 60;
       const RandomConstant = 0.4;
       const SecondsPerImage = Math.ceil(DurationMinutes * RandomConstant);
-      const ImageAmount = Math.ceil(item.Duration / SecondsPerImage);
+      const ImageAmount = Math.ceil(item?.Duration / SecondsPerImage);
 
       console.log("Starting Generate CroppedImages:", ImageAmount);
       for (let index = 0; index < ImageAmount; index++) {
@@ -318,7 +324,7 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
           <Text
             style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
           >
-            Episode {item.Episode}: {item.Title}
+            Episode {item?.EpisodeNum}: {item?.Title}
           </Text>
           <Octicons
             onPress={() => clearTimeout(timer)}

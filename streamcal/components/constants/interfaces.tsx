@@ -24,16 +24,16 @@ interface ICurrentContentInfo {
   ID?: any;
 }
 
-interface IEpisodes {
+interface IEpisode {
   Description?: any;
   Duration?: any;
-  Episode?: any;
+  EpisodeNum?: any;
   Path?: any;
   Thumbnail?: any;
   Title?: any;
 }
 interface ISeasons {
-  Episodes?: Array<IEpisodes>;
+  Episodes?: Array<IEpisode>;
   SeasonNum?: any;
 }
 
@@ -56,5 +56,5 @@ export {
   IMediaData,
   IGeneratedImages,
   ISeries,
-  IEpisodes,
+  IEpisode,
 };

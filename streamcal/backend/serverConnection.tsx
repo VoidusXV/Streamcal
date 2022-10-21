@@ -44,9 +44,9 @@ function coverURL() {
 //const mediaURL = baseIPURL() + "/v1/Media";
 //const coverURL = mediaURL + "/Cover";
 
-async function getServerData(URL: any) {
+async function getServerData(URL: any, AbortController?: AbortController) {
   try {
-    const request = await fetch(URL);
+    const request = await fetch(URL, { signal: AbortController?.signal });
     const data = request.json();
     return data;
   } catch (e: any) {
@@ -54,20 +54,20 @@ async function getServerData(URL: any) {
   }
 }
 
-async function getAllContent() {
-  return getServerData(AllContentURL());
+async function getAllContent(AbortController?: AbortController) {
+  return getServerData(AllContentURL(), AbortController);
 }
 
 function getCoverURL(ID: any) {
   return `${coverURL()}?id=${ID}`;
 }
 
-async function getMediaLocations(ID: any) {
-  return getServerData(mediaURL() + "?id=" + ID);
+async function getMediaLocations(ID: any, AbortController?: AbortController) {
+  return getServerData(mediaURL() + "?id=" + ID, AbortController);
 }
 
 function getSeasonAmount(data: IMediaData) {
-  return Object.keys(data.Series?.Seasons as any).length;
+  return Object.keys(data?.Series?.Seasons as any).length;
 }
 
 function getEpisodeAmount(data: IMediaData) {
@@ -108,20 +108,31 @@ function IsServerReachable() {
     });
 }
 
-async function checkAdminKey(AdminKey: any, IP?: any, Port?: any) {
+async function checkAdminKey(
+  AdminKey: any,
+  IP?: any,
+  Port?: any,
+  AbortController?: AbortController
+) {
   let rep; // await getServerData(`${baseAPIURL()}/check-adminkey?adminKey=${AdminKey}`);
   if (!AdminKey || !Port) {
-    rep = await getServerData(`${baseAPIURL()}/check-adminkey?adminKey=${AdminKey}`);
+    rep = await getServerData(
+      `${baseAPIURL()}/check-adminkey?adminKey=${AdminKey}`,
+      AbortController
+    );
     return rep;
   }
 
   const url = `http://${IP}:${Port}/v1`;
-  rep = await getServerData(`${url}/check-adminkey?adminKey=${AdminKey}`);
+  rep = await getServerData(`${url}/check-adminkey?adminKey=${AdminKey}`, AbortController);
   return rep;
 }
 
-async function getAllUsers(AdminKey: any) {
-  const rep = await getServerData(`${baseAPIURL()}/get-users?adminKey=${AdminKey}`);
+async function getAllUsers(AdminKey: any, AbortController?: AbortController) {
+  const rep = await getServerData(
+    `${baseAPIURL()}/get-users?adminKey=${AdminKey}`,
+    AbortController
+  );
   return rep;
 }
 function SetGlobalConnection(data: any) {
@@ -154,7 +165,7 @@ enum AuthResponse {
 }
 
 async function ServerAuthentication(APIKEY = null) {
-  const DeviceID = await Generate_DeviceID();
+  const DeviceID = await Generate_DeviceID(); // FIXME: DeviceID is not uniqe
   let URL = `${baseAPIURL()}/authenticate-user?apikey=${
     currentConnectionInfo.APIKEY
   }&deviceId=${DeviceID}`;
@@ -188,6 +199,39 @@ async function CreateAPIKEY(adminKey: any, description?: any) {
   await fetch(URL);
 }
 
+async function Server_AddHistory(ContentID: any, Season: any, Episode: any) {
+  const DeviceID = await Generate_DeviceID();
+  let URL = `${baseAPIURL()}/add-history`;
+
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      APIKey: currentConnectionInfo.APIKEY,
+      DeviceID: DeviceID,
+      UpdateObject: { ContentID: ContentID, Season: Season, Episode: Episode },
+    }),
+  };
+
+  await fetch(URL, requestOptions);
+}
+async function Server_GetHistory() {
+  const DeviceID = await Generate_DeviceID();
+  let URL = `${baseAPIURL()}/get-history`;
+
+  const requestOptions = {
+    method: "POST", //TODO: change it back to GET
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      APIKey: currentConnectionInfo.APIKEY,
+      DeviceID: DeviceID,
+    }),
+  };
+
+  const request = await fetch(URL, requestOptions);
+  return await request.json();
+}
+
 export {
   getServerData,
   getAllContent,
@@ -208,5 +252,7 @@ export {
   AuthResponse,
   Server_SetUsers,
   CreateAPIKEY,
+  Server_AddHistory,
+  Server_GetHistory,
   VERSION,
 };

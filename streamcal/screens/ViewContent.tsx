@@ -22,7 +22,7 @@ import {
   getSeasonAmount,
   getThumbnailURL,
 } from "../backend/serverConnection";
-import { ICurrentContentInfo, IMediaData } from "../components/constants/interfaces";
+import { ICurrentContentInfo, IEpisode, IMediaData } from "../components/constants/interfaces";
 import LoadingIndicator from "../components/Designs/LoadingIndicator";
 
 const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
@@ -269,17 +269,20 @@ const ViewContent = ({ route, navigation }: any) => {
   const [getMediaLocation, setMediaLocation] = React.useState<IMediaData>({});
   const [getSeason, setSeason] = React.useState(0);
   const [isSeasonModal, setSeasonModal] = React.useState(false);
-  const [getScrollValue, setScrollValue] = React.useState(0);
+  const [getScrollValue, setScrollValue] = React.useState(0); // TODO: Maybe change it to useRef
 
   let data: any;
   React.useEffect(() => {
+    const _AbortController = new AbortController();
     let unsub = setTimeout(async () => {
-      data = await getMediaLocations(contentData?.ID);
+      data = await getMediaLocations(contentData?.ID, _AbortController);
+      console.log("Loaded Media");
       setMediaLocation(data);
       setIsLoading(false);
     }, 0);
 
     return () => {
+      _AbortController.abort();
       clearTimeout(unsub);
       console.log("Unload ViewContent");
     };
@@ -339,12 +342,12 @@ const ViewContent = ({ route, navigation }: any) => {
                 data={getMediaLocation?.Series?.Seasons?.[getSeason].Episodes} // Staffel 1
                 estimatedItemSize={20}
                 contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
-                renderItem={({ item, index }: any) => (
+                renderItem={({ item, index }: { item?: IEpisode; index: any }) => (
                   <MediaItemCard
-                    ID_Path={item.Episode}
-                    Title={item.Title}
-                    Duration={item.Duration}
-                    Description={item.Description}
+                    ID_Path={item?.EpisodeNum}
+                    Title={item?.Title}
+                    Duration={item?.Duration}
+                    Description={item?.Description}
                     navigation={navigation}
                     routeParams={{
                       item,
@@ -356,7 +359,7 @@ const ViewContent = ({ route, navigation }: any) => {
                       isFullScreen: false,
                     }}
                     Source={{
-                      uri: getThumbnailURL(contentData?.ID, getSeason + 1, item.Episode),
+                      uri: getThumbnailURL(contentData?.ID, getSeason + 1, item?.EpisodeNum),
                     }}
                   ></MediaItemCard>
                 )}

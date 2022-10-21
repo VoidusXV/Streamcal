@@ -3,6 +3,7 @@ import React from "react";
 import { FlashList } from "@shopify/flash-list";
 import { WindowSize } from "../../constants/Layout";
 import { selectionColor } from "../../constants/Colors";
+import { Server_GetHistory } from "../../../backend/serverConnection";
 
 const HistoryCard = () => {
   const width = WindowSize.Width * 0.47;
@@ -75,6 +76,13 @@ const HistoryCard = () => {
 
 const data = [{ kok: "1" }, { kok: "2" }, { kok: "3" }, { kok: "4" }, {}, {}];
 const History = () => {
+  const [getHistoryData, setHistoryData] = React.useState([]);
+  React.useEffect(() => {
+    (async () => {
+      setHistoryData(await Server_GetHistory());
+    })();
+  }, []);
+
   return (
     <View style={{ width: "100%", height: "100%" }}>
       <FlashList
