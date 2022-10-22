@@ -18,7 +18,11 @@ import {
 import { IFilteredEpisodeHistory, IHistory, IHistoryData } from "./HistoryInterfaces";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPress: any }) => {
+interface IHistoryCard {
+  item?: IFilteredEpisodeHistory;
+  onPress?: any;
+}
+const HistoryCard = ({ item, onPress }: IHistoryCard) => {
   const [ThumbnailURL, setThumbnailURL] = React.useState("");
 
   const width = WindowSize.Width * 0.47;
@@ -26,15 +30,15 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
 
   React.useEffect(() => {
     (async () => {
-      setThumbnailURL(
-        await getThumbnailURL(
-          item?.HistoryData?.ContentID,
-          item?.HistoryData?.SeasonNum + 1,
-          item?.Episode?.EpisodeNum
-        )
+      const URL = await getThumbnailURL(
+        item?.HistoryData?.ContentID,
+        item?.HistoryData?.SeasonNum + 1,
+        item?.Episode?.EpisodeNum
       );
+
+      setThumbnailURL(URL);
     })();
-  }, []);
+  }, [item]);
 
   return (
     <TouchableOpacity
@@ -47,7 +51,8 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
         borderRadius: 5,
         marginTop: WindowSize.Width * 0.05,
         marginLeft: WindowSize.Width * (marginLeft / 4),
-      }}>
+      }}
+    >
       <View style={{ height: "50%", width: "100%" }}>
         {ThumbnailURL && (
           <Image
@@ -58,7 +63,8 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
               borderTopLeftRadius: 5,
               borderTopRightRadius: 5,
             }}
-            source={{ uri: ThumbnailURL }}></Image>
+            source={{ uri: ThumbnailURL }}
+          ></Image>
         )}
         {/* <View
           style={{
@@ -76,7 +82,8 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
           backgroundColor: "#22314d",
           borderBottomLeftRadius: 5,
           borderBottomRightRadius: 5,
-        }}>
+        }}
+      >
         <Text
           numberOfLines={1}
           style={{
@@ -84,7 +91,8 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
             marginTop: "4%",
             color: "rgba(255,255,255,0.8)",
             maxWidth: "90%",
-          }}>
+          }}
+        >
           {item?.ContentTitle.toUpperCase()}
         </Text>
         <Text
@@ -96,7 +104,8 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
             color: "rgba(255,255,255,0.8)",
             maxWidth: "90%",
             // fontSize: WindowSize.Width * 0.04,
-          }}>
+          }}
+        >
           {`SEASON ${item?.HistoryData?.SeasonNum + 1} | EPISODE ${item?.Episode?.EpisodeNum}`}
         </Text>
         <Text
@@ -107,7 +116,8 @@ const HistoryCard = ({ item, onPress }: { item?: IFilteredEpisodeHistory; onPres
             color: "white",
             maxWidth: "90%",
             fontSize: WindowSize.Width * 0.04,
-          }}>
+          }}
+        >
           {`${item?.Episode?.Title}`}
         </Text>
       </View>
@@ -149,6 +159,7 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
       const filteredContentInfo: Array<IFilteredEpisodeHistory> = await FilterData();
       setHistoryData(filteredContentInfo);
 
+      console.log("onHistoryScreen");
       //TODO: check gContent if its empty fetch data and
       //add mediaData content to the mediaData global variable and check if its emtpy
       // navigation listener
@@ -158,14 +169,15 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
       _AbortController.abort();
       unsubscribe();
     };
-  }, []);
+  }, [navigation]);
 
   return (
     <View style={{ width: "100%", height: "100%" }}>
       <FlashList
-        estimatedItemSize={20}
+        estimatedItemSize={200}
         data={getHistoryData}
         numColumns={2}
+        refreshing={true}
         contentContainerStyle={{ paddingBottom: 200 }}
         renderItem={({ item }) => (
           <HistoryCard
@@ -180,8 +192,10 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
                 isFullScreen: false,
               })
             }
-            item={item}></HistoryCard>
-        )}></FlashList>
+            item={item}
+          ></HistoryCard>
+        )}
+      ></FlashList>
     </View>
   );
 };

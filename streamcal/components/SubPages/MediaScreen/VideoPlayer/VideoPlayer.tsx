@@ -125,8 +125,8 @@ const Middle_Buttons: React.FC<IMiddle_Buttons> = ({
           name={status.isPlaying ? "pause" : "play-arrow"}
           onPress={async () => {
             status.isPlaying
-              ? await VideoRef.current.pauseAsync()
-              : await VideoRef.current.playAsync();
+              ? await VideoRef?.current.pauseAsync()
+              : await VideoRef?.current.playAsync();
             onPressAllButtons();
           }}
           size={IconSize * 1.2}

@@ -92,7 +92,8 @@ const NextEpisode_Container = ({
               routeParams?.getSeason + 1,
               EpisodeData?.EpisodeNum
             ),
-          }}></MediaItemCard>
+          }}
+        ></MediaItemCard>
       </View>
     );
   } else return <></>;
@@ -139,8 +140,10 @@ const FollowingEpisodes_Container = ({
                   routeParams?.getSeason + 1,
                   splicedEpisodes?.[index]?.EpisodeNum
                 ), // `http://192.168.2.121:3005/v1/test2?id=${ContentID}&season=1&episode=${item.Episode}&dr=thumb`,
-              }}></MediaItemCard>
-          )}></FlashList>
+              }}
+            ></MediaItemCard>
+          )}
+        ></FlashList>
       </View>
     );
   } else {
@@ -239,12 +242,13 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
       setIsLoading(true);
       if (isCancelled) return;
 
-      //await Server_AddHistory(ContentID, getSeason, Episode?.EpisodeNum);
+      //TODO: run both async funcs at the same time
+      await Server_AddHistory(ContentID, getSeason, Episode?.EpisodeNum);
       await image.downloadAsync();
       if (isCancelled) return;
 
       await VideoRef?.current?.loadAsync({ uri: videoURL });
-      await VideoRef.current.playAsync();
+      await VideoRef?.current.playAsync();
       setIsLoading(false);
 
       const DurationMinutes = Episode?.Duration / 60;
@@ -276,14 +280,16 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
     <ScrollView
       scrollEnabled={isFullScreen ? false : true}
       style={!isFullScreen ? styles.container : { backgroundColor: "black" }}
-      contentContainerStyle={{ paddingBottom: 50 }}>
+      contentContainerStyle={{ paddingBottom: 50 }}
+    >
       {isFullScreen && <StatusBar hidden></StatusBar>}
 
       <View
         style={{
           height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
           backgroundColor: "black",
-        }}>
+        }}
+      >
         {isLoading && (
           <>
             <MaterialIcons
@@ -291,13 +297,15 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
               size={Mini_IconSize}
               style={{ position: "absolute", zIndex: 2, marginLeft: "2%", marginTop: "2%" }}
               onPress={() => navigation?.goBack()}
-              color="white"></MaterialIcons>
+              color="white"
+            ></MaterialIcons>
             <LoadingIndicator
               style={{
                 position: "absolute",
                 height: !isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width,
                 zIndex: 1,
-              }}></LoadingIndicator>
+              }}
+            ></LoadingIndicator>
           </>
         )}
         <VideoPlayer
@@ -308,9 +316,8 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
           CroppedImages={getGeneratedImages}
           isFullScreen={isFullScreen}
           isLoading={(e: any) => setIsLoading(e)}
-          ScreenButtonOnPress={async () =>
-            setFullScreen(await changeScreenOrientation())
-          }></VideoPlayer>
+          ScreenButtonOnPress={async () => setFullScreen(await changeScreenOrientation())}
+        ></VideoPlayer>
       </View>
 
       <View style={{ flex: 1 }}>
@@ -321,7 +328,8 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
             //backgroundColor: "red",
             flexDirection: "column",
             justifyContent: "center",
-          }}>
+          }}
+        >
           <Text
             style={{
               ...styles.EpisodeText,
@@ -330,12 +338,14 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
               marginTop: "4%",
               color: "#95b9fc",
               //textDecorationLine: "underline",
-            }}>
+            }}
+          >
             {ContentTitle}
           </Text>
 
           <Text
-            style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}>
+            style={{ ...styles.EpisodeText, fontSize: WindowSize.Width * 0.05, maxWidth: "90%" }}
+          >
             Episode {Episode?.EpisodeNum}: {Episode?.Title}
           </Text>
           <Octicons
@@ -343,15 +353,18 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
             name="download"
             size={WindowSize.Width * 0.07}
             style={{ marginLeft: "auto", marginRight: "7%" }}
-            color="white"></Octicons>
+            color="white"
+          ></Octicons>
         </View>
         <Seperator style={{ marginTop: "5%", height: "0.03%" }}></Seperator>
         <NextEpisode_Container
           routeParams={{ ...route?.params, isFullScreen: isFullScreen }}
-          navigation={navigation}></NextEpisode_Container>
+          navigation={navigation}
+        ></NextEpisode_Container>
         <FollowingEpisodes_Container
           routeParams={{ ...route?.params, isFullScreen: isFullScreen }}
-          navigation={navigation}></FollowingEpisodes_Container>
+          navigation={navigation}
+        ></FollowingEpisodes_Container>
       </View>
     </ScrollView>
   );
