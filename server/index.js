@@ -430,9 +430,9 @@ app.post("/v1/get-history", (req, res) => {
 app.post("/v1/add-history", (req, res) => {
   (async () => {
     try {
-      const API_APIKey = req.body.APIKey;
-      const API_DeviceID = req.body.DeviceID;
-      const UpdateObject = req.body.UpdateObject;
+      const API_APIKey = req.body?.APIKey;
+      const API_DeviceID = req.body?.DeviceID;
+      const UpdateObject = req.body?.UpdateObject;
 
       if (!API_APIKey || !API_DeviceID || !UpdateObject) {
         console.log("add-history: missing params");
@@ -445,19 +445,23 @@ app.post("/v1/add-history", (req, res) => {
       const API_KEYS_Coll = database.collection("API_KEYS");
       const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
 
-      if (User.DeviceID != API_DeviceID) {
-        console.log("add-history: wrong DeviceID");
+      if (User?.DeviceID != API_DeviceID) {
         res.status(403);
         return;
       }
-
       const filter = { APIKEY: API_APIKey };
 
-      const updateDoc = {
-        $push: { History: UpdateObject },
-      };
+      const indexExists = (element) =>
+        element.ContentID == UpdateObject?.ContentID &&
+        element.SeasonNum == UpdateObject?.SeasonNum &&
+        element.EpisodeNum == UpdateObject?.EpisodeNum;
 
-      await API_KEYS_Coll.updateOne(filter, updateDoc).catch((e) => console.log(e));
+      const existsValue = User?.History.findIndex(indexExists);
+
+      if (existsValue >= 0) User?.History?.splice(existsValue, 1);
+
+      User?.History.splice(0, 0, UpdateObject);
+      await UpdateDocument(API_KEYS_Coll, filter, { History: User?.History });
 
       console.log("History Added");
     } catch (e) {
