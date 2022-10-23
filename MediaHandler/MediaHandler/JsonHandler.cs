@@ -12,7 +12,7 @@ namespace MediaHandler
     {
         public static void Add_NewEpisode(int Episode, string Path, string Title, string Description, long Duration, int NewContentSeason, string jsonPath)
         {
-            FileHandler.Locations.Episodes NewEpisode = new FileHandler.Locations.Episodes
+            FileHandler.Locations.Episode NewEpisode = new FileHandler.Locations.Episode
             {
                 EpisodeNum = Episode,
                 Thumbnail = "Thumbnail.jpg",
@@ -31,7 +31,7 @@ namespace MediaHandler
                 NewContentSeason_Index++;
             }
 
-            //temp.Series.Seasons[NewContentSeason_Index].Episodes.Add(NewEpisode); //Old
+            //temp.Series.Seasons[NewContentSeason_Index].Episode.Add(NewEpisode); //Old
 
             // Sort EpisodeNum
 
@@ -57,10 +57,10 @@ namespace MediaHandler
         }
 
 
-        public static void Add_NewSeason(string jsonPath, int NewContentSeason, List<FileHandler.Locations.Episodes> Episode = null)
+        public static void Add_NewSeason(string jsonPath, int NewContentSeason, List<FileHandler.Locations.Episode> Episode = null)
         {
             if (Episode == null)
-                Episode = new List<FileHandler.Locations.Episodes>();
+                Episode = new List<FileHandler.Locations.Episode>();
 
             FileHandler.Locations.Season NewSeason = new FileHandler.Locations.Season
             {

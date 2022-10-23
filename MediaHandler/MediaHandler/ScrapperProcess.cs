@@ -50,7 +50,7 @@ namespace MediaHandler
 
                 //Unknown Error 
 
-                //TODO: Create Another ConsoleForm and add data via args[]
+                //Other way: Create Another ConsoleForm and add data via args[]
 
                 await ScrappingProcess(URL);
                 AddLog("ScrappingProcess Done");
@@ -122,7 +122,7 @@ namespace MediaHandler
 
 
                 string NewContent_Locations = File.ReadAllText(NewContentJsonPath);
-                var NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_Locations);
+                var NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.ScrapperContent>(NewContent_Locations);
                 string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.Season}_{NewContent_LocationsObject.Episode}";
 
                 AddLog($"Anime Data: {Media_FileName}");
@@ -146,7 +146,7 @@ namespace MediaHandler
         void MoveFiles()
         {
             string NewContent_JsonFile = File.ReadAllText(NewContentJsonPath);
-            var NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(NewContent_JsonFile);
+            var NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.ScrapperContent>(NewContent_JsonFile);
 
             string ContentPath = $"{serverDataPath}/Content.json";
             string Content_JsonFile = File.ReadAllText(ContentPath);
@@ -180,7 +180,7 @@ namespace MediaHandler
             Content_JsonObject = JsonConvert.DeserializeObject<List<FileHandler.Data_Content>>(Content_JsonFile);
             Move_ExistingContent(Content_JsonObject.Count - 1, NewContent_JsonObject, Content_JsonObject, true);
         }
-        void Move_ExistingContent(int index, FileHandler.NewContent_Locations NewContent_JsonObject, List<FileHandler.Data_Content> Content_JsonObject, bool NewContent = false)
+        void Move_ExistingContent(int index, FileHandler.ScrapperContent NewContent_JsonObject, List<FileHandler.Data_Content> Content_JsonObject, bool NewContent = false)
         {
             try
             {
@@ -347,7 +347,7 @@ namespace MediaHandler
             int Columns = 10;
             double RandomConstant = 0.4;
 
-            var Duration = GetContentDuration() / 1000; //JsonConvert.DeserializeObject<FileHandler.NewContent_Locations>(File.ReadAllText(NewContentJsonPath)).Duration / 1000; // In Seconds
+            var Duration = GetContentDuration() / 1000; //JsonConvert.DeserializeObject<FileHandler.ScrapperContent>(File.ReadAllText(NewContentJsonPath)).Duration / 1000; // In Seconds
             var DurationMinutes = Duration / 60;
             var SecondsPerImage = Math.Ceiling(DurationMinutes * RandomConstant);
             var ImageRows = Math.Ceiling(Duration / SecondsPerImage / Columns);

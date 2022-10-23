@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace MediaHandler
 {
     public class FileHandler
     {
-        public class NewContent_Locations
+        public class ScrapperContent
         {
             public string Title { get; set; }
             public string Description { get; set; }
@@ -25,8 +26,13 @@ namespace MediaHandler
 
 
         }
+       
         public class NewContent
         {
+            [BsonId]
+            [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+           // [BsonIgnoreIfDefault]
+            public string MongoDB_ID { get; set; }
             public int ID { get; set; }
             public string Description { get; set; }
             public string Title { get; set; }
@@ -39,22 +45,33 @@ namespace MediaHandler
         public class Data_Content
         {
             public int ID { get; set; }
-            public string Title { get; set; }
             public string Description { get; set; }
+            public string Title { get; set; }
+
             public string Availability { get; set; }
             public string Genre { get; set; }
+            public string Started { get; set; }
+            public string Ended { get; set; }
+            public string Director { get; set; }
+            public string Producer { get; set; }
         }
 
         public class Locations
         {
+           
             public class Main
             {
+                [BsonId]
+                [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+                [BsonIgnoreIfDefault]
+                public string MongoDB_ID { get; set; }
                 public Series Series { get; set; }
                 public Movies Movies { get; set; }
             }
 
             public class Movies
             {
+
             }
 
             public class Series
@@ -65,10 +82,10 @@ namespace MediaHandler
             public class Season
             {
                 public int SeasonNum { get; set; }
-                public List<Episodes> Episodes { get; set; }
+                public List<Episode> Episodes { get; set; }
             }
 
-            public class Episodes
+            public class Episode
             {
                 public int EpisodeNum { get; set; }
                 public string Thumbnail { get; set; }
@@ -76,6 +93,8 @@ namespace MediaHandler
                 public string Title { get; set; }
                 public string Description { get; set; }
                 public long Duration { get; set; }
+                public long WatchTime { get; set; }
+
             }
         }
     }
