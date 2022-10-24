@@ -123,7 +123,7 @@ namespace MediaHandler
 
                 string NewContent_Locations = File.ReadAllText(NewContentJsonPath);
                 var NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.ScrapperContent>(NewContent_Locations);
-                string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.Season}_{NewContent_LocationsObject.Episode}";
+                string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.SeasonNum}_{NewContent_LocationsObject.EpisodeNum}";
 
                 AddLog($"Anime Data: {Media_FileName}");
 
@@ -184,20 +184,20 @@ namespace MediaHandler
         {
             try
             {
-                int NewContentSeason = NewContent_JsonObject.Season;
+                int NewContentSeason = Convert.ToInt32(NewContent_JsonObject.SeasonNum);
                 int ContentID = Content_JsonObject[index].ID;
                 string LocationFile_Path = $"{serverDataPath}/{ContentID}/Locations.json";// $"{currentPath}/Locations.json";
                                                                                           // string LocationFile = File.ReadAllText($"{serverDataPath}/{ContentID}/Locations.json");
                                                                                           //var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(LocationFile);
 
-                int Episode = NewContent_JsonObject.Episode;
-                string Path = $"/Series/Season_{NewContentSeason}/{Episode}/{NewContent_JsonObject.Episode}.mp4";
+                int Episode = Convert.ToInt32(NewContent_JsonObject.EpisodeNum);
+                string Path = $"/Series/Season_{NewContentSeason}/{Episode}/{NewContent_JsonObject.EpisodeNum}.mp4";
                 string EpisodeTitle = NewContent_JsonObject.EpisodeTitle;
                 string Description = NewContent_JsonObject.Episode_Description;
                 long Duration = (long)GetContentDuration();// NewContent_JsonObject.Duration;
 
                 string EpisodePath = $"{serverDataPath}/{ContentID}/Series/Season_{NewContentSeason}/{Episode}";
-                string VideoFileName = $"{NewContent_JsonObject.Title}_{NewContent_JsonObject.Season}_{Episode}".Replace(" ", "_");
+                string VideoFileName = $"{NewContent_JsonObject.Title}_{NewContent_JsonObject.SeasonNum}_{Episode}".Replace(" ", "_");
                 if (!JsonHandler.SeasonExists(LocationFile_Path, NewContentSeason))
                     JsonHandler.Add_NewSeason(LocationFile_Path, NewContentSeason);
 

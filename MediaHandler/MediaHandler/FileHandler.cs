@@ -15,10 +15,10 @@ namespace MediaHandler
             public string Description { get; set; }
             public string EpisodeTitle { get; set; }
             public string Episode_Description { get; set; }
-            public int Episode { get; set; }
-            public int Season { get; set; }
-            public int Started { get; set; }
-            public int Ended { get; set; }
+            public int EpisodeNum { get; set; }
+            public int SeasonNum { get; set; }
+            public string Started { get; set; }
+            public string Ended { get; set; }
             public long Duration { get; set; }
             public string Director { get; set; }
             public string Producer { get; set; }
@@ -31,17 +31,20 @@ namespace MediaHandler
         {
             [BsonId]
             [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
-           // [BsonIgnoreIfDefault]
             public string MongoDB_ID { get; set; }
             public int ID { get; set; }
             public string Description { get; set; }
             public string Title { get; set; }
             public string Availability { get; set; }
             public string Genre { get; set; }
+            public string Started { get; set; }
+            public string Ended { get; set; }
+            public string Director { get; set; }
+            public string Producer { get; set; }
 
         }
 
-
+        // NewContent and Data_Content are the same classes
         public class Data_Content
         {
             public int ID { get; set; }
@@ -93,8 +96,6 @@ namespace MediaHandler
                 public string Title { get; set; }
                 public string Description { get; set; }
                 public long Duration { get; set; }
-                public long WatchTime { get; set; }
-
             }
         }
     }

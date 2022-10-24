@@ -41,7 +41,7 @@ namespace MediaHandler
 
             for (int i = 0; i < EpisodeCount; i++)
             {
-                if (temp.Series.Seasons[NewContentSeason_Index].Episodes[i].EpisodeNum > Episode)
+                if ((int)temp.Series.Seasons[NewContentSeason_Index].Episodes[i].EpisodeNum > Episode) 
                 {
                     Console.WriteLine($"EpisodeNum Insert at {i}");
                     temp.Series.Seasons[NewContentSeason_Index].Episodes.Insert(i, NewEpisode);

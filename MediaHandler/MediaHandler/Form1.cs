@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Ookii.Dialogs.WinForms;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 
 namespace MediaHandler
 {
@@ -264,34 +265,7 @@ namespace MediaHandler
 
         private void button9_Click(object sender, EventArgs e)
         {
-            string NewContent_JsonFile = File.ReadAllText(NewContentJsonPath);
-            var NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.ScrapperContent>(NewContent_JsonFile);
 
-            string LocationFile = File.ReadAllText(@"C:\Coding\Projects\Private Streaming Service\Streamcal\server\Data\0\Locations.json");
-            var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(LocationFile);
-
-            FileHandler.Locations.Episode NewEpisode = new FileHandler.Locations.Episode
-            {
-                EpisodeNum = 5,
-                Thumbnail = "Thumbnail.jpg",
-                Path = "Path",
-                Title = "Title",
-                Description = "Description",
-                Duration = 1337,
-            };
-
-            for (int i = 0; i < LocationObject.Series.Seasons[0].Episodes.Count; i++)
-            {
-                if (LocationObject.Series.Seasons[0].Episodes[i].EpisodeNum > NewContent_JsonObject.Episode)
-                {
-                    LocationObject.Series.Seasons[0].Episodes.Insert(i, NewEpisode);
-                    break;
-                }
-            }
-
-            //LocationObject.Series.Seasons.Add(NewSeason);
-            var LocationObject_Formatted = JsonConvert.SerializeObject(LocationObject, Formatting.Indented);
-            Console.WriteLine(LocationObject_Formatted);
         }
 
 
@@ -347,53 +321,69 @@ namespace MediaHandler
 
 
             IMongoCollection<FileHandler.Locations.Main> LocationsCollection = database.GetCollection<FileHandler.Locations.Main>("Locations");
-            var LocationsProjection = Builders<FileHandler.Locations.Main>.Projection.Exclude(u => u.MongoDB_ID);//.Include(u => u.Series).Include(u => u.Movies);
-            var LocationsData = LocationsCollection.Find(x => true).Project<FileHandler.Locations.Main>(LocationsProjection).ToList();
+            //var LocationsProjection = Builders<FileHandler.Locations.Main>.Projection.Exclude(u => u.MongoDB_ID);//.Include(u => u.Series).Include(u => u.Movies);
+            //var LocationsData = LocationsCollection.Find(x => true).Project<FileHandler.Locations.Main>(LocationsProjection).ToList();
+            var LocationsData = LocationsCollection.Find(x => true).ToList();
 
 
 
 
+            string NewContent_Locations = File.ReadAllText(@"C:\Coding\Projects\Private Streaming Service\Streamcal\MediaHandler\MediaHandler\bin\Debug\Processes\2\NewContent.json");
+            FileHandler.ScrapperContent NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.ScrapperContent>(NewContent_Locations);
 
             FileHandler.NewContent NewContentOutput = null;
-            bool IsSeriesExists = MongoDB_Handler.SeriesExists(ContentData, "Kurokos Basketball", ref NewContentOutput);
+            bool IsSeriesExists = MongoDB_Handler.SeriesExists(ContentData, NewContent_LocationsObject.Title, ref NewContentOutput);
 
-            Console.WriteLine($"IsSeriesExists: {IsSeriesExists}");
+            //Console.WriteLine($"IsSeriesExists: {IsSeriesExists}");
+
             if (!IsSeriesExists)
-                return;
-
-            FileHandler.Locations.Season SeasonOutput = null;
-            bool IsSeasonExists = MongoDB_Handler.SeasonExists(LocationsData[NewContentOutput.ID].Series, 1, ref SeasonOutput);
-
-            Console.WriteLine($"IsSeasonExists: {IsSeasonExists}");
-            if (!IsSeasonExists)
-                return;
-
-            FileHandler.Locations.Episode EpisodeOutput = null;
-            bool IsEpisodeExists = MongoDB_Handler.EpisodeExists(SeasonOutput, "Ich meine es ernst", ref EpisodeOutput);
-
-            Console.WriteLine($"IsEpisodeExists: {IsEpisodeExists} {EpisodeOutput.ToBsonDocument()}");
-
-            //FileHandler.NewContent CheckingContent = new FileHandler.NewContent();
-            //if (MongoDB_Handler.SeriesExists(ContentData, "Kurokos Basketball", ref CheckingContent))
-            //{
-
-            //}
-
-
-
-            return;
-
-            //Kurokos Basketball
-
-            //foreach (var item in FindContent)
             {
-                //Console.WriteLine(item.ToBsonDocument());
+                FileHandler.NewContent NewContent = new FileHandler.NewContent
+                {
+                    ID = LocationsData.Count,
+                    Title = NewContent_LocationsObject.Title,
+                    Description = NewContent_LocationsObject.Description,
+                    Availability = "",
+                    Genre = "",
+                    Started = NewContent_LocationsObject.Started,
+                    Ended = NewContent_LocationsObject.Ended,
+                    Director = NewContent_LocationsObject.Director,
+                    Producer = NewContent_LocationsObject.Producer,
+
+                };
+
+                MongoDB_Handler.AddNewSeries("Content", database, NewContent, LocationsCollection);
+                return;
             }
 
-            //foreach (var item in LocationsData)
-            //{
-            //    Console.WriteLine(item.ToBsonDocument());
-            //}
+
+            FileHandler.Locations.Season SeasonOutput = null;
+            bool IsSeasonExists = MongoDB_Handler.SeasonExists(LocationsData[NewContentOutput.ID].Series, NewContent_LocationsObject.SeasonNum, ref SeasonOutput);
+            // Console.WriteLine($"IsSeasonExists: {IsSeasonExists}");
+
+            bool IsEpisodeExists = false;
+
+
+
+            if (IsSeasonExists)
+            {
+                FileHandler.Locations.Episode EpisodeOutput = null;
+                IsEpisodeExists = MongoDB_Handler.EpisodeExists(SeasonOutput, NewContent_LocationsObject.EpisodeNum, ref EpisodeOutput);
+
+                if (IsEpisodeExists)
+                    return;
+            }
+            else
+            {
+                MongoDB_Handler.AddNewSeason(NewContent_LocationsObject, "", 0, LocationsCollection, LocationsData, NewContentOutput.ID);
+                return;
+            }
+
+            Console.WriteLine($"IsEpisodeExists: {IsEpisodeExists}");
+
+            MongoDB_Handler.AddNewEpisode(NewContent_LocationsObject, "", 0, LocationsCollection, LocationsData, NewContentOutput.ID, SeasonOutput);
+
+
         }
     }
 }

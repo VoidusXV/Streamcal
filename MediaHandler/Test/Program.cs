@@ -17,8 +17,8 @@ namespace Test
         public string Description { get; set; }
         public string EpisodeTitle { get; set; }
         public string Episode_Description { get; set; }
-        public string Episode { get; set; }
-        public string Season { get; set; }
+        public int EpisodeNum { get; set; }
+        public int SeasonNum { get; set; }
         public long Duration { get; set; }
         public string Started { get; set; }
         public string Ended { get; set; }
@@ -132,8 +132,8 @@ namespace Test
 
 
             int SlashAmount = driver.Url.Split("/").Length - 1;
-            string Season = driver.Url.Split("/")[SlashAmount - 1].Split("-")[1];
-            string Episode = driver.Url.Split("/")[SlashAmount].Split("-")[1];
+            int Season = Convert.ToInt32(driver.Url.Split("/")[SlashAmount - 1].Split("-")[1]);
+            int Episode = Convert.ToInt32(driver.Url.Split("/")[SlashAmount].Split("-")[1]);
 
             return new NewContent
             {
@@ -141,8 +141,8 @@ namespace Test
                 Description = animeDetailsElement?.Text ?? "",
                 EpisodeTitle = episodeTitleElement?.Text ?? "",
                 Episode_Description = episodeDescriptionElement?.GetAttribute("textContent") ?? "",
-                Episode = Episode,
-                Season = Season,
+                EpisodeNum = Episode,
+                SeasonNum = Season,
                 Started = startedElement?.Text ?? "",
                 Ended = endedElement?.Text ?? "",
                 Director = directorElement?.Text ?? "",
