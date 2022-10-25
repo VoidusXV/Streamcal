@@ -19,7 +19,7 @@ namespace Test
         public string Episode_Description { get; set; }
         public int EpisodeNum { get; set; }
         public int SeasonNum { get; set; }
-        public long Duration { get; set; }
+        public double Duration { get; set; }
         public string Started { get; set; }
         public string Ended { get; set; }
         public string Director { get; set; }

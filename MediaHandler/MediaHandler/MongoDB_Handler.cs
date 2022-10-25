@@ -12,7 +12,7 @@ namespace MediaHandler
 
         public static bool SeriesExists(List<FileHandler.NewContent> CollectionData, string CompareTitle, ref FileHandler.NewContent Series)
         {
-            var FindContent = CollectionData.Find(x => x.GetType().GetProperty("Title").GetValue(x).ToString() == CompareTitle);
+            FileHandler.NewContent FindContent = CollectionData.Find(x => x.GetType().GetProperty("Title").GetValue(x).ToString() == CompareTitle);
             if (FindContent == null)
                 return false;
 
@@ -42,7 +42,7 @@ namespace MediaHandler
         }
 
 
-        public static void AddNewSeries(string CollectionName, IMongoDatabase database, FileHandler.NewContent NewContent, IMongoCollection<FileHandler.Locations.Main> LocationsCollection)
+        public static void AddNewSeries(string CollectionName, IMongoDatabase database, FileHandler.NewContent NewContent, IMongoCollection<FileHandler.Locations.Main> LocationsCollection, FileHandler.Locations.Episode Episode, int SeasonNum)
         {
 
             database.GetCollection<FileHandler.NewContent>(CollectionName).InsertOne(NewContent);
@@ -50,7 +50,14 @@ namespace MediaHandler
             {
                 Series = new FileHandler.Locations.Series
                 {
-                    Seasons = new List<FileHandler.Locations.Season> { }
+                    Seasons = new List<FileHandler.Locations.Season>
+                    {
+                        new FileHandler.Locations.Season
+                        {
+                            SeasonNum = SeasonNum,
+                            Episodes = new List<FileHandler.Locations.Episode> { Episode }
+                        }
+                    }
                 },
 
                 Movies = new FileHandler.Locations.Movies { }
@@ -58,25 +65,15 @@ namespace MediaHandler
             LocationsCollection.InsertOne(NewLocation);
         }
 
-        public static void AddNewSeason(FileHandler.ScrapperContent NewContent_LocationsObject, string Path, long Duration, IMongoCollection<FileHandler.Locations.Main> LocationsCollection, List<FileHandler.Locations.Main> LocationsData, int index)
+        public static void AddNewSeason(FileHandler.ScrapperContent NewContent_LocationsObject, IMongoCollection<FileHandler.Locations.Main> LocationsCollection, List<FileHandler.Locations.Main> LocationsData, int index, FileHandler.Locations.Episode NewEpisode)
         {
-
-
-            FileHandler.Locations.Episode Episode = new FileHandler.Locations.Episode
-            {
-                EpisodeNum = NewContent_LocationsObject.EpisodeNum,
-                Thumbnail = "Thumbnail.jpg",
-                Path = Path,
-                Title = NewContent_LocationsObject.EpisodeTitle,
-                Description = NewContent_LocationsObject.Episode_Description,
-                Duration = Duration,
-            };
 
             FileHandler.Locations.Season NewSeason = new FileHandler.Locations.Season
             {
                 SeasonNum = NewContent_LocationsObject.SeasonNum,
-                Episodes = new List<FileHandler.Locations.Episode> { Episode }
+                Episodes = new List<FileHandler.Locations.Episode> { NewEpisode }
             };
+
 
             bool isSeasonNumWithBiggestNum =
                 LocationsData[index].Series.Seasons.Find(x => x.SeasonNum > NewContent_LocationsObject.SeasonNum) == null ? true : false;
@@ -99,17 +96,9 @@ namespace MediaHandler
             Console.WriteLine("New Season Added");
         }
 
-        public static void AddNewEpisode(FileHandler.ScrapperContent NewContent_LocationsObject, string Path, long Duration, IMongoCollection<FileHandler.Locations.Main> LocationsCollection, List<FileHandler.Locations.Main> LocationsData, int index, FileHandler.Locations.Season Season)
+        public static void AddNewEpisode(FileHandler.ScrapperContent NewContent_LocationsObject, IMongoCollection<FileHandler.Locations.Main> LocationsCollection, List<FileHandler.Locations.Main> LocationsData, int index, FileHandler.Locations.Season Season, FileHandler.Locations.Episode NewEpisode)
         {
-            FileHandler.Locations.Episode NewEpisode = new FileHandler.Locations.Episode
-            {
-                EpisodeNum = NewContent_LocationsObject.EpisodeNum,
-                Thumbnail = "Thumbnail.jpg",
-                Path = Path,
-                Title = NewContent_LocationsObject.EpisodeTitle,
-                Description = NewContent_LocationsObject.Episode_Description,
-                Duration = Duration,
-            };
+
 
             List<FileHandler.Locations.Episode> Episodes = Season.Episodes;
 
@@ -143,16 +132,17 @@ namespace MediaHandler
         {
             return Builders<T>.Projection.Exclude(x => u);
         }
-        public static List<T> FetchCollection<T>(IMongoDatabase database, string CollectionName, ProjectionDefinition<T> Projection)
+        public static List<FileHandler.NewContent> FetchCollection(IMongoDatabase database, string CollectionName, ProjectionDefinition<FileHandler.NewContent> Projection = null)
         {
-            //Console.WriteLine(LocationsData[0].Series.Seasons[0].Episodes[0].GetType().GetProperty("Title").
-            //GetValue(LocationsData[0].Series.Seasons[0].Episodes[0]));
 
+            var Collection = database.GetCollection<FileHandler.NewContent>(CollectionName);
+            List<FileHandler.NewContent> LocationsData;
 
-            var Collection = database.GetCollection<T>(CollectionName);
-            //var Projection = Builders<T>.Projection.Exclude(u => u.GetType().GetProperty("MongoDB_ID").PropertyType);    //.Include(u => u.Series).Include(u => u.Movies);
-            var LocationsData = Collection.Find(x => true).Project<T>(Projection).ToList();
-            // var LocationsData = Collection.Find(x => true).ToList();
+            if (Projection != null)
+                LocationsData = Collection.Find(x => true).Project<FileHandler.NewContent>(Projection).ToList();
+            else
+                LocationsData = Collection.Find(x => true).ToList();
+
 
             return LocationsData;
         }

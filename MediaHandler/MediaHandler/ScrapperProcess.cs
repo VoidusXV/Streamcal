@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MongoDB.Driver;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,11 +24,22 @@ namespace MediaHandler
         string NewContentJsonPath;// = processesPath + "/NewContent.json";
         string serverDataPath;
         string ffmpegPath = "..\\ffmpeg.exe";
+        double DurationMiliseconds = 0;
 
         public string Logs = "";
         public string URL = "";
 
-        public ScrapperProcess(string URL, string serverDataPath, int ProcessIndex)
+        bool isSeriesExisting;
+        bool isSeasonExisting;
+        bool isEpisodeExisting;
+        IMongoDatabase database;
+
+        FileHandler.NewContent NewContentOutput = null;
+        FileHandler.Locations.Season SeasonOutput = null;
+        FileHandler.Locations.Episode EpisodeOutput = null;
+
+
+        public ScrapperProcess(string URL, string serverDataPath, int ProcessIndex, IMongoDatabase database)
         {
             this.URL = URL;
             this.serverDataPath = serverDataPath;
@@ -35,6 +47,8 @@ namespace MediaHandler
             processesPath = currentPath + $"/Processes/{ProcessIndex}";
             scrapperPath = currentPath + "/scrapper";
             NewContentJsonPath = processesPath + "/NewContent.json";
+            this.database = database;
+
         }
 
         public async Task Start()
@@ -50,16 +64,35 @@ namespace MediaHandler
 
                 //Unknown Error 
 
-                //Other way: Create Another ConsoleForm and add data via args[]
+                IMongoCollection<FileHandler.Locations.Main> LocationsCollection = database.GetCollection<FileHandler.Locations.Main>("Locations");
+                List<FileHandler.Locations.Main> LocationsData = LocationsCollection.Find(x => true).ToList();
+                List<FileHandler.NewContent> ContentData = MongoDB_Handler.FetchCollection(database, "Content");
 
-                await ScrappingProcess(URL);
-                AddLog("ScrappingProcess Done");
-                MoveFiles();
-                DeleteFiles();
+
+                await RunCmd(URL, scrapperPath + "/scrapper.exe", hidden: false);
+                if (!File.Exists(NewContentJsonPath))
+                    return;
+
+                string NewContent_Locations = File.ReadAllText(NewContentJsonPath);
+                FileHandler.ScrapperContent NewContent_JsonObject = JsonConvert.DeserializeObject<FileHandler.ScrapperContent>(NewContent_Locations);
+
+                DataExistingCheck(LocationsData, ContentData, NewContent_JsonObject); //TODO: Change To an Async Func
+
+                if (isEpisodeExisting)   //TODO: Wanna replace Episode? Question MsgBox
+                    throw new Exception("Episode Already exists");
+
+
+                await ScrappingDownloadProcess(URL, NewContent_JsonObject);
+                //return;
+                AddDataToMongoDB(NewContent_JsonObject, LocationsCollection, LocationsData); //TODO: Change To an Async Func
+               // DeleteFiles();
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ScrapperProcessStart Error:" + ex.Message);
+                if (ex.Message == "Episode Already exists")
+                    MessageBox.Show("Episode Already exists", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                else
+                    Console.WriteLine("ScrapperProcessStart Error:" + ex.Message);
             }
             finally
             {
@@ -93,56 +126,118 @@ namespace MediaHandler
             await Task.WhenAny(eventHandled.Task);
 
         }
-        async Task ScrappingProcess(string URL)
+
+        async Task ScrappingDownloadProcess(string URL, FileHandler.ScrapperContent NewContent_LocationsObject)
         {
-            try
+            //try
             {
-
-
-                AddLog("Scrapping started");
-                await RunCmd(URL, scrapperPath + "/scrapper.exe", hidden: false);
-                AddLog("Scrapping successfully ended");
-                if (!File.Exists(NewContentJsonPath))
-                    return;
-                //progressBar1.Value = 10;
-
-                string indexURL;
-                Download_MasterFile();
-                indexURL = File.ReadAllLines(processesPath + "/master.m3u8")[2];
-                // progressBar1.Value = 20;
-
-                Download_IndexFile(indexURL);
-                //progressBar1.Value = 40;
-
-                await Download_TsFiles(indexURL, $"{processesPath}/TS_Files");
-                // progressBar1.Value = 60;
-
-                Create_TsList($"{processesPath}/TS_Files");
-                //progressBar1.Value = 80;
-
-
-                string NewContent_Locations = File.ReadAllText(NewContentJsonPath);
-                var NewContent_LocationsObject = JsonConvert.DeserializeObject<FileHandler.ScrapperContent>(NewContent_Locations);
                 string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.SeasonNum}_{NewContent_LocationsObject.EpisodeNum}";
 
-                AddLog($"Anime Data: {Media_FileName}");
+                /* string indexURL;
+                 Download_MasterFile();
+                 indexURL = File.ReadAllLines(processesPath + "/master.m3u8")[2];
 
-                await ConvertTsToMp4($"{Media_FileName}");
-                // progressBar1.Value = 100;
+                 Download_IndexFile(indexURL);
 
-                await GeneratePreviewImagesAndThumbnail(Media_FileName);
-                AddLog("========================================================\nDone");
+                 await Download_TsFiles(indexURL, $"{processesPath}/TS_Files");
+
+                 Create_TsList($"{processesPath}/TS_Files");
+
+                 AddLog($"Anime Data: {Media_FileName}");
+                 await ConvertTsToMp4($"{Media_FileName}");
+                */
+
+                await Download_RawVideo(Media_FileName); // Internet connection too Slow
+                DurationMiliseconds = await GetContentDurationNEW(Media_FileName);
+
+                await GeneratePreviewImagesAndThumbnail(Media_FileName, DurationMiliseconds);
+                AddLog("ScrappingProcess Done");
 
             }
-            catch (Exception ex)
+            //catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "ScrappingProcess Error");
+                //  MessageBox.Show(ex.Message, "ScrappingProcess Error");
             }
 
         }
 
 
+        void DataExistingCheck(List<FileHandler.Locations.Main> LocationsData, List<FileHandler.NewContent> ContentData, FileHandler.ScrapperContent NewContent_LocationsObject)
+        {
+            try
+            {
+                AddLog("Starting DataExistingCheck");
 
+                isSeriesExisting = MongoDB_Handler.SeriesExists(ContentData, NewContent_LocationsObject.Title, ref NewContentOutput);
+                Console.WriteLine($"isSeriesExisting:{isSeriesExisting}");
+
+                if (!isSeriesExisting)
+                    return;
+
+                isSeasonExisting = MongoDB_Handler.SeasonExists(LocationsData[NewContentOutput.ID].Series, NewContent_LocationsObject.SeasonNum, ref SeasonOutput);
+                Console.WriteLine($"isSeasonExisting:{isSeasonExisting} {NewContent_LocationsObject.SeasonNum}");
+
+                if (!isSeasonExisting)
+                    return;
+
+                isEpisodeExisting = MongoDB_Handler.EpisodeExists(SeasonOutput, NewContent_LocationsObject.EpisodeNum, ref EpisodeOutput);
+                Console.WriteLine($"isEpisodeExisting:{isEpisodeExisting}");
+
+            }
+            finally
+            {
+                AddLog("DataExistingCheck Ended");
+            }
+        }
+
+
+        void AddDataToMongoDB(FileHandler.ScrapperContent NewContent_JsonObject, IMongoCollection<FileHandler.Locations.Main> LocationsCollection, List<FileHandler.Locations.Main> LocationsData)
+        {
+
+
+            string Path = $"/Series/Season_{NewContent_JsonObject.SeasonNum}/{NewContent_JsonObject.EpisodeNum}/{NewContent_JsonObject.EpisodeNum}.mp4";
+
+            FileHandler.Locations.Episode NewEpisode = new FileHandler.Locations.Episode
+            {
+                EpisodeNum = NewContent_JsonObject.EpisodeNum,
+                Thumbnail = "Thumbnail.jpg",
+                Path = Path,
+                Title = NewContent_JsonObject.EpisodeTitle,
+                Description = NewContent_JsonObject.Episode_Description,
+                Duration = DurationMiliseconds,
+            };
+
+            if (!isSeriesExisting)
+            {
+                FileHandler.NewContent NewContent = new FileHandler.NewContent
+                {
+                    ID = LocationsData.Count,
+                    Title = NewContent_JsonObject.Title,
+                    Description = NewContent_JsonObject.Description,
+                    Availability = "",
+                    Genre = "",
+                    Started = NewContent_JsonObject.Started,
+                    Ended = NewContent_JsonObject.Ended,
+                    Director = NewContent_JsonObject.Director,
+                    Producer = NewContent_JsonObject.Producer,
+
+                };
+
+                MongoDB_Handler.AddNewSeries("Content", database, NewContent, LocationsCollection, NewEpisode, NewContent_JsonObject.SeasonNum);
+                return;
+            }
+
+            if (!isSeasonExisting)
+            {
+                MongoDB_Handler.AddNewSeason(NewContent_JsonObject, LocationsCollection, LocationsData, NewContentOutput.ID, NewEpisode);
+                return;
+            }
+
+
+            MongoDB_Handler.AddNewEpisode(NewContent_JsonObject, LocationsCollection, LocationsData, NewContentOutput.ID, SeasonOutput, NewEpisode);
+        }
+
+        #region Old MoveFiles
         void MoveFiles()
         {
             string NewContent_JsonFile = File.ReadAllText(NewContentJsonPath);
@@ -184,13 +279,13 @@ namespace MediaHandler
         {
             try
             {
-                int NewContentSeason = Convert.ToInt32(NewContent_JsonObject.SeasonNum);
+                int NewContentSeason = NewContent_JsonObject.SeasonNum;
                 int ContentID = Content_JsonObject[index].ID;
                 string LocationFile_Path = $"{serverDataPath}/{ContentID}/Locations.json";// $"{currentPath}/Locations.json";
                                                                                           // string LocationFile = File.ReadAllText($"{serverDataPath}/{ContentID}/Locations.json");
                                                                                           //var LocationObject = JsonConvert.DeserializeObject<FileHandler.Locations.Main>(LocationFile);
 
-                int Episode = Convert.ToInt32(NewContent_JsonObject.EpisodeNum);
+                int Episode = NewContent_JsonObject.EpisodeNum;
                 string Path = $"/Series/Season_{NewContentSeason}/{Episode}/{NewContent_JsonObject.EpisodeNum}.mp4";
                 string EpisodeTitle = NewContent_JsonObject.EpisodeTitle;
                 string Description = NewContent_JsonObject.Episode_Description;
@@ -221,6 +316,8 @@ namespace MediaHandler
                 MessageBox.Show(ex.Message, "Move_ExistingContent Error");
             }
         }
+        #endregion
+
 
         double GetContentDuration()
         {
@@ -238,6 +335,28 @@ namespace MediaHandler
             duration += addTime;
             AddLog("Media Duration calculated");
             return duration;
+        }
+
+        async Task<double> GetContentDurationNEW(string Media_FileName)
+        {
+            await RunCmd($"{ffmpegPath} -i {Media_FileName}.mp4 2> VideoInfo.txt", hidden: true, systemArguments: true);
+
+            string path = $"{processesPath}/VideoInfo.txt";
+            if (!File.Exists(path))
+                throw new Exception("GetContentDurationNEW: VideoInfo.txt doesnt exist");
+
+            string[] videoInfoFile = File.ReadAllLines(path);
+            foreach (var item in videoInfoFile)
+            {
+                if (item.Contains("Duration:"))
+                {
+                    int timeStampBegin = 12;
+                    string timeStamp = item.Substring(timeStampBegin).Split(',')[0];
+                    double duration = TimeSpan.Parse(timeStamp).TotalMilliseconds;
+                    return duration;
+                }
+            }
+            throw new Exception("Duration cannot found");
         }
 
         void DeleteFiles()
@@ -282,14 +401,40 @@ namespace MediaHandler
             {
                 if (item.Contains("/master.m3u8"))
                 {
-                    string masterURL = item.Split('"')[3];
+                    string masterURL = item.Split('\'')[3];
+                    //Console.WriteLine("masterURL: " + masterURL);
                     webClient.DownloadFile(masterURL, $"{processesPath}/master.m3u8");
                     AddLog("master.m3u8 successfully downloaded");
+                    return;
+                }
+                // Console.WriteLine("running.....");
+            }
+        }
+
+        async Task Download_RawVideo(string Media_FileName)
+        {
+            AddLog("Downloading Raw Video");
+            WebClient webClient = new WebClient();
+            webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
+
+            string[] a = File.ReadAllLines(processesPath + "/video.html");
+            foreach (var item in a)
+            {
+                if (item.Contains("voe-network.net/engine/mp4"))
+                {
+                    string rawVideoURL = item.Split('\'')[3];
+                    Console.WriteLine("rawVideoURL: " + rawVideoURL);
+                    await webClient.DownloadFileTaskAsync(rawVideoURL, $"{processesPath}/{Media_FileName}.mp4");
+                    AddLog("Raw Video successfully downloaded");
                     return;
                 }
             }
         }
 
+        private void WebClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            Console.WriteLine("downloaded {0} of {1} bytes. {2} % complete...", e.BytesReceived, e.TotalBytesToReceive, e.ProgressPercentage);
+        }
 
         async Task Download_TsFiles(string indexURL, string destinationPath)
         {
@@ -337,7 +482,7 @@ namespace MediaHandler
 
         }
 
-        async Task GeneratePreviewImagesAndThumbnail(string fileName)
+        async Task GeneratePreviewImagesAndThumbnail(string fileName, double DurationMiliseconds)
         {
             //27s => 27/60 => 0.45
             //0.45/0.4 => (0.18 < 1) => 1
@@ -347,10 +492,10 @@ namespace MediaHandler
             int Columns = 10;
             double RandomConstant = 0.4;
 
-            var Duration = GetContentDuration() / 1000; //JsonConvert.DeserializeObject<FileHandler.ScrapperContent>(File.ReadAllText(NewContentJsonPath)).Duration / 1000; // In Seconds
-            var DurationMinutes = Duration / 60;
+            // var Duration = GetContentDurationNEW(); //GetContentDuration() / 1000;
+            var DurationMinutes = DurationMiliseconds / 60;
             var SecondsPerImage = Math.Ceiling(DurationMinutes * RandomConstant);
-            var ImageRows = Math.Ceiling(Duration / SecondsPerImage / Columns);
+            var ImageRows = Math.Ceiling(DurationMiliseconds / SecondsPerImage / Columns);
 
             Directory.CreateDirectory($"{processesPath}/img");
             AddLog("Generating Preview Images...");
@@ -359,7 +504,7 @@ namespace MediaHandler
             AddLog("Preview Images Generated");
 
             AddLog("Generating Thumbnail...");
-            int MiddleContentLength = Convert.ToInt32(Duration / 2);
+            int MiddleContentLength = Convert.ToInt32(DurationMiliseconds / 2);
             await RunCmd($"{ffmpegPath} -ss {MiddleContentLength} -i {Fixed_FileName}.mp4 -qscale:v 1 -frames:v 1 Thumbnail.jpg", hidden: true, systemArguments: true);
             AddLog("Thumbnail Generated");
 

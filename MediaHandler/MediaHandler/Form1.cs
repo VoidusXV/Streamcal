@@ -36,15 +36,16 @@ namespace MediaHandler
         public static List<BackgroundWorker> backgroundWorkers = new List<BackgroundWorker>();
         // ProcessForm processForm = new ProcessForm();
 
-        string IP_Address = "192.168.2.121";
         int Port = 3005;
         MongoClient mongoClient = null;
-        MongoClientSettings mongoClientSettings = null;
+        IMongoDatabase database = null;
+
         public Form1()
         {
             InitializeComponent();
             Setup();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
 
         }
         private void Form1_Load(object sender, EventArgs e)
@@ -54,6 +55,7 @@ namespace MediaHandler
                 // mongoClientSettings = MongoClientSettings.FromConnectionString($"mongodb://localhost:{Port}");
 
                 mongoClient = new MongoClient($"mongodb://localhost:{Port}");
+                database = mongoClient.GetDatabase("Streamcal");
 
                 label6.Text = "Connected";
                 label6.ForeColor = Color.Green;
@@ -113,7 +115,7 @@ namespace MediaHandler
                     for (int i = 0; i <= numericUpDown2.Value - numericUpDown1.Value; i++)
                     {
                         string URL = textBox1.Text + (numericUpDown1.Value + i);
-                        ScrapperProcess scrapperProcess = new ScrapperProcess(URL, serverDataPath, GetProcessIndex() + 1);
+                        ScrapperProcess scrapperProcess = new ScrapperProcess(URL, serverDataPath, GetProcessIndex() + 1, database);
                         CurrentProcesses.Add(scrapperProcess);
                         TaskProcesses.Add(scrapperProcess.Start());
                     }
@@ -124,7 +126,7 @@ namespace MediaHandler
                 }
                 else
                 {
-                    ScrapperProcess scrapperProcess = new ScrapperProcess(textBox1.Text, serverDataPath, GetProcessIndex() + 1);
+                    ScrapperProcess scrapperProcess = new ScrapperProcess(textBox1.Text, serverDataPath, GetProcessIndex() + 1, database);
                     CurrentProcesses.Add(scrapperProcess);
                     await scrapperProcess.Start();
                 }
@@ -308,13 +310,27 @@ namespace MediaHandler
 
         private void button8_Click_1(object sender, EventArgs e)
         {
-            ProcessForm processForm = new ProcessForm("Kopf\n23242424\n");
-            processForm.Show();
+            //ProcessForm processForm = new ProcessForm("Kopf\n23242424\n");
+            //processForm.Show();
+
+
+            string[] videoInfoFile = File.ReadAllLines(@"C:\Coding\Projects\Private Streaming Service\Streamcal\MediaHandler\MediaHandler\bin\Debug\Processes\VideoInfo.txt");
+            foreach (var item in videoInfoFile)
+            {
+                if (item.Contains("Duration:"))
+                {
+                    int timeStampBegin = 12;
+                    string timeStamp = item.Substring(timeStampBegin).Split(',')[0];
+                    double duration = TimeSpan.Parse(timeStamp).TotalMilliseconds;
+                    Console.WriteLine(duration);
+                    return;
+                }
+            }
         }
 
         private void button9_Click_1(object sender, EventArgs e)
         {
-            var database = mongoClient.GetDatabase("Streamcal");
+
 
             var ContentProjection = Builders<FileHandler.NewContent>.Projection.Exclude(u => u.MongoDB_ID);
             List<FileHandler.NewContent> ContentData = MongoDB_Handler.FetchCollection(database, "Content", ContentProjection);
@@ -334,7 +350,6 @@ namespace MediaHandler
             FileHandler.NewContent NewContentOutput = null;
             bool IsSeriesExists = MongoDB_Handler.SeriesExists(ContentData, NewContent_LocationsObject.Title, ref NewContentOutput);
 
-            //Console.WriteLine($"IsSeriesExists: {IsSeriesExists}");
 
             if (!IsSeriesExists)
             {
@@ -352,14 +367,13 @@ namespace MediaHandler
 
                 };
 
-                MongoDB_Handler.AddNewSeries("Content", database, NewContent, LocationsCollection);
+                //MongoDB_Handler.AddNewSeries("Content", database, NewContent, LocationsCollection);
                 return;
             }
 
 
             FileHandler.Locations.Season SeasonOutput = null;
             bool IsSeasonExists = MongoDB_Handler.SeasonExists(LocationsData[NewContentOutput.ID].Series, NewContent_LocationsObject.SeasonNum, ref SeasonOutput);
-            // Console.WriteLine($"IsSeasonExists: {IsSeasonExists}");
 
             bool IsEpisodeExists = false;
 
@@ -375,13 +389,12 @@ namespace MediaHandler
             }
             else
             {
-                MongoDB_Handler.AddNewSeason(NewContent_LocationsObject, "", 0, LocationsCollection, LocationsData, NewContentOutput.ID);
+               // MongoDB_Handler.AddNewSeason(NewContent_LocationsObject, LocationsCollection, LocationsData, NewContentOutput.ID, Episode);
                 return;
             }
 
-            Console.WriteLine($"IsEpisodeExists: {IsEpisodeExists}");
 
-            MongoDB_Handler.AddNewEpisode(NewContent_LocationsObject, "", 0, LocationsCollection, LocationsData, NewContentOutput.ID, SeasonOutput);
+          //  MongoDB_Handler.AddNewEpisode(NewContent_LocationsObject, "", 0, LocationsCollection, LocationsData, NewContentOutput.ID, SeasonOutput);
 
 
         }

@@ -19,7 +19,7 @@ namespace MediaHandler
             public int SeasonNum { get; set; }
             public string Started { get; set; }
             public string Ended { get; set; }
-            public long Duration { get; set; }
+            public double Duration { get; set; }
             public string Director { get; set; }
             public string Producer { get; set; }
             public string CoverURL { get; set; }
@@ -95,7 +95,7 @@ namespace MediaHandler
                 public string Path { get; set; }
                 public string Title { get; set; }
                 public string Description { get; set; }
-                public long Duration { get; set; }
+                public double Duration { get; set; }
             }
         }
     }
