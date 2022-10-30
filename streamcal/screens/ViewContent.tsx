@@ -22,9 +22,16 @@ import {
   getSeasonAmount,
   getThumbnailURL,
 } from "../backend/serverConnection";
-import { ICurrentContentInfo, IEpisode, IMediaData } from "../components/constants/interfaces";
+import {
+  IContentInfo,
+  ICurrentContentInfo,
+  IEpisode,
+  IMediaData,
+} from "../components/constants/interfaces";
 import LoadingIndicator from "../components/Designs/LoadingIndicator";
 import { gContent } from "../components/constants/Content";
+import { smallFont, smallTitleFont } from "../components/Designs/Fonts";
+import CloseTopBar from "../components/Designs/CloseTopBar";
 
 const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
   const [getTextHeight, setTextHeight] = React.useState<any>(0);
@@ -97,7 +104,68 @@ const DescriptionContainer = ({ DescriptionText }: any) => {
     </View>
   );
 };
-const ContentInfo = ({ SeasonNum, EpisodeNum, DescriptionText }: any) => (
+const DetailsModal = ({ ContentInfo, onClose }: any) => {
+  let ContentInfoObjects = Object.keys(ContentInfo); //.splice(4);
+
+  const filter = (x: any) =>
+    x == "Genre" || x == "Started" || x == "Ended" || x == "Director" || x == "Producer";
+  ContentInfoObjects = ContentInfoObjects.filter(filter);
+
+  const InfoBox = ({ ObjectName, ObjectValue }: any) => {
+    return (
+      <View
+        style={{
+          width: "100%",
+          backgroundColor: "",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          padding: "4%",
+          borderBottomWidth: 1,
+          borderColor: "grey",
+        }}>
+        <Text style={{ ...smallFont, fontWeight: "500" }}>{ObjectName}</Text>
+        <Text style={{ ...smallFont, fontWeight: "500", maxWidth: "50%" }}>
+          {!ObjectValue ? "-" : ObjectValue}
+        </Text>
+      </View>
+    );
+  };
+
+  return (
+    <ScrollView
+      style={{ backgroundColor: backgroundColor, width: "100%", height: "100%" }}
+      contentContainerStyle={{ paddingBottom: 20 }}>
+      <CloseTopBar Icon={"close"} Title={ContentInfo.Title} onPress={onClose}></CloseTopBar>
+      <Text
+        style={{
+          ...smallTitleFont,
+          marginLeft: 20,
+          marginTop: "7%",
+          marginBottom: "3%",
+          fontWeight: "500",
+        }}>
+        Description:
+      </Text>
+
+      <View
+        style={{
+          width: "100%",
+          alignItems: "center",
+          borderBottomWidth: 1,
+          borderColor: "grey",
+          paddingBottom: 15,
+        }}>
+        <Text style={{ ...smallFont, lineHeight: 25 }}>{ContentInfo.Description}</Text>
+      </View>
+
+      {ContentInfoObjects.map((e: any, i) => {
+        return <InfoBox key={i} ObjectName={e} ObjectValue={ContentInfo?.[e]}></InfoBox>;
+      })}
+      {/* <InfoBox></InfoBox> */}
+    </ScrollView>
+  );
+};
+const ContentInfo = ({ SeasonNum, EpisodeNum, DescriptionText, onPress }: any) => (
   <>
     <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
       <Text style={styles.InfoText}>&#9679; Series</Text>
@@ -110,7 +178,7 @@ const ContentInfo = ({ SeasonNum, EpisodeNum, DescriptionText }: any) => (
     </View>
     <DescriptionContainer DescriptionText={DescriptionText}></DescriptionContainer>
     <Text
-      onPress={() => console.log("Show More Details")}
+      onPress={onPress}
       style={{ ...styles.InfoText, textDecorationLine: "underline", textAlign: "center" }}>
       Show More Details
     </Text>
@@ -253,8 +321,9 @@ const ViewContent = ({ route, navigation }: any) => {
   const [getSeason, setSeason] = React.useState(0);
   const [isSeasonModal, setSeasonModal] = React.useState(false);
   const [getScrollValue, setScrollValue] = React.useState(0); // TODO: Maybe change it to useRef
+  const [getDetailsModal, setDetailsModal] = React.useState(false);
 
-  let data: any;
+  let data: IMediaData;
   React.useEffect(() => {
     const _AbortController = new AbortController();
     let unsub = setTimeout(async () => {
@@ -293,6 +362,7 @@ const ViewContent = ({ route, navigation }: any) => {
               ContentTitle={contentData?.Title}></ImageContainer>
             <View style={styles.ContentContainer}>
               <ContentInfo
+                onPress={() => setDetailsModal(true)}
                 DescriptionText={contentData?.Description}
                 SeasonNum={getSeasonAmount(getMediaLocation)}
                 EpisodeNum={getEpisodeAmount(getMediaLocation)}></ContentInfo>
@@ -344,6 +414,16 @@ const ViewContent = ({ route, navigation }: any) => {
           </>
         )}
       </ScrollView>
+
+      <Modal
+        animationType="slide"
+        transparent
+        visible={getDetailsModal}
+        onRequestClose={() => setDetailsModal(false)}>
+        <DetailsModal
+          ContentInfo={contentData}
+          onClose={() => setDetailsModal(false)}></DetailsModal>
+      </Modal>
     </>
   );
 };

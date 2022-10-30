@@ -18,11 +18,15 @@ interface IServerInfo {
 }
 
 interface IContentInfo {
-  Availability?: any;
-  Description?: any;
-  Genre?: any;
   ID?: any;
+  Description?: any;
   Title?: any;
+  Availability?: any;
+  Genre?: any;
+  Started?: any;
+  Ended?: any;
+  Director?: any;
+  Producer?: any;
 }
 
 interface ICurrentContentInfo {

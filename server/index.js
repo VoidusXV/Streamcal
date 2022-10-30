@@ -95,18 +95,20 @@ async function GetAllContent() {
   return AllContent;
 }
 
-async function getContentAPI(ID) {
+async function getLocationData(ID) {
   const database = MongoClient.db("Streamcal");
-  const Content_Collection = database.collection("Content");
-  let Content = [];
+  const Content_Collection = database.collection("Locations");
+  let Content = {};
+  let index = 0;
   await Content_Collection.find({}, { projection: { _id: 0 } }).forEach((e) => {
-    e.ID == ID && Content.push(e);
+    if (index == ID) Content = e;
+    index++;
   });
   return Content;
 }
 
 app.get("/v1/kok", async (req, res) => {
-  res.send(await getContentAPI(5)).end();
+  res.send(await getLocationData(1)).end();
 });
 
 app.get("/v1/test2", (req, res) => {
@@ -149,7 +151,7 @@ app.get("/v1/Media", async (req, res) => {
     const ContentID = new URLSearchParams(req.url).get("/v1/Media?id");
     if (!ContentID) return res.status(403);
 
-    res.send(await getContentAPI(ContentID));
+    res.send(await getLocationData(ContentID));
   } catch (e) {
     return res.status(403);
   } finally {
