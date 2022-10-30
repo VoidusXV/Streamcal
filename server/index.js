@@ -11,18 +11,6 @@ const MongoClient = new Mongo.MongoClient(MongoURL);
 app.use(cors());
 app.use(express.json());
 
-const All_Content = require("./Data/Content.json");
-const mediaData = require("./Data/0/Locations.json");
-
-function getContentAPI(ID) {
-  const data = require(`./Data/${ID}/Locations.json`);
-  return data;
-}
-function contentExists(ID) {
-  const data = require(`./Data/Content.json`);
-  return data.length > ID && ID >= 0;
-}
-
 function Generate_APIKEY() {
   const Numbers = "0123456789";
   const UpperAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -98,6 +86,28 @@ async function UpdateDocument(Collection, filter, updateObject) {
 }
 
 // Media API
+async function GetAllContent() {
+  const database = MongoClient.db("Streamcal");
+  const Content_Collection = database.collection("Content");
+
+  let AllContent = [];
+  await Content_Collection.find({}, { projection: { _id: 0 } }).forEach((e) => AllContent.push(e));
+  return AllContent;
+}
+
+async function getContentAPI(ID) {
+  const database = MongoClient.db("Streamcal");
+  const Content_Collection = database.collection("Content");
+  let Content = [];
+  await Content_Collection.find({}, { projection: { _id: 0 } }).forEach((e) => {
+    e.ID == ID && Content.push(e);
+  });
+  return Content;
+}
+
+app.get("/v1/kok", async (req, res) => {
+  res.send(await getContentAPI(5)).end();
+});
 
 app.get("/v1/test2", (req, res) => {
   try {
@@ -129,17 +139,17 @@ app.get("/v1/test2", (req, res) => {
   }
 });
 
-app.get("/v1/Content", (req, res) => {
+app.get("/v1/Content", async (req, res) => {
   console.log("Trying to get Content");
-  res.send(All_Content).end();
+  res.send(await GetAllContent()).end();
 });
 
-app.get("/v1/Media", (req, res) => {
+app.get("/v1/Media", async (req, res) => {
   try {
     const ContentID = new URLSearchParams(req.url).get("/v1/Media?id");
     if (!ContentID) return res.status(403);
 
-    res.send(getContentAPI(ContentID));
+    res.send(await getContentAPI(ContentID));
   } catch (e) {
     return res.status(403);
   } finally {
@@ -150,11 +160,12 @@ app.get("/v1/Media", (req, res) => {
 app.get("/v1/Media/Cover", (req, res) => {
   try {
     const ContentID = new URLSearchParams(req.url).get("/v1/Media/Cover?id");
-
-    if (!ContentID) return res.status(403).end();
-    if (!contentExists(ContentID)) return res.status(403).end();
-
     const url = __dirname + `/Data/${ContentID}/Cover.jpg`;
+
+    const coverExists = fs.existsSync(url);
+    console.log(coverExists);
+    if (!ContentID || !coverExists) return res.status(403).end();
+
     res.sendFile(url);
   } catch (e) {
     res.status(403).end();

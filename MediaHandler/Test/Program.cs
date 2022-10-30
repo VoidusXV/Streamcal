@@ -60,6 +60,7 @@ namespace Test
             URL = args[0];
 
             ChromeOptions options = new ChromeOptions();
+            //options.BinaryLocation = $"{currentPath}/";
             //options.AddExtension(@"C:\Coding\Projects\Private Streaming Service\Streamcal\MediaHandler\MediaHandler\bin\Debug\Extensions\AdblockPLUS\3.14.2_0.crx");
             options.AddExtension(@"C:\Coding\Projects\Private Streaming Service\Streamcal\MediaHandler\MediaHandler\bin\Debug\Extensions\Popblocker\0.6.6_0.crx");
             options.AddArgument("--window-size=0,0");

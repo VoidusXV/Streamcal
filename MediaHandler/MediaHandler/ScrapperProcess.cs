@@ -9,13 +9,16 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
+
 namespace MediaHandler
 {
-    public delegate void LOGS(string text);
+    public delegate void Event(string text = "");
 
     public class ScrapperProcess
     {
-        public event LOGS LogAdded;
+        public event Event LogAdded;
+        public event Event onFinished;
 
         WebClient webClient = new WebClient();
         static string currentPath = Directory.GetCurrentDirectory();
@@ -28,6 +31,7 @@ namespace MediaHandler
 
         public string Logs = "";
         public string URL = "";
+        public int Index = 0;
 
         bool isSeriesExisting;
         bool isSeasonExisting;
@@ -37,7 +41,7 @@ namespace MediaHandler
         FileHandler.NewContent NewContentOutput = null;
         FileHandler.Locations.Season SeasonOutput = null;
         FileHandler.Locations.Episode EpisodeOutput = null;
-
+        public System.Threading.Thread ProcessThread = null;
 
         public ScrapperProcess(string URL, string serverDataPath, int ProcessIndex, IMongoDatabase database)
         {
@@ -68,7 +72,6 @@ namespace MediaHandler
                 List<FileHandler.Locations.Main> LocationsData = LocationsCollection.Find(x => true).ToList();
                 List<FileHandler.NewContent> ContentData = MongoDB_Handler.FetchCollection(database, "Content");
 
-
                 await RunCmd(URL, scrapperPath + "/scrapper.exe", hidden: false);
                 if (!File.Exists(NewContentJsonPath))
                     return;
@@ -82,10 +85,14 @@ namespace MediaHandler
                     throw new Exception("Episode Already exists");
 
 
+
                 await ScrappingDownloadProcess(URL, NewContent_JsonObject);
-                //return;
                 AddDataToMongoDB(NewContent_JsonObject, LocationsCollection, LocationsData); //TODO: Change To an Async Func
-               // DeleteFiles();
+                MoveMediaFile(LocationsData, NewContent_JsonObject);
+                DeleteFiles();
+                onFinished();
+                DeleteFiles();
+
             }
             catch (Exception ex)
             {
@@ -96,7 +103,7 @@ namespace MediaHandler
             }
             finally
             {
-                //  DeleteFiles();
+                //DeleteFiles();
             }
         }
 
@@ -132,7 +139,7 @@ namespace MediaHandler
             //try
             {
                 string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.SeasonNum}_{NewContent_LocationsObject.EpisodeNum}";
-
+                #region Old
                 /* string indexURL;
                  Download_MasterFile();
                  indexURL = File.ReadAllLines(processesPath + "/master.m3u8")[2];
@@ -146,6 +153,7 @@ namespace MediaHandler
                  AddLog($"Anime Data: {Media_FileName}");
                  await ConvertTsToMp4($"{Media_FileName}");
                 */
+                #endregion
 
                 await Download_RawVideo(Media_FileName); // Internet connection too Slow
                 DurationMiliseconds = await GetContentDurationNEW(Media_FileName);
@@ -235,6 +243,33 @@ namespace MediaHandler
 
 
             MongoDB_Handler.AddNewEpisode(NewContent_JsonObject, LocationsCollection, LocationsData, NewContentOutput.ID, SeasonOutput, NewEpisode);
+        }
+
+        void MoveMediaFile(List<FileHandler.Locations.Main> LocationsData, FileHandler.ScrapperContent NewContent_JsonObject)
+        {
+
+            int ContentID = NewContentOutput != null ? NewContentOutput.ID : LocationsData.Count;
+            Console.WriteLine($"ContentID: {ContentID}");
+            int SeasonNum = NewContent_JsonObject.SeasonNum;
+            int EpisodeNum = NewContent_JsonObject.EpisodeNum;
+            string Title = NewContent_JsonObject.Title;
+
+            string EpisodePath = $"{serverDataPath}/{ContentID}/Series/Season_{SeasonNum}/{EpisodeNum}";
+            string Path = $"/Series/Season_{SeasonNum}/{EpisodeNum}/{EpisodeNum}.mp4";
+            string VideoFileName = $"{Title}_{SeasonNum}_{EpisodeNum}".Replace(" ", "_");
+
+            Directory.CreateDirectory($"{serverDataPath}/{ContentID}");
+            Directory.CreateDirectory($"{serverDataPath}/{ContentID}/Movie");
+            Directory.CreateDirectory($"{serverDataPath}/{ContentID}/Series");
+            Directory.CreateDirectory($"{serverDataPath}/{ContentID}/Series/Season_{SeasonNum}");
+            Directory.CreateDirectory(EpisodePath);
+
+            File.Move($"{processesPath}/{VideoFileName}.mp4", $"{serverDataPath}/{ContentID}/{Path}");
+            File.Move($"{processesPath}/SeekSliderPreview.png", $"{EpisodePath}/SeekSliderPreview.png");
+            File.Move($"{processesPath}/Thumbnail.jpg", $"{EpisodePath}/Thumbnail.jpg");
+
+            if (!isSeriesExisting)
+                webClient.DownloadFile(NewContent_JsonObject.CoverURL, $"{serverDataPath}/{ContentID}/Cover.jpg");
         }
 
         #region Old MoveFiles
@@ -425,6 +460,8 @@ namespace MediaHandler
                     string rawVideoURL = item.Split('\'')[3];
                     Console.WriteLine("rawVideoURL: " + rawVideoURL);
                     await webClient.DownloadFileTaskAsync(rawVideoURL, $"{processesPath}/{Media_FileName}.mp4");
+                    // webClient.DownloadFileAsync(new Uri(rawVideoURL), $"{processesPath}/{Media_FileName}.mp4");
+
                     AddLog("Raw Video successfully downloaded");
                     return;
                 }
@@ -492,10 +529,11 @@ namespace MediaHandler
             int Columns = 10;
             double RandomConstant = 0.4;
 
-            // var Duration = GetContentDurationNEW(); //GetContentDuration() / 1000;
-            var DurationMinutes = DurationMiliseconds / 60;
+            var DurationSeconds = DurationMiliseconds / 1000;
+            var DurationMinutes = DurationSeconds / 60;
             var SecondsPerImage = Math.Ceiling(DurationMinutes * RandomConstant);
-            var ImageRows = Math.Ceiling(DurationMiliseconds / SecondsPerImage / Columns);
+            var ImageRows = Math.Ceiling(DurationSeconds / SecondsPerImage / Columns);
+
 
             Directory.CreateDirectory($"{processesPath}/img");
             AddLog("Generating Preview Images...");
@@ -504,7 +542,7 @@ namespace MediaHandler
             AddLog("Preview Images Generated");
 
             AddLog("Generating Thumbnail...");
-            int MiddleContentLength = Convert.ToInt32(DurationMiliseconds / 2);
+            int MiddleContentLength = Convert.ToInt32(DurationSeconds / 2);
             await RunCmd($"{ffmpegPath} -ss {MiddleContentLength} -i {Fixed_FileName}.mp4 -qscale:v 1 -frames:v 1 Thumbnail.jpg", hidden: true, systemArguments: true);
             AddLog("Thumbnail Generated");
 

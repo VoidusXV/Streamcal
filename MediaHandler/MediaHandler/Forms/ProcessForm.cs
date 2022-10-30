@@ -37,12 +37,25 @@ namespace MediaHandler
             {
                 listBox1.Items.Add(i.ToString());
                 scrapperProcesses[i].LogAdded += ProcessForm_LogAdded;
+                scrapperProcesses[i].onFinished += ProcessForm_onFinished;
+
             }
+        }
+
+        private void ProcessForm_onFinished(string text)
+        {
+            ProcessForm_LogAdded("--------Done----------------");
+
         }
 
         private void ProcessForm_LogAdded(string text)
         {
-            richTextBox1.AppendText(text);
+            this.Invoke((MethodInvoker)delegate
+            {
+
+                richTextBox1.AppendText(text);
+
+            });
         }
 
 
@@ -63,6 +76,25 @@ namespace MediaHandler
                 Console.WriteLine("Error:" + ex.Message);
             }
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (scrapperProcesses == null)
+                    return;
+
+                var a = scrapperProcesses[listBox1.SelectedIndex].ProcessThread;
+
+                Console.WriteLine(a == null ? false : true);
+                scrapperProcesses[listBox1.SelectedIndex].ProcessThread.Abort();
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine("Error:" + ex.Message);
+            }
         }
     }
 }

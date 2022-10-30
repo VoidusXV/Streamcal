@@ -161,10 +161,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="APIKEY_Generator.cs">
+    <Compile Include="Forms\APIKEY_Generator.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="APIKEY_Generator.Designer.cs">
+    <Compile Include="Forms\APIKEY_Generator.Designer.cs">
       <DependentUpon>APIKEY_Generator.cs</DependentUpon>
     </Compile>
     <Compile Include="FileHandler.cs" />
@@ -174,24 +174,33 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="JsonHandler.cs" />
-    <Compile Include="MongoDB_Handler.cs" />
-    <Compile Include="ProcessForm.cs">
+    <Compile Include="Forms\DragDropFrom.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ProcessForm.Designer.cs">
+    <Compile Include="Forms\DragDropFrom.Designer.cs">
+      <DependentUpon>DragDropFrom.cs</DependentUpon>
+    </Compile>
+    <Compile Include="JsonHandler.cs" />
+    <Compile Include="MongoDB_Handler.cs" />
+    <Compile Include="Forms\ProcessForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ProcessForm.Designer.cs">
       <DependentUpon>ProcessForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScrapperProcess.cs" />
-    <EmbeddedResource Include="APIKEY_Generator.resx">
+    <EmbeddedResource Include="Forms\APIKEY_Generator.resx">
       <DependentUpon>APIKEY_Generator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ProcessForm.resx">
+    <EmbeddedResource Include="Forms\DragDropFrom.resx">
+      <DependentUpon>DragDropFrom.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ProcessForm.resx">
       <DependentUpon>ProcessForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

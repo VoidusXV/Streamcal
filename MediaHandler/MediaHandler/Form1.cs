@@ -116,6 +116,7 @@ namespace MediaHandler
                     {
                         string URL = textBox1.Text + (numericUpDown1.Value + i);
                         ScrapperProcess scrapperProcess = new ScrapperProcess(URL, serverDataPath, GetProcessIndex() + 1, database);
+                        scrapperProcess.Index = i;
                         CurrentProcesses.Add(scrapperProcess);
                         TaskProcesses.Add(scrapperProcess.Start());
                     }
@@ -134,7 +135,7 @@ namespace MediaHandler
                 //MoveFiles();
                 //DeleteFiles();
 
-                MessageBox.Show("Media successfully downloaded", "Downloaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //MessageBox.Show("Media successfully downloaded", "Downloaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -170,13 +171,14 @@ namespace MediaHandler
 
         List<Task> randomTasks = new List<Task>();
         bool isCanceled = false;
-
+        CancellationTokenSource cancellationToken = new CancellationTokenSource();
+        Thread thread = null;
 
         Task Cancelation(int Sleeptimer = 1000, Action action = null)
         {
             Task a = new Task(() =>
             {
-                try
+                // try
                 {
                     while (true)
                     {
@@ -190,10 +192,10 @@ namespace MediaHandler
 
                     }
                 }
-                catch (Exception ex)
+                // catch (Exception ex)
                 {
-                    if (ex.Message == "Task canceled")
-                        Console.WriteLine("Task canceled");
+                    //  if (ex.Message == "Task canceled")
+                    //    Console.WriteLine("Task canceled");
                 }
             });
 
@@ -202,7 +204,7 @@ namespace MediaHandler
 
 
 
-        private void button5_Click(object sender, EventArgs e)
+        private async void button5_Click(object sender, EventArgs e)
         {
 
 
@@ -210,23 +212,41 @@ namespace MediaHandler
             {
 
 
-                Task cancelTask = Cancelation(action: () => { throw new Exception("Task canceled"); });
-                cancelTask.Start();
-                for (int i = 0; i < 100; i++)
+                try
                 {
-                    //Console.WriteLine("randomTask:" + i);
-                    //Console.WriteLine("isCanceled:" + isCanceled);
-                    Thread.Sleep(1000);
+                    //  Task cancelTask = Cancelation(action: () => { throw new Exception("Task canceled"); });
+                    // cancelTask.Start();
+
+                    for (int i = 0; i < 100; i++)
+                    {
+                        Console.WriteLine("randomTask:" + i);
+                        //Console.WriteLine("isCanceled:" + isCanceled);
+                        //cancellationToken.Token.ThrowIfCancellationRequested();
+                        Thread.Sleep(1000);
+                    }
                 }
+                catch { }
 
             }));
 
-            randomTasks[0].Start();
+            thread = new Thread(() =>
+           {
+               for (int i = 0; i < 100; i++)
+               {
+                   Console.WriteLine("randomTask:" + i);
+                   Thread.Sleep(1000);
+               }
+           });
+
+            thread.Start();
+
         }
 
 
         private void button10_Click(object sender, EventArgs e)
         {
+            thread.Abort();
+            // .Cancel();
 
             //randomTask2.Abort();
             isCanceled = true;
@@ -389,14 +409,22 @@ namespace MediaHandler
             }
             else
             {
-               // MongoDB_Handler.AddNewSeason(NewContent_LocationsObject, LocationsCollection, LocationsData, NewContentOutput.ID, Episode);
+                // MongoDB_Handler.AddNewSeason(NewContent_LocationsObject, LocationsCollection, LocationsData, NewContentOutput.ID, Episode);
                 return;
             }
 
 
-          //  MongoDB_Handler.AddNewEpisode(NewContent_LocationsObject, "", 0, LocationsCollection, LocationsData, NewContentOutput.ID, SeasonOutput);
+            //  MongoDB_Handler.AddNewEpisode(NewContent_LocationsObject, "", 0, LocationsCollection, LocationsData, NewContentOutput.ID, SeasonOutput);
 
 
+        }
+
+        private void button11_Click_1(object sender, EventArgs e)
+        {
+            Forms.DragDropFrom dragDropFrom = new Forms.DragDropFrom();
+            dragDropFrom.ShowDialog();
+
+            Console.WriteLine("After Show Form");
         }
     }
 }
