@@ -230,7 +230,8 @@ async function Server_GetHistory() {
   };
 
   const request = await fetch(URL, requestOptions);
-  return await request.json();
+  const data = await request.json();
+  return data;
 }
 
 export {

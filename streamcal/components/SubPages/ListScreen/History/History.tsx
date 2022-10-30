@@ -51,8 +51,7 @@ const HistoryCard = ({ item, onPress }: IHistoryCard) => {
         borderRadius: 5,
         marginTop: WindowSize.Width * 0.05,
         marginLeft: WindowSize.Width * (marginLeft / 4),
-      }}
-    >
+      }}>
       <View style={{ height: "50%", width: "100%" }}>
         {ThumbnailURL && (
           <Image
@@ -63,8 +62,7 @@ const HistoryCard = ({ item, onPress }: IHistoryCard) => {
               borderTopLeftRadius: 5,
               borderTopRightRadius: 5,
             }}
-            source={{ uri: ThumbnailURL }}
-          ></Image>
+            source={{ uri: ThumbnailURL }}></Image>
         )}
         {/* <View
           style={{
@@ -82,8 +80,7 @@ const HistoryCard = ({ item, onPress }: IHistoryCard) => {
           backgroundColor: "#22314d",
           borderBottomLeftRadius: 5,
           borderBottomRightRadius: 5,
-        }}
-      >
+        }}>
         <Text
           numberOfLines={1}
           style={{
@@ -91,8 +88,7 @@ const HistoryCard = ({ item, onPress }: IHistoryCard) => {
             marginTop: "4%",
             color: "rgba(255,255,255,0.8)",
             maxWidth: "90%",
-          }}
-        >
+          }}>
           {item?.ContentTitle.toUpperCase()}
         </Text>
         <Text
@@ -104,8 +100,7 @@ const HistoryCard = ({ item, onPress }: IHistoryCard) => {
             color: "rgba(255,255,255,0.8)",
             maxWidth: "90%",
             // fontSize: WindowSize.Width * 0.04,
-          }}
-        >
+          }}>
           {`SEASON ${item?.HistoryData?.SeasonNum + 1} | EPISODE ${item?.Episode?.EpisodeNum}`}
         </Text>
         <Text
@@ -116,8 +111,7 @@ const HistoryCard = ({ item, onPress }: IHistoryCard) => {
             color: "white",
             maxWidth: "90%",
             fontSize: WindowSize.Width * 0.04,
-          }}
-        >
+          }}>
           {`${item?.Episode?.Title}`}
         </Text>
       </View>
@@ -158,7 +152,6 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
     const unsubscribe = navigation.addListener("focus", async () => {
       const filteredContentInfo: Array<IFilteredEpisodeHistory> = await FilterData();
       setHistoryData(filteredContentInfo);
-
       console.log("onHistoryScreen");
       //TODO: check gContent if its empty fetch data and
       //add mediaData content to the mediaData global variable and check if its emtpy
@@ -192,10 +185,8 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
                 isFullScreen: false,
               })
             }
-            item={item}
-          ></HistoryCard>
-        )}
-      ></FlashList>
+            item={item}></HistoryCard>
+        )}></FlashList>
     </View>
   );
 };

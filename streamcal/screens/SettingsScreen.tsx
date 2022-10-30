@@ -136,7 +136,7 @@ const SettingsScreen = ({ navigation }: any) => {
           name="ServerHistoryScreen"
           component={ServerHistoryScreen}></Stack.Screen>
         <Stack.Screen
-          initialParams={{ setMessageText }}
+          //initialParams={{ setMessageText }}
           options={{
             headerShown: true,
             headerTitle: "Manage Users",

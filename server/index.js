@@ -107,10 +107,6 @@ async function getLocationData(ID) {
   return Content;
 }
 
-app.get("/v1/kok", async (req, res) => {
-  res.send(await getLocationData(1)).end();
-});
-
 app.get("/v1/test2", (req, res) => {
   try {
     const ContentID = new URLSearchParams(req.url).get("/v1/test2?id");
@@ -207,6 +203,7 @@ app.get("/v1/create-apikey", (req, res) => {
         History: [],
         DeviceID: "",
         Description: API_Description || "",
+        WatchTime: [],
       };
 
       await API_KEYS_Coll.insertOne(New_APIKEY_Doc);
@@ -409,35 +406,34 @@ app.get("/v1/authenticate-user", (req, res) => {
   }
 });
 
-app.post("/v1/get-history", (req, res) => {
-  (async () => {
-    try {
-      const API_APIKey = req.body.APIKey;
-      const API_DeviceID = req.body.DeviceID;
+app.post("/v1/get-history", async (req, res) => {
+  try {
+    const API_APIKey = req.body.APIKey;
+    const API_DeviceID = req.body.DeviceID;
 
-      if (!API_APIKey || !API_DeviceID) {
-        console.log("get-history: missing params");
-        res.status(403);
-        return;
-      }
-
-      await MongoClient.connect();
-      const database = MongoClient.db("Streamcal");
-      const API_KEYS_Coll = database.collection("API_KEYS");
-      const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
-
-      if (User.DeviceID != API_DeviceID) {
-        console.log("get-history: wrong DeviceID");
-        res.status(403);
-        return;
-      }
-      res.send(User.History);
-    } catch (e) {
-      console.log("add-history error", e.message);
-    } finally {
-      res.end();
+    if (!API_APIKey || !API_DeviceID) {
+      console.log("get-history: missing params");
+      return;
     }
-  })();
+
+    await MongoClient.connect();
+    const database = MongoClient.db("Streamcal");
+    const API_KEYS_Coll = database.collection("API_KEYS");
+    const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
+    if (!User) {
+      console.log("get-history: user doesnt exist");
+      return;
+    }
+    if (User.DeviceID != API_DeviceID) {
+      console.log("get-history: wrong DeviceID");
+      return;
+    }
+    res.send(User.History);
+  } catch (e) {
+    console.log("get-history error", e.message);
+  } finally {
+    res.send([]).status(403).end();
+  }
 });
 
 app.post("/v1/add-history", (req, res) => {
@@ -484,6 +480,8 @@ app.post("/v1/add-history", (req, res) => {
     }
   })();
 });
+
+//TODO: Coding WatchTime for each Anime
 
 app.get("/status", (req, res) => {
   res.send("0").end();
