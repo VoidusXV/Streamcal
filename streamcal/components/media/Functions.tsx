@@ -14,4 +14,9 @@ const generateThumbnail = async (VideoURL: any, Time = 15000, quality?: any) => 
   }
 };
 
-export { generateThumbnail };
+function MilisecondsToMinutes(num: any, round = true) {
+  if (round) return Math.round(num / 1000 / 60);
+
+  return num / 1000 / 60;
+}
+export { generateThumbnail, MilisecondsToMinutes };

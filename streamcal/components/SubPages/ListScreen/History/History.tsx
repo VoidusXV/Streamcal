@@ -7,9 +7,10 @@ import {
   getMediaLocations,
   getThumbnailURL,
   Server_GetHistory,
+  Server_GetWatchTime,
 } from "../../../../backend/serverConnection";
 import { gContent } from "../../../constants/Content";
-import { IMediaData } from "../../../constants/interfaces";
+import { IMediaData, IWatchTime } from "../../../constants/interfaces";
 import {
   getContentInfoByContentID,
   getEpisodeByEpisdeNum,
@@ -17,16 +18,37 @@ import {
 } from "../../../../backend/MediaHandler";
 import { IFilteredEpisodeHistory, IHistory, IHistoryData } from "./HistoryInterfaces";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { MilisecondsToMinutes } from "../../../media/Functions";
 
 interface IHistoryCard {
   item?: IFilteredEpisodeHistory;
   onPress?: any;
+  WatchTimeData?: Array<IWatchTime>;
 }
-const HistoryCard = ({ item, onPress }: IHistoryCard) => {
+const HistoryCard = ({ item, onPress, WatchTimeData }: IHistoryCard) => {
   const [ThumbnailURL, setThumbnailURL] = React.useState("");
+  const [getWatchedDurationPercent, setWatchedDurationPercent] = React.useState(0);
 
   const width = WindowSize.Width * 0.47;
   const marginLeft = 1 - (width * 2) / WindowSize.Width;
+
+  const WatchTimeContent = WatchTimeData?.find((x) => x.ContentID == item?.HistoryData?.ContentID);
+  const Find_WatchTimeLocation = (x: any) =>
+    x.SeasonNum == item?.HistoryData?.SeasonNum + 1 &&
+    x.EpisodeNum == item?.HistoryData?.EpisodeNum;
+
+  const WatchTimeLocation = WatchTimeContent?.Locations?.find(Find_WatchTimeLocation);
+  const WatchedDurationPercent = Math.floor(
+    (WatchTimeLocation?.WatchedDuration / item?.Episode?.Duration) * 100
+  );
+  const WatchedDurationLeft_Minutes = MilisecondsToMinutes(
+    item?.Episode?.Duration - WatchTimeLocation?.WatchedDuration,
+    false
+  );
+
+  const WatchedDuration_Minutes = MilisecondsToMinutes(WatchTimeLocation?.WatchedDuration, false);
+  console.log(WatchedDuration_Minutes);
+  // if (WatchTimeLocation) console.log(WatchTimeLocation);
 
   React.useEffect(() => {
     (async () => {
@@ -64,15 +86,34 @@ const HistoryCard = ({ item, onPress }: IHistoryCard) => {
             }}
             source={{ uri: ThumbnailURL }}></Image>
         )}
-        {/* <View
-          style={{
-            backgroundColor: selectionColor,
-            width: "50%",
-            height: "8%",
-            position: "absolute",
-            marginTop: WindowSize.Width * 0.185,
-          }}
-        ></View> */}
+        {WatchTimeLocation && WatchedDurationLeft_Minutes >= 2 && WatchedDuration_Minutes >= 2 && (
+          <>
+            <Text
+              numberOfLines={1}
+              style={{
+                backgroundColor: "rgba(0,0,0,0.5)",
+                padding: "1%",
+                paddingLeft: "5%",
+                paddingRight: "5%",
+                marginTop: WindowSize.Width * 0.15,
+                marginLeft: WindowSize.Width * 0.2,
+                color: "white",
+                //textAlign: "right",
+                position: "absolute",
+              }}>
+              {Math.floor(WatchedDurationLeft_Minutes)} Min Left
+            </Text>
+
+            <View
+              style={{
+                backgroundColor: selectionColor,
+                width: `${WatchedDurationPercent}%`, //WatchedDurationPercent
+                height: "8%",
+                position: "absolute",
+                marginTop: WindowSize.Width * 0.235,
+              }}></View>
+          </>
+        )}
       </View>
       <View
         style={{
@@ -89,7 +130,7 @@ const HistoryCard = ({ item, onPress }: IHistoryCard) => {
             color: "rgba(255,255,255,0.8)",
             maxWidth: "90%",
           }}>
-          {item?.ContentTitle.toUpperCase()}
+          {item?.ContentTitle?.toUpperCase()}
         </Text>
         <Text
           numberOfLines={1}
@@ -121,13 +162,19 @@ const HistoryCard = ({ item, onPress }: IHistoryCard) => {
 
 const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> }) => {
   const [getHistoryData, setHistoryData] = React.useState<Array<IFilteredEpisodeHistory>>([]);
+  const [getWatchTimeData, setWatchTimeData] = React.useState<Array<IWatchTime>>([]);
 
   React.useEffect(() => {
     const _AbortController = new AbortController();
 
     async function FilterData() {
-      const historyData: Array<IHistoryData> = await Server_GetHistory();
-      // const data = await getMediaLocations(contentData?.ID);
+      let historyData: Array<IHistoryData> = [];
+      //let watchTimeData: Array<IWatchTime> = [];
+
+      await Promise.all([Server_GetHistory(), Server_GetWatchTime()]).then((data) => {
+        historyData = data[0];
+        setWatchTimeData(data[1]);
+      });
 
       let filteredHistoryData: Array<IFilteredEpisodeHistory> = [];
       //TODO: only do this if gContent.mediaData is empty
@@ -168,11 +215,12 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
     <View style={{ width: "100%", height: "100%" }}>
       <FlashList
         estimatedItemSize={200}
+        extraData={{ WatchTimeData: getWatchTimeData }}
         data={getHistoryData}
         numColumns={2}
         refreshing={true}
-        contentContainerStyle={{ paddingBottom: 200 }}
-        renderItem={({ item }) => (
+        contentContainerStyle={{ paddingBottom: 20 }}
+        renderItem={({ item, WatchTimeData }: any) => (
           <HistoryCard
             onPress={() =>
               navigation.navigate("MediaScreen", {
@@ -185,7 +233,8 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
                 isFullScreen: false,
               })
             }
-            item={item}></HistoryCard>
+            item={item}
+            WatchTimeData={getWatchTimeData}></HistoryCard>
         )}></FlashList>
     </View>
   );

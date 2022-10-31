@@ -38,9 +38,9 @@ async function ConnectToServer(
     onLoadStarted && onLoadStarted();
     await StoreData_AsyncStorage("currentConnection", currentConnection);
     const serverStatus = await IsServerReachable();
-    await AddData_AsyncStorage("ServerConnection_History", currentConnection, true);
 
-    onLoadEnded && onLoadEnded();
+    //await AddData_AsyncStorage("ServerConnection_History", currentConnection, true);
+    //onLoadEnded && onLoadEnded();
 
     if (!serverStatus) {
       Alert.alert("Error", "Server is Offline");
@@ -55,7 +55,6 @@ async function ConnectToServer(
     console.log("ServerConnection AuthResponse:", authResponse);
     await AddData_AsyncStorage("ServerConnection_History", currentConnection);
     onConnected && onConnected();
-    //onLoadEnded && onLoadEnded();
   } finally {
     onLoadEnded && onLoadEnded();
   }
@@ -97,33 +96,28 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
     <>
       <ScrollView
         style={{ height: WindowSize.Height, width: "100%", backgroundColor: backgroundColor }}
-        contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
-      >
+        contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}>
         <>
           <NormalTextInput
             defaultValue={getServerInfo?.Description}
             onChangeText={(e: any) => setServerInfo({ ...getServerInfo, Description: e })}
             bodyStyle={{ ...styles.NormalTextInputStyle }}
-            PlaceholderText={"Server Description"}
-          ></NormalTextInput>
+            PlaceholderText={"Server Description"}></NormalTextInput>
           <NormalTextInput
             defaultValue={getServerInfo?.Server}
             onChangeText={(e: any) => setServerInfo({ ...getServerInfo, Server: e })}
             bodyStyle={{ ...styles.NormalTextInputStyle }}
-            PlaceholderText={"Server Domain"}
-          ></NormalTextInput>
+            PlaceholderText={"Server Domain"}></NormalTextInput>
           <NormalTextInput
             defaultValue={getServerInfo?.Port}
             onChangeText={(e: any) => setServerInfo({ ...getServerInfo, Port: e })}
             bodyStyle={{ ...styles.NormalTextInputStyle }}
-            PlaceholderText={"Port"}
-          ></NormalTextInput>
+            PlaceholderText={"Port"}></NormalTextInput>
           <NormalTextInput
             defaultValue={getServerInfo?.APIKEY}
             onChangeText={(e: any) => setServerInfo({ ...getServerInfo, APIKEY: e })}
             bodyStyle={{ ...styles.NormalTextInputStyle }}
-            PlaceholderText={"API-KEY"}
-          ></NormalTextInput>
+            PlaceholderText={"API-KEY"}></NormalTextInput>
           <SettingsButton
             IconFamily={MaterialCommunityIcons}
             IconName={"qrcode-scan"}
@@ -132,8 +126,7 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
             style={{
               alignSelf: "center",
               marginTop: WindowSize.Width * 0.05,
-            }}
-          ></SettingsButton>
+            }}></SettingsButton>
           <SettingsButton
             IconFamily={MaterialCommunityIcons}
             IconName={"image"}
@@ -143,8 +136,7 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
             style={{
               alignSelf: "center",
               marginTop: WindowSize.Width * 0.05,
-            }}
-          ></SettingsButton>
+            }}></SettingsButton>
 
           <Text
             style={{
@@ -153,16 +145,14 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
               marginTop: WindowSize.Width * 0.05,
               marginLeft: WindowSize.Width * 0.05,
               textAlign: "left",
-            }}
-          >
+            }}>
             Use Your Admin-Key for Admin-Access
           </Text>
           <NormalTextInput
             bodyStyle={{ ...styles.NormalTextInputStyle, alignSelf: "center" }}
             defaultValue={getServerInfo.AdminKey}
             onChangeText={(e: any) => setServerInfo({ ...getServerInfo, AdminKey: e })}
-            PlaceholderText={"Admin-KEY"}
-          ></NormalTextInput>
+            PlaceholderText={"Admin-KEY"}></NormalTextInput>
 
           <SettingsButton
             IconFamily={MaterialCommunityIcons}
@@ -179,8 +169,7 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
             style={{
               alignSelf: "center",
               marginTop: WindowSize.Width * 0.05,
-            }}
-          ></SettingsButton>
+            }}></SettingsButton>
           <SettingsButton
             IconFamily={MaterialCommunityIcons}
             IconName={"history"}
@@ -189,8 +178,7 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
             style={{
               alignSelf: "center",
               marginTop: WindowSize.Width * 0.05,
-            }}
-          ></SettingsButton>
+            }}></SettingsButton>
         </>
       </ScrollView>
 

@@ -77,6 +77,28 @@ async function GetUserByAPIKEY(API_KEYS_Coll, API_APIKey) {
   return await API_KEYS_Coll.findOne({ APIKEY: API_APIKey });
 }
 
+function AuthenticateUser(User, API_DeviceID) {
+  if (!User) {
+    console.log("AuthenticateUser: user doesnt exist");
+    return false;
+  }
+  if (User?.DeviceID != API_DeviceID) {
+    console.log("AuthenticateUser: wrong DeviceID");
+    return false;
+  }
+
+  return true;
+}
+
+function API_ParamsCheck(...API_Params) {
+  API_Params.forEach((ArgElement) => {
+    if (!ArgElement) {
+      console.log("API_ParamsCheck: missing params", ArgElement);
+      return false;
+    }
+  });
+}
+
 async function UpdateDocument(Collection, filter, updateObject) {
   const updateDoc = {
     $set: updateObject, // $set: updateObject,
@@ -106,6 +128,49 @@ async function getLocationData(ID) {
   });
   return Content;
 }
+
+//TODO: Figuering out
+app.get("/v1/ChunkTest", async (req, res) => {
+  try {
+    //console.log(__dirname, __filename);
+    const vidPath = `${__dirname}/Data/0/Series/Season_1/2/2.mp4`;
+    const read = fs.readFileSync(vidPath);
+    const stream = fs.createReadStream(vidPath);
+
+    // stream.on("data", (chunkData) => {
+    //   console.log(chunkData);
+    //   res.write(chunkData);
+    // });
+
+    //const t = fs.readFileSync(vidPath);
+    //res.send(stream);
+
+    const start = 0;
+    const end = read.byteLength; //245475214
+    const total = read.byteLength; //245475215
+    const chunksize = 100000;
+    const mimeType = "video/mp4";
+    // const header = {
+    //   "Content-Range": "bytes " + start + "-" + end + "/" + total,
+    //   "Accept-Ranges": "bytes",
+    //   "Content-Length": chunksize,
+    //   "Content-Type": mimeType,
+    // };
+
+    // //res.writeHead(206, header);
+
+    //res.setHeader("Content-Range", "bytes " + start + "-" + end + "/" + total);
+    res.setHeader("Accept-Ranges", "bytes");
+    res.setHeader("Content-Length", read.byteLength); //read.byteLength
+    res.setHeader("Content-Type", mimeType);
+    //stream.pipe(res);
+    console.log("first");
+    res.write(read);
+    //res.sendFile(vidPath);
+  } catch (e) {
+    console.log("ChunkTest error", e.message);
+  }
+});
 
 app.get("/v1/test2", (req, res) => {
   try {
@@ -432,56 +497,124 @@ app.post("/v1/get-history", async (req, res) => {
   } catch (e) {
     console.log("get-history error", e.message);
   } finally {
-    res.send([]).status(403).end();
+    res.status(403).end();
   }
 });
 
-app.post("/v1/add-history", (req, res) => {
-  (async () => {
-    try {
-      const API_APIKey = req.body?.APIKey;
-      const API_DeviceID = req.body?.DeviceID;
-      const UpdateObject = req.body?.UpdateObject;
+app.post("/v1/add-history", async (req, res) => {
+  try {
+    const API_APIKey = req.body?.APIKey;
+    const API_DeviceID = req.body?.DeviceID;
+    const UpdateObject = req.body?.UpdateObject;
 
-      if (!API_APIKey || !API_DeviceID || !UpdateObject) {
-        console.log("add-history: missing params");
-        res.status(403);
-        return;
-      }
-
-      await MongoClient.connect();
-      const database = MongoClient.db("Streamcal");
-      const API_KEYS_Coll = database.collection("API_KEYS");
-      const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
-
-      if (User?.DeviceID != API_DeviceID) {
-        res.status(403);
-        return;
-      }
-      const filter = { APIKEY: API_APIKey };
-
-      const indexExists = (element) =>
-        element.ContentID == UpdateObject?.ContentID &&
-        element.SeasonNum == UpdateObject?.SeasonNum &&
-        element.EpisodeNum == UpdateObject?.EpisodeNum;
-
-      const existsValue = User?.History.findIndex(indexExists);
-
-      if (existsValue >= 0) User?.History?.splice(existsValue, 1);
-
-      User?.History.splice(0, 0, UpdateObject);
-      await UpdateDocument(API_KEYS_Coll, filter, { History: User?.History });
-
-      console.log("History Added");
-    } catch (e) {
-      console.log("add-history error", e.message);
-    } finally {
-      res.end();
+    if (!API_APIKey || !API_DeviceID || !UpdateObject) {
+      console.log("add-history: missing params");
+      res.status(403);
+      return;
     }
-  })();
+
+    await MongoClient.connect();
+    const database = MongoClient.db("Streamcal");
+    const API_KEYS_Coll = database.collection("API_KEYS");
+    const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
+
+    if (!AuthenticateUser(User, API_DeviceID)) return;
+
+    const filter = { APIKEY: API_APIKey };
+
+    const indexExists = (element) =>
+      element.ContentID == UpdateObject?.ContentID &&
+      element.SeasonNum == UpdateObject?.SeasonNum &&
+      element.EpisodeNum == UpdateObject?.EpisodeNum;
+
+    const existsValue = User?.History.findIndex(indexExists);
+
+    if (existsValue >= 0) User?.History?.splice(existsValue, 1);
+
+    User?.History.splice(0, 0, UpdateObject);
+    await UpdateDocument(API_KEYS_Coll, filter, { History: User?.History });
+
+    console.log("History Added");
+  } catch (e) {
+    console.log("add-history error", e.message);
+  } finally {
+    res.end();
+  }
 });
 
-//TODO: Coding WatchTime for each Anime
+app.post("/v1/get-watchtime", async (req, res) => {
+  try {
+    const API_APIKey = req.body?.APIKey;
+    const API_DeviceID = req.body?.DeviceID;
+
+    if (!API_APIKey || !API_DeviceID) {
+      console.log("add-watchtime: missing params");
+      res.status(403);
+      return;
+    }
+
+    await MongoClient.connect();
+    const database = MongoClient.db("Streamcal");
+    const API_KEYS_Coll = database.collection("API_KEYS");
+    const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
+
+    if (!AuthenticateUser(User, API_DeviceID)) return;
+    res.send(User?.WatchTime || []);
+  } catch (e) {
+    console.log("add-watchtime error", e.message);
+  } finally {
+    res.end();
+  }
+});
+app.post("/v1/add-watchtime", async (req, res) => {
+  try {
+    const API_APIKey = req.body?.APIKey;
+    const API_DeviceID = req.body?.DeviceID;
+    const API_ContentID = req.body?.ContentID;
+    const UpdateObject = req.body?.UpdateObject;
+
+    if (!API_APIKey || !API_DeviceID || !UpdateObject || !API_ContentID) {
+      console.log("add-watchtime: missing params");
+      res.status(403);
+      return;
+    }
+
+    await MongoClient.connect();
+    const database = MongoClient.db("Streamcal");
+    const API_KEYS_Coll = database.collection("API_KEYS");
+    const User = await GetUserByAPIKEY(API_KEYS_Coll, API_APIKey);
+
+    if (!AuthenticateUser(User, API_DeviceID)) return;
+
+    let ContentID_Index = 0;
+    ContentID_Index = User.WatchTime.findIndex((x) => x.ContentID == API_ContentID);
+
+    if (ContentID_Index == -1) {
+      User.WatchTime.push({
+        ContentID: API_ContentID,
+        Locations: [UpdateObject],
+      });
+    } else {
+      const findIndexEpisode = (x) =>
+        x.SeasonNum == UpdateObject.SeasonNum && x.EpisodeNum == UpdateObject.EpisodeNum;
+
+      const WatchTimeLocationsIndex =
+        User.WatchTime[ContentID_Index].Locations.findIndex(findIndexEpisode);
+
+      if (WatchTimeLocationsIndex == -1)
+        User.WatchTime[ContentID_Index].Locations.push(UpdateObject);
+      else User.WatchTime[ContentID_Index].Locations[WatchTimeLocationsIndex] = UpdateObject;
+    }
+
+    const filter = { APIKEY: API_APIKey };
+    await UpdateDocument(API_KEYS_Coll, filter, { WatchTime: User.WatchTime });
+    console.log("WatchTime Added");
+  } catch (e) {
+    console.log("add-watchtime error", e.message);
+  } finally {
+    res.end();
+  }
+});
 
 app.get("/status", (req, res) => {
   res.send("0").end();

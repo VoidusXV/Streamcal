@@ -10,10 +10,9 @@ const Seperator: React.FC<ISeperator> = ({ style }: any) => {
       style={{
         width: "100%",
         height: "0.1%",
-        backgroundColor: "white",
+        backgroundColor: "grey", //"white",
         ...style,
-      }}
-    ></View>
+      }}></View>
   );
 };
 

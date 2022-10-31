@@ -90,8 +90,9 @@ namespace MediaHandler
                 AddDataToMongoDB(NewContent_JsonObject, LocationsCollection, LocationsData); //TODO: Change To an Async Func
                 MoveMediaFile(LocationsData, NewContent_JsonObject);
                 DeleteFiles();
-                onFinished();
-                DeleteFiles();
+
+                if (onFinished != null)
+                    onFinished();
 
             }
             catch (Exception ex)
@@ -99,7 +100,7 @@ namespace MediaHandler
                 if (ex.Message == "Episode Already exists")
                     MessageBox.Show("Episode Already exists", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 else
-                    Console.WriteLine("ScrapperProcessStart Error:" + ex.Message);
+                    MessageBox.Show("ScrapperProcessStart Error:" + ex.Message);
             }
             finally
             {
@@ -138,7 +139,8 @@ namespace MediaHandler
         {
             //try
             {
-                string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.SeasonNum}_{NewContent_LocationsObject.EpisodeNum}";
+                string Media_FileName = $"{NewContent_LocationsObject.Title}_{NewContent_LocationsObject.SeasonNum}_{NewContent_LocationsObject.EpisodeNum}".Replace(" ", "_");
+
                 #region Old
                 /* string indexURL;
                  Download_MasterFile();

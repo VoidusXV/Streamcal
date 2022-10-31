@@ -219,6 +219,24 @@ async function Server_AddHistory(ContentID: any, Season: any, Episode: any) {
 async function Server_GetHistory() {
   const DeviceID = await Generate_DeviceID();
   let URL = `${baseAPIURL()}/get-history`;
+  console.log(DeviceID);
+  const requestOptions = {
+    method: "POST", //TODO: change it back to GET
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      APIKey: currentConnectionInfo.APIKEY,
+      DeviceID: DeviceID,
+    }),
+  };
+
+  const request = await fetch(URL, requestOptions);
+  const data = await request.json();
+  return data;
+}
+
+async function Server_GetWatchTime() {
+  const DeviceID = await Generate_DeviceID();
+  let URL = `${baseAPIURL()}/get-watchtime`;
 
   const requestOptions = {
     method: "POST", //TODO: change it back to GET
@@ -256,5 +274,6 @@ export {
   CreateAPIKEY,
   Server_AddHistory,
   Server_GetHistory,
+  Server_GetWatchTime,
   VERSION,
 };

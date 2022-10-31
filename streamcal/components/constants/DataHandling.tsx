@@ -11,7 +11,7 @@ const GetData_AsyncStorage = async (storageKey: any) => {
 
 const AddData_AsyncStorage = async (storageKey: any, value: any, isArray?: Boolean) => {
   let Data: any = await GetData_AsyncStorage(storageKey);
-  if (isArray && Data == null) Data = [];
+  if (isArray || !Data) Data = [];
 
   Data.push(value);
   await StoreData_AsyncStorage(storageKey, Data);

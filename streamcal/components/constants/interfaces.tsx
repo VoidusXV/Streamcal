@@ -67,6 +67,17 @@ interface IMediaDataIdentifier {
   mediaData?: IMediaData;
 }
 
+interface IWatchTimeLocationData {
+  SeasonNum?: any;
+  EpisodeNum?: any;
+  WatchedDuration?: any;
+}
+
+interface IWatchTime {
+  ContentID?: any;
+  Locations?: Array<IWatchTimeLocationData>;
+}
+
 export {
   IUserInfo,
   IServerInfo,
@@ -77,4 +88,5 @@ export {
   ISeries,
   IEpisode,
   IMediaDataIdentifier,
+  IWatchTime,
 };

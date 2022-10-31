@@ -10,6 +10,7 @@ import React from "react";
 import { MaterialIcons, Octicons } from "@expo/vector-icons";
 import { WindowSize } from "../../components/constants/Layout";
 import { IMediaRouteParams } from "../../screens/MediaScreen/MediaScreenInterfaces";
+import { MilisecondsToMinutes } from "../media/Functions";
 interface IMediaItemCard {
   ID_Path: number;
   Title?: any;
@@ -21,10 +22,6 @@ interface IMediaItemCard {
   Description?: any;
   routeParams?: IMediaRouteParams;
   isMediaScreen?: any;
-}
-
-function MilisecondsToMinutes(num: any) {
-  return Math.round(num / 1000 / 60);
 }
 
 const MediaItemCard: React.FC<IMediaItemCard> = ({
