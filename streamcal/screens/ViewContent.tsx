@@ -76,6 +76,9 @@ const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
             zIndex: 3,
             marginTop: WindowSize.Width * 0.85 - (getTextHeight - WindowSize.Width * 0.1), //"85%",
             marginLeft: "5%",
+            textShadowColor: "black",
+            textShadowRadius: 10,
+            textShadowOffset: { width: 1, height: 1 },
             //maxWidth: "90%",
             // backgroundColor: "red",
           }}>
