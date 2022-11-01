@@ -13,7 +13,6 @@ interface ISliderBar {
 
 interface ISlider_Preview {
   getSliderValue: any;
-  imageURI: any;
   status: any;
   CroppedImages: IGeneratedImages[];
   isFullScreen: any;

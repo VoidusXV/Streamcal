@@ -32,6 +32,7 @@ import {
   getThumbnailURL,
   getVideoURL,
   Server_AddHistory,
+  Server_AddWatchTime,
 } from "../../backend/serverConnection";
 import LoadingIndicator from "../../components/Designs/LoadingIndicator";
 import { IMediaRouteParams, IMediaScreen } from "./MediaScreenInterfaces";
@@ -89,7 +90,7 @@ const NextEpisode_Container = ({
           Source={{
             uri: getThumbnailURL(
               routeParams?.ContentID,
-              routeParams?.getSeason + 1,
+              routeParams?.getSeason,
               EpisodeData?.EpisodeNum
             ),
           }}></MediaItemCard>
@@ -136,7 +137,7 @@ const FollowingEpisodes_Container = ({
               Source={{
                 uri: getThumbnailURL(
                   routeParams?.ContentID,
-                  routeParams?.getSeason + 1,
+                  routeParams?.getSeason,
                   splicedEpisodes?.[index]?.EpisodeNum
                 ), // `http://192.168.2.121:3005/v1/test2?id=${ContentID}&season=1&episode=${item.Episode}&dr=thumb`,
               }}></MediaItemCard>
@@ -205,15 +206,21 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
   const [getGeneratedImages, setGeneratedImages] = React.useState<any>([{}]);
   let generatedImages: IGeneratedImages[] = [];
 
-  const VideoRef = React.useRef<any>(null);
+  const VideoRef = React.useRef<Video>(null);
   const image = Asset.fromURI(getPreviewImageURL(ContentID, 1, Episode?.EpisodeNum));
   const videoURL = getVideoURL(ContentID, 1, Episode?.EpisodeNum);
 
   React.useEffect(() => {
     const backAction = () => {
       if (!isFullScreen) {
-        navigation?.goBack();
-        return true;
+        (async () => {
+          const videoRefStatus: any = await VideoRef.current?.getStatusAsync();
+          const currentPosition = videoRefStatus?.positionMillis || 0;
+          await Server_AddWatchTime(ContentID, getSeason, Episode?.EpisodeNum, currentPosition);
+
+          navigation?.goBack();
+          return true;
+        })();
       }
       ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
       NavigationBar.setVisibilityAsync("visible");
@@ -245,7 +252,8 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
       if (isCancelled) return;
 
       await VideoRef?.current?.loadAsync({ uri: videoURL });
-      await VideoRef?.current.playAsync();
+      await VideoRef?.current?.playAsync();
+      console.log("VideoRef cant be null anymore");
       setIsLoading(false);
 
       const DurationMinutes = Episode?.Duration / 60;

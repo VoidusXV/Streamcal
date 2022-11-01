@@ -32,6 +32,7 @@ import LoadingIndicator from "../components/Designs/LoadingIndicator";
 import { gContent } from "../components/constants/Content";
 import { smallFont, smallTitleFont } from "../components/Designs/Fonts";
 import CloseTopBar from "../components/Designs/CloseTopBar";
+import { getSeasonIndexBySeasonNum } from "../backend/MediaHandler";
 
 const ImageContainer = ({ ContentTitle, CoverURL, scrollValue }: any) => {
   const [getTextHeight, setTextHeight] = React.useState<any>(0);
@@ -318,7 +319,7 @@ const ViewContent = ({ route, navigation }: any) => {
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [getMediaLocation, setMediaLocation] = React.useState<IMediaData>({});
-  const [getSeason, setSeason] = React.useState(0);
+  const [getSeasonIndex, setSeasonIndex] = React.useState(0); // TODO: add new function getSeasonNumIndex
   const [isSeasonModal, setSeasonModal] = React.useState(false);
   const [getScrollValue, setScrollValue] = React.useState(0); // TODO: Maybe change it to useRef
   const [getDetailsModal, setDetailsModal] = React.useState(false);
@@ -369,7 +370,7 @@ const ViewContent = ({ route, navigation }: any) => {
               <SelectionBox></SelectionBox>
               <Season_SelectionBox
                 onPress={() => setSeasonModal(true)}
-                TitleText={`Season ${getMediaLocation?.Series?.Seasons?.[getSeason].SeasonNum} - ${contentData.Title}`}></Season_SelectionBox>
+                TitleText={`Season ${getMediaLocation?.Series?.Seasons?.[getSeasonIndex].SeasonNum} - ${contentData.Title}`}></Season_SelectionBox>
 
               <Modal
                 transparent
@@ -381,13 +382,13 @@ const ViewContent = ({ route, navigation }: any) => {
                   SeasonData={getMediaLocation?.Series?.Seasons}
                   ContentTitle={contentData?.Title}
                   onPress={(index: any) => {
-                    setSeason(index);
+                    setSeasonIndex(index);
                     setSeasonModal(false);
                   }}></SeasonModalContainer>
               </Modal>
 
               <FlashList
-                data={getMediaLocation?.Series?.Seasons?.[getSeason].Episodes}
+                data={getMediaLocation?.Series?.Seasons?.[getSeasonIndex].Episodes}
                 estimatedItemSize={20}
                 contentContainerStyle={{ paddingBottom: WindowSize.Width * 0.1 }}
                 renderItem={({ item, index }: { item?: IEpisode; index: any }) => (
@@ -401,13 +402,13 @@ const ViewContent = ({ route, navigation }: any) => {
                       Episode: item,
                       ContentTitle: contentData?.Title,
                       ContentID: contentData?.ID,
-                      Episodes: getMediaLocation?.Series?.Seasons?.[getSeason].Episodes,
+                      Episodes: getMediaLocation?.Series?.Seasons?.[getSeasonIndex].Episodes,
                       index: index,
-                      getSeason: getSeason,
+                      getSeason: getSeasonIndex + 1,
                       isFullScreen: false,
                     }}
                     Source={{
-                      uri: getThumbnailURL(contentData?.ID, getSeason + 1, item?.EpisodeNum),
+                      uri: getThumbnailURL(contentData?.ID, getSeasonIndex + 1, item?.EpisodeNum),
                     }}></MediaItemCard>
                 )}></FlashList>
             </View>

@@ -44,13 +44,13 @@ interface IEpisode {
   Thumbnail?: any;
   Title?: any;
 }
-interface ISeasons {
+interface ISeason {
   Episodes?: Array<IEpisode>;
   SeasonNum?: any;
 }
 
 interface ISeries {
-  Seasons?: Array<ISeasons>;
+  Seasons?: Array<ISeason>;
 }
 interface IMediaData {
   Movies?: any;
@@ -89,4 +89,5 @@ export {
   IEpisode,
   IMediaDataIdentifier,
   IWatchTime,
+  ISeason,
 };

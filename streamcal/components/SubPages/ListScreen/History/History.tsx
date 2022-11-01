@@ -15,6 +15,7 @@ import {
   getContentInfoByContentID,
   getEpisodeByEpisdeNum,
   getIndexByEpisodeNum,
+  getSeasonIndexBySeasonNum,
 } from "../../../../backend/MediaHandler";
 import { IFilteredEpisodeHistory, IHistory, IHistoryData } from "./HistoryInterfaces";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -51,10 +52,16 @@ const HistoryCard_WatchedHUD = ({
       <Text numberOfLines={1} style={styles.textWatchedHUD_Style}>
         {TextValue}
       </Text>
-      {contentWatchted && (
+      {contentWatchted ? (
         <MaterialIcons
           style={{ position: "absolute", alignSelf: "center", marginTop: "18%" }}
           name="refresh"
+          size={Mini_IconSize}
+          color="white"></MaterialIcons>
+      ) : (
+        <MaterialIcons
+          style={{ position: "absolute", alignSelf: "center", marginTop: "18%" }}
+          name="play-arrow"
           size={Mini_IconSize}
           color="white"></MaterialIcons>
       )}
@@ -79,15 +86,13 @@ interface IHistoryCard {
 }
 const HistoryCard = ({ item, onPress, WatchTimeData }: IHistoryCard) => {
   const [ThumbnailURL, setThumbnailURL] = React.useState("");
-  //const [getWatchedDurationPercent, setWatchedDurationPercent] = React.useState(0);
 
   const width = WindowSize.Width * 0.47;
   const marginLeft = 1 - (width * 2) / WindowSize.Width;
 
   const WatchTimeContent = WatchTimeData?.find((x) => x.ContentID == item?.HistoryData?.ContentID);
   const Find_WatchTimeLocation = (x: any) =>
-    x.SeasonNum == item?.HistoryData?.SeasonNum + 1 &&
-    x.EpisodeNum == item?.HistoryData?.EpisodeNum;
+    x.SeasonNum == item?.HistoryData?.SeasonNum && x.EpisodeNum == item?.HistoryData?.EpisodeNum;
 
   const WatchTimeLocation = WatchTimeContent?.Locations?.find(Find_WatchTimeLocation);
   const WatchedDurationPercent = Math.floor(
@@ -99,15 +104,11 @@ const HistoryCard = ({ item, onPress, WatchTimeData }: IHistoryCard) => {
   );
 
   const WatchedDuration_Minutes = MilisecondsToMinutes(WatchTimeLocation?.WatchedDuration, false);
-
-  //console.log(WatchedDuration_Minutes);
-  //if (WatchTimeLocation) console.log(WatchedDuration_Minutes, WatchedDurationLeft_Minutes);
-
   React.useEffect(() => {
     (async () => {
       const URL = await getThumbnailURL(
         item?.HistoryData?.ContentID,
-        item?.HistoryData?.SeasonNum + 1,
+        item?.HistoryData?.SeasonNum,
         item?.Episode?.EpisodeNum
       );
 
@@ -173,7 +174,7 @@ const HistoryCard = ({ item, onPress, WatchTimeData }: IHistoryCard) => {
             maxWidth: "90%",
             // fontSize: WindowSize.Width * 0.04,
           }}>
-          {`SEASON ${item?.HistoryData?.SeasonNum + 1} | EPISODE ${item?.Episode?.EpisodeNum}`}
+          {`SEASON ${item?.HistoryData?.SeasonNum} | EPISODE ${item?.Episode?.EpisodeNum}`}
         </Text>
         <Text
           numberOfLines={1}
@@ -212,14 +213,16 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
       for (const e of historyData) {
         const data: IMediaData = await getMediaLocations(e?.ContentID, _AbortController);
 
+        const SeasonIndex = getSeasonIndexBySeasonNum(data.Series?.Seasons, e.SeasonNum) || 0;
+
         const Episode = getEpisodeByEpisdeNum(
-          data.Series?.Seasons?.[e.SeasonNum]?.Episodes,
+          data.Series?.Seasons?.[SeasonIndex]?.Episodes,
           e.EpisodeNum
         );
         filteredHistoryData.push({
           ContentTitle: getContentInfoByContentID(gContent.data, e.ContentID)?.Title,
           HistoryData: e,
-          Episodes: data.Series?.Seasons?.[e.SeasonNum]?.Episodes,
+          Episodes: data.Series?.Seasons?.[SeasonIndex]?.Episodes,
           Episode,
         }); //TODO: If Movies are supported make it variable
       }
@@ -278,7 +281,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.7)",
     marginTop: WindowSize.Width * 0.16,
     marginLeft: "auto",
-    marginRight: "3%",
+    marginRight: "10%",
     maxWidth: "70%",
     color: "white",
   },

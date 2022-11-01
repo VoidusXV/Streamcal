@@ -573,7 +573,7 @@ app.post("/v1/add-watchtime", async (req, res) => {
     const API_ContentID = req.body?.ContentID;
     const UpdateObject = req.body?.UpdateObject;
 
-    if (!API_APIKey || !API_DeviceID || !UpdateObject || !API_ContentID) {
+    if (!API_APIKey || !API_DeviceID || !UpdateObject || API_ContentID == undefined) {
       console.log("add-watchtime: missing params");
       res.status(403);
       return;

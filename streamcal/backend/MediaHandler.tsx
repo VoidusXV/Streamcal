@@ -1,4 +1,4 @@
-import { IContentInfo, IEpisode } from "../components/constants/interfaces";
+import { IContentInfo, IEpisode, ISeason } from "../components/constants/interfaces";
 
 function getEpisodeByEpisdeNum(Episodes?: Array<IEpisode>, EpisodeNum?: any): IEpisode | undefined {
   if (!Episodes) return undefined;
@@ -30,4 +30,17 @@ function getIndexByEpisodeNum(Episodes?: Array<IEpisode>, EpisodeNum?: any): any
   return undefined;
 }
 
-export { getEpisodeByEpisdeNum, getContentInfoByContentID, getIndexByEpisodeNum };
+function getSeasonIndexBySeasonNum(Seasons?: Array<ISeason>, SeasonNum?: any) {
+  if (!Seasons) return undefined;
+  for (let index = 0; index < Seasons.length; index++) {
+    if (Seasons[index].SeasonNum == SeasonNum) return index;
+  }
+  return undefined;
+}
+
+export {
+  getEpisodeByEpisdeNum,
+  getContentInfoByContentID,
+  getIndexByEpisodeNum,
+  getSeasonIndexBySeasonNum,
+};

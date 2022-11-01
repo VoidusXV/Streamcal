@@ -274,7 +274,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
   // UseStates
   const [getStatus, setStatus] = React.useState<any>({});
   const [isIcons, setIcons] = React.useState(true);
-  const [getCroppedImage, setCroppedImage] = React.useState<any>(null);
+  //const [getCroppedImage, setCroppedImage] = React.useState<any>(null);
 
   //UseRefs
   const videoLayout = React.useRef<any>(null);
@@ -388,7 +388,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({
                 <Slider_Preview
                   status={getStatus}
                   getSliderValue={getSliderValue}
-                  imageURI={getCroppedImage}
+                  //imageURI={getCroppedImage}
                   CroppedImages={CroppedImages}
                   isFullScreen={isFullScreen}></Slider_Preview>
               )}

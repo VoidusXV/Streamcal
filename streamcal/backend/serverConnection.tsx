@@ -67,7 +67,8 @@ async function getMediaLocations(ID: any, AbortController?: AbortController) {
 }
 
 function getSeasonAmount(data: IMediaData) {
-  return Object.keys(data?.Series?.Seasons as any).length;
+  const Seasons = data?.Series?.Seasons;
+  return Seasons ? Object.keys(data?.Series?.Seasons as any).length : 0;
 }
 
 function getEpisodeAmount(data: IMediaData) {
@@ -239,7 +240,7 @@ async function Server_GetWatchTime() {
   let URL = `${baseAPIURL()}/get-watchtime`;
 
   const requestOptions = {
-    method: "POST", //TODO: change it back to GET
+    method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       APIKey: currentConnectionInfo.APIKEY,
@@ -252,6 +253,32 @@ async function Server_GetWatchTime() {
   return data;
 }
 
+async function Server_AddWatchTime(
+  ContentID: any,
+  SeasonNum: any,
+  EpisodeNum: any,
+  WatchedDuration: any
+) {
+  const DeviceID = await Generate_DeviceID();
+  let URL = `${baseAPIURL()}/add-watchtime`;
+
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      APIKey: currentConnectionInfo.APIKEY,
+      DeviceID: DeviceID,
+      ContentID: ContentID,
+      UpdateObject: {
+        SeasonNum: SeasonNum,
+        EpisodeNum: EpisodeNum,
+        WatchedDuration: WatchedDuration,
+      },
+    }),
+  };
+
+  await fetch(URL, requestOptions);
+}
 export {
   getServerData,
   getAllContent,
@@ -275,5 +302,6 @@ export {
   Server_AddHistory,
   Server_GetHistory,
   Server_GetWatchTime,
+  Server_AddWatchTime,
   VERSION,
 };
