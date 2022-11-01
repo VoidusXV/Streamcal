@@ -33,10 +33,8 @@ const HistoryCard_WatchedHUD = ({
   WatchedDurationPercent,
 }: HistoryCard_WatchedHUD) => {
   const contentWatchted = Math.round(WatchedDurationLeft_Minutes) <= 2;
-  const ShowWatched_HUD = WatchedDuration_Minutes >= 2 && !contentWatchted;
-  //console.log(WatchedDurationLeft_Minutes);
 
-  const TextValue = ShowWatched_HUD
+  const TextValue = !contentWatchted
     ? `${Math.round(WatchedDurationLeft_Minutes)} Min Left`
     : "Watched";
 
@@ -48,6 +46,7 @@ const HistoryCard_WatchedHUD = ({
         position: "absolute",
         zIndex: 1,
         backgroundColor: "rgba(0,0,0,0.7)",
+        borderRadius: 5,
       }}>
       <Text numberOfLines={1} style={styles.textWatchedHUD_Style}>
         {TextValue}
@@ -65,7 +64,7 @@ const HistoryCard_WatchedHUD = ({
           size={Mini_IconSize}
           color="white"></MaterialIcons>
       )}
-      {ShowWatched_HUD && (
+      {!contentWatchted && (
         <View
           style={{
             backgroundColor: selectionColor,
@@ -104,6 +103,7 @@ const HistoryCard = ({ item, onPress, WatchTimeData }: IHistoryCard) => {
   );
 
   const WatchedDuration_Minutes = MilisecondsToMinutes(WatchTimeLocation?.WatchedDuration, false);
+
   React.useEffect(() => {
     (async () => {
       const URL = await getThumbnailURL(
@@ -284,5 +284,8 @@ const styles = StyleSheet.create({
     marginRight: "10%",
     maxWidth: "70%",
     color: "white",
+    padding: "2%",
+    paddingLeft: "5%",
+    paddingRight: "5%",
   },
 });

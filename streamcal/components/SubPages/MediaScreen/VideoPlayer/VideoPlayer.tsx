@@ -213,20 +213,22 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({
   isFullScreen,
 }: ISlider_Preview) => {
   const zoomImageIndex = Math.trunc(getSliderValue / 1000 / 10);
-  const ImageURI_ByIndex = CroppedImages.find(
-    (e: any) => e.zoomImageIndex === zoomImageIndex
-  )?.zoomImageURI;
+
+  const findURI = (e: any) => e.zoomImageIndex === zoomImageIndex;
+  const ImageURI_ByIndex = CroppedImages?.find(findURI)?.zoomImageURI;
+
+  const PreviewBox_Width = isFullScreen ? WindowSize.Width * 0.6 : WindowSize.Width * 0.5;
+  const PreviewBox_Height = (PreviewBox_Width / 16) * 9; // 16x9 format  WindowSize.Width * 0.25
 
   function pos() {
     if (!status.durationMillis) return;
 
     const sliderPercent = getSliderValue / status.durationMillis;
-    const PreviewBox_Size = (WindowSize.Width * 0.4) / 2;
 
     const end =
-      (!isFullScreen ? WindowSize.Width : WindowSize.Height) * sliderPercent - PreviewBox_Size;
+      (!isFullScreen ? WindowSize.Width : WindowSize.Height) * sliderPercent - PreviewBox_Width / 2;
     const leftMargin = !isFullScreen ? WindowSize.Width * 0.03 : WindowSize.Height * 0.03;
-    const rightMargin = !isFullScreen ? WindowSize.Width * 0.57 : WindowSize.Height * 0.67;
+    const rightMargin = !isFullScreen ? WindowSize.Width * 0.47 : WindowSize.Height * 0.57;
 
     if (leftMargin < end) {
       if (rightMargin < end) return rightMargin;
@@ -240,10 +242,10 @@ const Slider_Preview: React.FC<ISlider_Preview> = ({
       style={{
         //opacity: isSliding.current ? 1 : 0,
         //backgroundColor: "red",
-        width: WindowSize.Width * 0.4,
-        height: WindowSize.Width * 0.25,
+        width: PreviewBox_Width,
+        height: PreviewBox_Height,
         position: "absolute",
-        top: !isFullScreen ? WindowSize.Width * 0.2 : WindowSize.Width * 0.55,
+        top: !isFullScreen ? WindowSize.Width * 0.2 : WindowSize.Width * 0.4,
         left: pos(),
         zIndex: 2,
       }}>

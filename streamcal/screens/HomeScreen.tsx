@@ -59,16 +59,18 @@ const RenderItem = ({ onPress, TitleText, CoverURL, Availability }: any) => {
   return (
     <Animated.View
       style={{
-        borderRadius: 5,
+        borderBottomLeftRadius: 5,
+        borderBottomRightRadius: 5,
         width: "90%",
         height: WindowSize.Width * 0.825,
         backgroundColor: "#22314d",
         marginLeft: "5%",
         marginTop: "10%",
         transform: [{ scale }],
+        paddingBottom: 20,
       }}>
       <TouchableHighlight
-        style={{ flex: 1, borderRadius: 5 }}
+        style={{ flex: 1 }}
         underlayColor="#2c4063"
         onPressIn={onPressIn}
         onPressOut={onPressOut}
@@ -76,9 +78,13 @@ const RenderItem = ({ onPress, TitleText, CoverURL, Availability }: any) => {
         <>
           <View style={{ height: "80%", width: "100%" }}>
             <Image
-              borderRadius={5}
               source={{ uri: CoverURL }}
-              style={{ width: "100%", height: "100%" }}
+              style={{
+                width: "100%",
+                height: "100%",
+                borderTopLeftRadius: 5,
+                borderTopRightRadius: 5,
+              }}
               resizeMode="contain"></Image>
           </View>
           <View style={{ flex: 1 }}>
