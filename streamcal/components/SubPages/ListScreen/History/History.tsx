@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { FlashList } from "@shopify/flash-list";
-import { WindowSize } from "../../../constants/Layout";
+import { Bigger_IconSize, Mini_IconSize, WindowSize } from "../../../constants/Layout";
 import { selectionColor } from "../../../constants/Colors";
 import {
   getMediaLocations,
@@ -19,6 +19,58 @@ import {
 import { IFilteredEpisodeHistory, IHistory, IHistoryData } from "./HistoryInterfaces";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MilisecondsToMinutes } from "../../../media/Functions";
+import { MaterialIcons } from "@expo/vector-icons";
+
+interface HistoryCard_WatchedHUD {
+  WatchedDurationLeft_Minutes?: any;
+  WatchedDuration_Minutes?: any;
+  WatchedDurationPercent?: any;
+}
+const HistoryCard_WatchedHUD = ({
+  WatchedDurationLeft_Minutes,
+  WatchedDuration_Minutes,
+  WatchedDurationPercent,
+}: HistoryCard_WatchedHUD) => {
+  const contentWatchted = Math.round(WatchedDurationLeft_Minutes) <= 2;
+  const ShowWatched_HUD = WatchedDuration_Minutes >= 2 && !contentWatchted;
+  //console.log(WatchedDurationLeft_Minutes);
+
+  const TextValue = ShowWatched_HUD
+    ? `${Math.round(WatchedDurationLeft_Minutes)} Min Left`
+    : "Watched";
+
+  return (
+    <View
+      style={{
+        width: "100%",
+        height: "100%",
+        position: "absolute",
+        zIndex: 1,
+        backgroundColor: "rgba(0,0,0,0.7)",
+      }}>
+      <Text numberOfLines={1} style={styles.textWatchedHUD_Style}>
+        {TextValue}
+      </Text>
+      {contentWatchted && (
+        <MaterialIcons
+          style={{ position: "absolute", alignSelf: "center", marginTop: "18%" }}
+          name="refresh"
+          size={Mini_IconSize}
+          color="white"></MaterialIcons>
+      )}
+      {ShowWatched_HUD && (
+        <View
+          style={{
+            backgroundColor: selectionColor,
+            width: `${WatchedDurationPercent}%`, //WatchedDurationPercent
+            height: "4%",
+            position: "absolute",
+            marginTop: WindowSize.Width * 0.24,
+          }}></View>
+      )}
+    </View>
+  );
+};
 
 interface IHistoryCard {
   item?: IFilteredEpisodeHistory;
@@ -27,7 +79,7 @@ interface IHistoryCard {
 }
 const HistoryCard = ({ item, onPress, WatchTimeData }: IHistoryCard) => {
   const [ThumbnailURL, setThumbnailURL] = React.useState("");
-  const [getWatchedDurationPercent, setWatchedDurationPercent] = React.useState(0);
+  //const [getWatchedDurationPercent, setWatchedDurationPercent] = React.useState(0);
 
   const width = WindowSize.Width * 0.47;
   const marginLeft = 1 - (width * 2) / WindowSize.Width;
@@ -47,8 +99,9 @@ const HistoryCard = ({ item, onPress, WatchTimeData }: IHistoryCard) => {
   );
 
   const WatchedDuration_Minutes = MilisecondsToMinutes(WatchTimeLocation?.WatchedDuration, false);
-  console.log(WatchedDuration_Minutes);
-  // if (WatchTimeLocation) console.log(WatchTimeLocation);
+
+  //console.log(WatchedDuration_Minutes);
+  //if (WatchTimeLocation) console.log(WatchedDuration_Minutes, WatchedDurationLeft_Minutes);
 
   React.useEffect(() => {
     (async () => {
@@ -75,6 +128,12 @@ const HistoryCard = ({ item, onPress, WatchTimeData }: IHistoryCard) => {
         marginLeft: WindowSize.Width * (marginLeft / 4),
       }}>
       <View style={{ height: "50%", width: "100%" }}>
+        {WatchTimeLocation && (
+          <HistoryCard_WatchedHUD
+            WatchedDurationLeft_Minutes={WatchedDurationLeft_Minutes}
+            WatchedDurationPercent={WatchedDurationPercent}
+            WatchedDuration_Minutes={WatchedDuration_Minutes}></HistoryCard_WatchedHUD>
+        )}
         {ThumbnailURL && (
           <Image
             style={{
@@ -85,34 +144,6 @@ const HistoryCard = ({ item, onPress, WatchTimeData }: IHistoryCard) => {
               borderTopRightRadius: 5,
             }}
             source={{ uri: ThumbnailURL }}></Image>
-        )}
-        {WatchTimeLocation && WatchedDurationLeft_Minutes >= 2 && WatchedDuration_Minutes >= 2 && (
-          <>
-            <Text
-              numberOfLines={1}
-              style={{
-                backgroundColor: "rgba(0,0,0,0.5)",
-                padding: "1%",
-                paddingLeft: "5%",
-                paddingRight: "5%",
-                marginTop: WindowSize.Width * 0.15,
-                marginLeft: WindowSize.Width * 0.2,
-                color: "white",
-                //textAlign: "right",
-                position: "absolute",
-              }}>
-              {Math.floor(WatchedDurationLeft_Minutes)} Min Left
-            </Text>
-
-            <View
-              style={{
-                backgroundColor: selectionColor,
-                width: `${WatchedDurationPercent}%`, //WatchedDurationPercent
-                height: "8%",
-                position: "absolute",
-                marginTop: WindowSize.Width * 0.235,
-              }}></View>
-          </>
         )}
       </View>
       <View
@@ -242,4 +273,13 @@ const History = ({ navigation }: { navigation: NativeStackNavigationProp<any> })
 
 export default History;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  textWatchedHUD_Style: {
+    backgroundColor: "rgba(0,0,0,0.7)",
+    marginTop: WindowSize.Width * 0.16,
+    marginLeft: "auto",
+    marginRight: "3%",
+    maxWidth: "70%",
+    color: "white",
+  },
+});

@@ -6,6 +6,9 @@ const height = Dimensions.get('window').height;
 
 
 const Mini_IconSize = width * 0.08;
+const Normal_IconSize = width * 0.1;
+const Big_IconSize = width * 0.13;
+const Bigger_IconSize = width * 0.15;
 
 
 const WindowSize= {
@@ -14,6 +17,9 @@ const WindowSize= {
 }
 export  {
   WindowSize,
-  Mini_IconSize
+  Mini_IconSize,
+  Normal_IconSize,
+  Big_IconSize,
+  Bigger_IconSize
  // isSmallDevice: width < 375,
 };

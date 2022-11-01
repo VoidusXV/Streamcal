@@ -1,4 +1,12 @@
-import { StyleSheet, Text, TextStyle, TouchableHighlight, View, ViewStyle } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextProps,
+  TextStyle,
+  TouchableHighlight,
+  View,
+  ViewStyle,
+} from "react-native";
 import React from "react";
 import { WindowSize } from "../constants/Layout";
 const IconSize = WindowSize.Width * 0.07;
@@ -8,6 +16,7 @@ interface ISettingsButton {
   onPress?: any;
   style?: ViewStyle | ViewStyle[];
   textStyle?: TextStyle | TextStyle[];
+  TextProps?: TextProps;
   ButtonText?: any;
   IconFamily?: any;
   IconName?: any;
@@ -17,6 +26,7 @@ const SettingsButton = ({
   onPress,
   style,
   textStyle,
+  TextProps,
   ButtonText,
   IconFamily,
   IconName,
@@ -36,8 +46,7 @@ const SettingsButton = ({
       backgroundColor: "#253959",
       borderRadius: WindowSize.Width * 0.01,
       ...style,
-    }}
-  >
+    }}>
     <>
       {IconFamily ? (
         <>
@@ -45,14 +54,15 @@ const SettingsButton = ({
             name={IconName}
             size={IconSize}
             style={{ marginLeft: "5%" }}
-            color="white"
-          ></IconFamily>
+            color="white"></IconFamily>
           <Text style={{ color: "white", fontSize: fontSize, marginLeft: "5%", ...textStyle }}>
             {ButtonText}
           </Text>
         </>
       ) : (
-        <Text style={{ color: "white", fontSize: fontSize, ...textStyle }}>{ButtonText}</Text>
+        <Text {...TextProps} style={{ color: "white", fontSize: fontSize, ...textStyle }}>
+          {ButtonText}
+        </Text>
       )}
     </>
   </TouchableHighlight>

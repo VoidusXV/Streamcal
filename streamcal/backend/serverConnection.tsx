@@ -219,7 +219,7 @@ async function Server_AddHistory(ContentID: any, Season: any, Episode: any) {
 async function Server_GetHistory() {
   const DeviceID = await Generate_DeviceID();
   let URL = `${baseAPIURL()}/get-history`;
-  console.log(DeviceID);
+
   const requestOptions = {
     method: "POST", //TODO: change it back to GET
     headers: { "Content-Type": "application/json" },

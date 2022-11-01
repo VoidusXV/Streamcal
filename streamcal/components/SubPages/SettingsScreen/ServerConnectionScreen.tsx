@@ -131,6 +131,7 @@ const ServerConnectionScreen = ({ navigation, route }: any) => {
             IconFamily={MaterialCommunityIcons}
             IconName={"image"}
             ButtonText="Pick QR-Code from Gallery"
+            TextProps={{ numberOfLines: 1, adjustsFontSizeToFit: true }}
             onPress={async () => await GetQRCode_ByImage((e) => setServerInfo(e))}
             textStyle={{ maxWidth: "80%" }}
             style={{
