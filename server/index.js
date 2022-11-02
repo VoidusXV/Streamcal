@@ -128,44 +128,45 @@ async function getLocationData(ID) {
   });
   return Content;
 }
+app.get("/index.html", function (req, res) {
+  res.sendFile(__dirname + "/index.html");
+});
 
 //TODO: Figuering out
 app.get("/v1/ChunkTest", async (req, res) => {
   try {
     //console.log(__dirname, __filename);
+
+    const range = req.headers.range;
+    if (!range) {
+      res.status(400).send("Requires Range header").end();
+      return;
+    }
+
     const vidPath = `${__dirname}/Data/0/Series/Season_1/2/2.mp4`;
-    const read = fs.readFileSync(vidPath);
-    const stream = fs.createReadStream(vidPath);
+    const videoSize = fs.statSync(vidPath).size;
 
-    // stream.on("data", (chunkData) => {
-    //   console.log(chunkData);
-    //   res.write(chunkData);
-    // });
+    console.log(Number(range.replace(/\D/g, "")));
 
-    //const t = fs.readFileSync(vidPath);
-    //res.send(stream);
+    const chunksize = 10 ** 6; // 10 MB in bytes
+    const start = Number(range.replace(/\D/g, ""));
+    const end = Math.min(start + chunksize, videoSize - 1);
+    const contentLength = end - start + 1;
+    const contentType = "video/mp4";
 
-    const start = 0;
-    const end = read.byteLength; //245475214
-    const total = read.byteLength; //245475215
-    const chunksize = 100000;
-    const mimeType = "video/mp4";
-    // const header = {
-    //   "Content-Range": "bytes " + start + "-" + end + "/" + total,
-    //   "Accept-Ranges": "bytes",
-    //   "Content-Length": chunksize,
-    //   "Content-Type": mimeType,
-    // };
+    const headers = {
+      "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": contentLength,
+      "Content-Type": contentType,
+    };
+    res.writeHead(206, headers);
 
-    // //res.writeHead(206, header);
-
-    //res.setHeader("Content-Range", "bytes " + start + "-" + end + "/" + total);
-    res.setHeader("Accept-Ranges", "bytes");
-    res.setHeader("Content-Length", read.byteLength); //read.byteLength
-    res.setHeader("Content-Type", mimeType);
-    //stream.pipe(res);
-    console.log("first");
-    res.write(read);
+    const stream = fs.createReadStream(vidPath, { start, end });
+    stream.pipe(res);
+    //console.log("first");
+    //res.write(read);
+    //console.log("first");
     //res.sendFile(vidPath);
   } catch (e) {
     console.log("ChunkTest error", e.message);

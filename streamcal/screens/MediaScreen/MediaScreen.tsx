@@ -197,12 +197,10 @@ function SkipEpisode(
 }
 
 const MediaScreen = ({ route, navigation }: IMediaScreen) => {
-  const { Episode, Episodes, ContentTitle, ContentID, index, getSeason }: IMediaRouteParams =
-    route?.params;
+  const { Episode, ContentTitle, ContentID, getSeason }: IMediaRouteParams = route?.params;
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [isFullScreen, setFullScreen] = React.useState<any>(false);
-  //const [getImage, setImage] = React.useState<any>(null);
   const [getGeneratedImages, setGeneratedImages] = React.useState<any>([{}]);
   let generatedImages: IGeneratedImages[] = [];
 
@@ -216,7 +214,9 @@ const MediaScreen = ({ route, navigation }: IMediaScreen) => {
         (async () => {
           const videoRefStatus: any = await VideoRef.current?.getStatusAsync();
           const currentPosition = videoRefStatus?.positionMillis || 0;
-          await Server_AddWatchTime(ContentID, getSeason, Episode?.EpisodeNum, currentPosition);
+          const watched_Atleast_2Mins = currentPosition >= 120000;
+          if (watched_Atleast_2Mins)
+            await Server_AddWatchTime(ContentID, getSeason, Episode?.EpisodeNum, currentPosition);
 
           navigation?.goBack();
           return true;
