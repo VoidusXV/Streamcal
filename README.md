@@ -4,7 +4,7 @@ DEPRECATED!
 
 A Private Streaming-App using React Native as Frontend and Node.js & MongoDB as Backend.
 A Aniworld Scrapper is included in the C# .NET Framework Project. 
-You're able to host & manage the server on your own Home-PC and share Anime Series or Movie with your Friends.
+You're able to host & manage the server on your own Home-PC and share Anime Series or Movies with your Friends.
 
 ![Screenshot_1672884468](https://user-images.githubusercontent.com/117258295/210687011-70514281-61fd-4a3e-828e-783c9e985f10.png)
 ![Screenshot_1672884478](https://user-images.githubusercontent.com/117258295/210687014-5abca86f-6da6-4a0c-b132-7deb9084bbd9.png)
